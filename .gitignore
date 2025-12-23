@@ -1,0 +1,62 @@
+# Xcode
+*.xcuserstate
+*.xcworkspace
+xcuserdata/
+DerivedData/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+Package.resolved
+
+# CocoaPods
+Pods/
+
+# Carthage
+Carthage/Build/
+
+# Swift
+*.swp
+*~.nib
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# VS Code
+.vscode/
+
+# Claude Code
+.claude/
+
+# Build products
+build/
+*.app
+
+# Personal data (if you fork this repo)
+# Uncomment to ignore your personal configuration
+# Configuration/FamilyAccountsConfig.swift
+
+# CSV files
+*.csv
+
+# Database files
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

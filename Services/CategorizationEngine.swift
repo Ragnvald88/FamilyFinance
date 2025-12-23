@@ -226,28 +226,14 @@ class CategorizationEngine {
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    /// Clean and standardize counter party name
+    /// Clean and standardize counter party name.
+    /// Uses pre-compiled regex patterns for O(P) complexity instead of O(N×P).
+    /// See CleaningPatterns in ThreadSafeCategorization.swift for details.
     private func cleanCounterPartyName(_ name: String?) -> String? {
         guard let name = name, !name.isEmpty else { return nil }
 
-        var cleaned = name
-
-        // Remove store numbers (e.g., "ALBERT HEIJN 1308" → "Albert Heijn")
-        let patterns = [
-            #"\s+\d{2,}$"#,           // Trailing numbers
-            #"\s+[A-Z]{2}\d+$"#,      // Terminal codes like "EV822"
-            #"\s*\*\s*"#,             // Asterisks (CCV*Merchant)
-            #"^CCV\*"#,               // CCV prefix
-            #"^Zettle_\*"#,           // Zettle prefix
-            #"^BCK\*"#,               // BCK prefix
-        ]
-
-        for pattern in patterns {
-            if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive) {
-                let range = NSRange(cleaned.startIndex..<cleaned.endIndex, in: cleaned)
-                cleaned = regex.stringByReplacingMatches(in: cleaned, range: range, withTemplate: "")
-            }
-        }
+        // Use pre-compiled patterns - critical for performance with 15k+ transactions
+        let cleaned = CleaningPatterns.clean(name)
 
         // Capitalize properly
         return cleaned

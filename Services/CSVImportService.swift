@@ -115,7 +115,13 @@ struct ParsedTransaction: Sendable {
     }
 
     /// Unique key for duplicate detection
+    /// Format: "IBAN-YYYYMMDD-sequence" (matches Transaction.generateUniqueKey)
     var uniqueKey: String {
+        Transaction.generateUniqueKey(iban: iban, date: date, sequenceNumber: sequenceNumber)
+    }
+
+    /// Legacy unique key (for compatibility with v1.x databases)
+    var legacyUniqueKey: String {
         "\(iban)-\(sequenceNumber)"
     }
 
@@ -276,78 +282,37 @@ class CSVImportService: ObservableObject {
             )
         }
 
-        // Phase 2: Categorize transactions (uses cached rules - fast)
+        // Phase 2: Build rules cache (fast, on MainActor)
+        // This converts @Model rules to Sendable structs with pre-compiled regexes
         progress = CSVImportProgress(
             processedRows: 0,
             totalRows: allParsedTransactions.count,
-            currentFile: "Categorizing...",
+            currentFile: "Preparing categorization...",
             stage: .categorizing
         )
 
-        var categorizedTransactions: [CategorizedTransaction] = []
-        var categorizedCount = 0
-
-        for (index, parsed) in allParsedTransactions.enumerated() {
-            let result = await categorizationEngine.categorize(parsed)
-
-            categorizedTransactions.append(CategorizedTransaction(
-                parsed: parsed,
-                autoCategory: result.category,
-                standardizedName: result.standardizedName
-            ))
-
-            if result.category != nil {
-                categorizedCount += 1
-            }
-
-            // Update progress every 200 transactions
-            if (index + 1) % 200 == 0 {
-                progress = CSVImportProgress(
-                    processedRows: index + 1,
-                    totalRows: allParsedTransactions.count,
-                    currentFile: "Categorizing...",
-                    stage: .categorizing
-                )
-            }
+        let rulesCache: RulesCache
+        do {
+            rulesCache = try await categorizationEngine.buildRulesCache()
+        } catch {
+            // Fallback to hardcoded rules if database fetch fails
+            rulesCache = categorizationEngine.buildHardcodedRulesCache()
         }
 
-        // Phase 3: Convert to TransactionImportData and delegate to BackgroundDataHandler
+        // Phase 3: Delegate to BackgroundDataHandler for categorization + import
+        // CRITICAL: This moves the 15k-iteration loop OFF the MainActor!
         progress = CSVImportProgress(
             processedRows: 0,
-            totalRows: categorizedTransactions.count,
-            currentFile: "Saving to database...",
+            totalRows: allParsedTransactions.count,
+            currentFile: "Categorizing & saving...",
             stage: .saving
         )
 
-        let importData = categorizedTransactions.map { categorized -> TransactionImportData in
-            let parsed = categorized.parsed
-            return TransactionImportData(
-                iban: parsed.iban,
-                sequenceNumber: parsed.sequenceNumber,
-                date: parsed.date,
-                amount: parsed.amount,
-                balance: parsed.balance,
-                counterIBAN: parsed.counterIBAN,
-                counterName: parsed.counterName,
-                standardizedName: categorized.standardizedName,
-                description1: parsed.description1,
-                description2: parsed.description2,
-                description3: parsed.description3,
-                transactionCode: parsed.transactionCode,
-                valueDate: parsed.valueDate,
-                returnReason: parsed.returnReason,
-                mandateReference: parsed.mandateReference,
-                autoCategory: categorized.autoCategory,
-                transactionType: parsed.transactionType,
-                contributor: parsed.contributor,
-                sourceFile: parsed.sourceFile,
-                importBatchID: batchID
-            )
-        }
-
-        // Use BackgroundDataHandler for database operations (off main thread!)
         let handler = BackgroundDataHandler(modelContainer: modelContainer)
-        let importResult = try await handler.importTransactions(importData)
+        let importResult = try await handler.importWithCategorization(
+            allParsedTransactions,
+            rulesCache: rulesCache
+        )
 
         progress = CSVImportProgress(
             processedRows: importResult.imported,
@@ -364,8 +329,8 @@ class CSVImportService: ObservableObject {
             duplicates: importResult.duplicates,
             errors: errors,
             duration: duration,
-            categorized: categorizedCount,
-            uncategorized: totalRows - categorizedCount,
+            categorized: importResult.categorized,
+            uncategorized: importResult.uncategorized,
             batchID: batchID,
             filesProcessed: urls.count
         )

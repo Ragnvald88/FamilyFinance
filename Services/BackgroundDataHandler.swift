@@ -27,7 +27,7 @@ actor BackgroundDataHandler {
     /// This ensures fetchOrCreateAccount is atomic within a single import session.
     private var accountCache: [String: Account] = [:]
 
-    // MARK: - Import Result
+    // MARK: - Import Results
 
     /// Result of an import operation with detailed statistics.
     struct ImportResult: Sendable {
@@ -42,6 +42,27 @@ actor BackgroundDataHandler {
         }
     }
 
+    /// Extended result including categorization statistics.
+    /// Returned by importWithCategorization().
+    struct ImportResultWithCategorization: Sendable {
+        let imported: Int
+        let duplicates: Int
+        let errors: Int
+        let totalProcessed: Int
+        let categorized: Int
+        let uncategorized: Int
+
+        var successRate: Double {
+            guard totalProcessed > 0 else { return 0 }
+            return Double(imported) / Double(totalProcessed) * 100
+        }
+
+        var categorizationRate: Double {
+            guard totalProcessed > 0 else { return 0 }
+            return Double(categorized) / Double(totalProcessed) * 100
+        }
+    }
+
     // MARK: - Duplicate Detection Cache
 
     /// Pre-loaded unique keys for O(1) duplicate detection.
@@ -49,6 +70,66 @@ actor BackgroundDataHandler {
     private var existingUniqueKeys: Set<String> = []
 
     // MARK: - Transaction Import
+
+    /// Import transactions with categorization performed on background thread.
+    /// This is the preferred method - categorization happens inside the actor,
+    /// avoiding the MainActor bottleneck.
+    ///
+    /// - Parameters:
+    ///   - parsedTransactions: Array of parsed (uncategorized) transactions
+    ///   - rulesCache: Pre-built Sendable cache of categorization rules
+    /// - Returns: ImportResult with statistics including categorization counts
+    func importWithCategorization(
+        _ parsedTransactions: [ParsedTransaction],
+        rulesCache: RulesCache
+    ) async throws -> ImportResultWithCategorization {
+        let categorizer = BackgroundCategorizer(rulesCache: rulesCache)
+        var categorizedCount = 0
+
+        // Convert parsed transactions to import data with categorization
+        // This runs entirely on the background actor - no MainActor blocking!
+        let importData: [TransactionImportData] = parsedTransactions.map { parsed in
+            let result = categorizer.categorize(parsed)
+            if result.category != nil {
+                categorizedCount += 1
+            }
+
+            return TransactionImportData(
+                iban: parsed.iban,
+                sequenceNumber: parsed.sequenceNumber,
+                date: parsed.date,
+                amount: parsed.amount,
+                balance: parsed.balance,
+                counterIBAN: parsed.counterIBAN,
+                counterName: parsed.counterName,
+                standardizedName: result.standardizedName,
+                description1: parsed.description1,
+                description2: parsed.description2,
+                description3: parsed.description3,
+                transactionCode: parsed.transactionCode,
+                valueDate: parsed.valueDate,
+                returnReason: parsed.returnReason,
+                mandateReference: parsed.mandateReference,
+                autoCategory: result.category,
+                transactionType: parsed.transactionType,
+                contributor: parsed.contributor,
+                sourceFile: parsed.sourceFile,
+                importBatchID: nil
+            )
+        }
+
+        // Now import the categorized data
+        let baseResult = try await importTransactions(importData)
+
+        return ImportResultWithCategorization(
+            imported: baseResult.imported,
+            duplicates: baseResult.duplicates,
+            errors: baseResult.errors,
+            totalProcessed: baseResult.totalProcessed,
+            categorized: categorizedCount,
+            uncategorized: parsedTransactions.count - categorizedCount
+        )
+    }
 
     /// Import transactions from parsed CSV data with duplicate detection.
     /// - Parameter transactions: Array of transaction data to import
@@ -77,7 +158,12 @@ actor BackgroundDataHandler {
             for data in batch {
                 do {
                     // O(1) duplicate check using pre-loaded Set (critical performance fix)
-                    let uniqueKey = "\(data.iban)-\(data.sequenceNumber)"
+                    // Uses new format: IBAN-YYYYMMDD-sequence
+                    let uniqueKey = Transaction.generateUniqueKey(
+                        iban: data.iban,
+                        date: data.date,
+                        sequenceNumber: data.sequenceNumber
+                    )
                     if existingUniqueKeys.contains(uniqueKey) {
                         duplicateCount += 1
                         continue

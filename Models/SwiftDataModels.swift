@@ -35,7 +35,12 @@ final class Transaction {
     /// ⚠️ WARNING: Use `updateDate(_:)` method to modify - never set directly!
     @Attribute(.indexed) private(set) var date: Date
 
-    /// Unique constraint: IBAN + sequence number
+    /// Unique constraint: IBAN + date (YYYYMMDD) + sequence number
+    /// This prevents collisions if bank resets sequence numbers.
+    /// Format: "NL00BANK0123456001-20251223-42"
+    ///
+    /// **Migration Note:** If upgrading from v1.x where uniqueKey was "IBAN-sequence",
+    /// run DataIntegrityService.migrateUniqueKeys() on first launch.
     @Attribute(.unique) var uniqueKey: String
 
     // MARK: - Financial Data
@@ -250,7 +255,8 @@ final class Transaction {
         self.iban = iban
         self.sequenceNumber = sequenceNumber
         self.date = date
-        self.uniqueKey = "\(iban)-\(sequenceNumber)"
+        // New format: IBAN-YYYYMMDD-sequence (prevents collision if bank resets sequence numbers)
+        self.uniqueKey = Transaction.generateUniqueKey(iban: iban, date: date, sequenceNumber: sequenceNumber)
         self.amount = amount
         self.balance = balance
         self.counterIBAN = counterIBAN
@@ -328,6 +334,23 @@ final class Transaction {
         year = calendar.component(.year, from: date)
         month = calendar.component(.month, from: date)
         indexedCategory = effectiveCategory
+    }
+
+    // MARK: - Static Helpers
+
+    /// Generates a unique key for duplicate detection.
+    /// Format: "IBAN-YYYYMMDD-sequence" (e.g., "NL00BANK0123456001-20251223-42")
+    static func generateUniqueKey(iban: String, date: Date, sequenceNumber: Int) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMdd"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        let dateStr = dateFormatter.string(from: date)
+        return "\(iban)-\(dateStr)-\(sequenceNumber)"
+    }
+
+    /// Legacy unique key format (v1.x compatibility)
+    static func generateLegacyUniqueKey(iban: String, sequenceNumber: Int) -> String {
+        return "\(iban)-\(sequenceNumber)"
     }
 
     // MARK: - Split Management

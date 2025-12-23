@@ -279,6 +279,41 @@ class CategorizationEngine {
         cachedRules = []
         cacheLastUpdated = nil
     }
+
+    // MARK: - Thread-Safe Cache Building
+
+    /// Build a Sendable RulesCache for background processing.
+    /// This cache can be safely passed to BackgroundDataHandler.
+    ///
+    /// Usage:
+    /// ```swift
+    /// let cache = await categorizationEngine.buildRulesCache()
+    /// let result = await backgroundHandler.importWithCategorization(data, rulesCache: cache)
+    /// ```
+    func buildRulesCache() async throws -> RulesCache {
+        let rules = try await getActiveRules()
+
+        // Convert to Sendable CachedRule structs (includes regex pre-compilation)
+        let cachedRules = rules.map { CachedRule(from: $0) }
+
+        return RulesCache(rules: cachedRules, createdAt: Date())
+    }
+
+    /// Build cache from hardcoded rules only (no database access).
+    /// Useful for first-run or when database is empty.
+    func buildHardcodedRulesCache() -> RulesCache {
+        let cachedRules = DefaultRulesLoader.defaultRules.enumerated().map { (index, rule) in
+            CachedRule(
+                pattern: rule.pattern,
+                matchType: .contains,
+                standardizedName: rule.standardizedName,
+                targetCategory: rule.category,
+                priority: index
+            )
+        }
+
+        return RulesCache(rules: cachedRules, createdAt: Date())
+    }
 }
 
 // MARK: - Default Rules Loader

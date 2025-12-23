@@ -49,6 +49,13 @@ struct FamilyFinanceApp: App {
             let context = ModelContext(container)
             Task { @MainActor in
                 try? await initializeDefaultData(context: context)
+
+                // Phase 2.2: Run data integrity validation on startup
+                let integrityService = DataIntegrityService(modelContext: context)
+                let report = try? await integrityService.performStartupValidation()
+                if let report = report, report.hasIssues {
+                    print("Data integrity: \(report.summary)")
+                }
             }
 
             return container

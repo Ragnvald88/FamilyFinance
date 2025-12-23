@@ -142,8 +142,16 @@ struct CategorizedTransaction: Sendable {
 
 /// Service for importing Rabobank CSV files.
 ///
-/// **Architecture:** This service handles UI coordination and progress reporting.
-/// Heavy import work is delegated to BackgroundDataHandler to keep UI responsive.
+/// **Architecture (v2.1 - Fixed MainActor Blocking):**
+/// - `@Published` properties require MainActor for SwiftUI observation
+/// - CSV parsing runs in background via `nonisolated` methods
+/// - Progress updates hop to MainActor explicitly
+/// - Heavy categorization/import delegated to BackgroundDataHandler
+///
+/// **Why not full @MainActor?**
+/// CSV parsing (string operations on 15k rows) takes 200-500ms.
+/// Running this synchronously on MainActor freezes the UI.
+/// By making parsing `nonisolated`, we keep the UI responsive.
 ///
 /// **Usage:**
 /// ```swift
@@ -154,7 +162,7 @@ struct CategorizedTransaction: Sendable {
 @MainActor
 class CSVImportService: ObservableObject {
 
-    // MARK: - Published Properties
+    // MARK: - Published Properties (MainActor-bound for SwiftUI)
 
     @Published var isImporting = false
     @Published var progress: CSVImportProgress?
@@ -170,6 +178,14 @@ class CSVImportService: ObservableObject {
 
     /// Maximum file size for CSV import (50MB)
     static let maxFileSizeBytes = 50_000_000
+
+    /// Supported encodings for CSV files (try in order)
+    /// Made nonisolated static for background thread access
+    private static let supportedEncodings: [String.Encoding] = [
+        .isoLatin1,     // Primary encoding for Rabobank
+        .windowsCP1252, // Fallback for Windows
+        .utf8           // Modern fallback
+    ]
 
     /// Rabobank CSV column indices (26 columns total)
     private enum CSVColumn {
@@ -201,13 +217,6 @@ class CSVImportService: ObservableObject {
         static let exchangeRate = 25
     }
 
-    /// Supported encodings for CSV files (try in order)
-    private let supportedEncodings: [String.Encoding] = [
-        .isoLatin1,     // Primary encoding for Rabobank
-        .windowsCP1252, // Fallback for Windows
-        .utf8           // Modern fallback
-    ]
-
     // MARK: - Thread-Safe DateFormatter (static for safety)
 
     private static let dateFormatter: DateFormatter = {
@@ -228,7 +237,9 @@ class CSVImportService: ObservableObject {
     // MARK: - Public Import Methods
 
     /// Import multiple CSV files with progress tracking.
-    /// Uses BackgroundDataHandler for heavy work to keep UI responsive.
+    /// - CSV parsing runs in BACKGROUND (not MainActor) to keep UI responsive
+    /// - Progress updates hop to MainActor for SwiftUI
+    /// - Categorization + database writes run on BackgroundDataHandler actor
     func importFiles(_ urls: [URL]) async throws -> CSVImportResult {
         let startTime = Date()
         let batchID = UUID()
@@ -237,11 +248,8 @@ class CSVImportService: ObservableObject {
         lastError = nil
         defer { isImporting = false }
 
-        var totalRows = 0
-        var errors: [CSVImportError] = []
-        var allParsedTransactions: [ParsedTransaction] = []
-
-        // Phase 1: Parse all CSV files (on main thread - fast string parsing)
+        // Phase 1: Parse all CSV files in BACKGROUND
+        // This is the critical fix - parsing 15k rows no longer blocks UI
         progress = CSVImportProgress(
             processedRows: 0,
             totalRows: urls.count,
@@ -249,31 +257,16 @@ class CSVImportService: ObservableObject {
             stage: .reading
         )
 
-        for (index, url) in urls.enumerated() {
-            do {
-                progress = CSVImportProgress(
-                    processedRows: index,
-                    totalRows: urls.count,
-                    currentFile: url.lastPathComponent,
-                    stage: .reading
-                )
+        // Run parsing on background thread, collect results
+        let parsingResult = await parseFilesInBackground(urls)
 
-                let transactions = try parseCSVFile(url, sourceFile: url.lastPathComponent)
-                allParsedTransactions.append(contentsOf: transactions)
-                totalRows += transactions.count
-            } catch let error as CSVImportError {
-                errors.append(error)
-            } catch {
-                errors.append(.fileReadFailed(url.lastPathComponent, error.localizedDescription))
-            }
-        }
-
-        guard !allParsedTransactions.isEmpty else {
+        // Check for empty result
+        guard !parsingResult.transactions.isEmpty else {
             return CSVImportResult(
                 totalRows: 0,
                 imported: 0,
                 duplicates: 0,
-                errors: errors,
+                errors: parsingResult.errors,
                 duration: Date().timeIntervalSince(startTime),
                 categorized: 0,
                 uncategorized: 0,
@@ -282,11 +275,14 @@ class CSVImportService: ObservableObject {
             )
         }
 
-        // Phase 2: Build rules cache (fast, on MainActor)
-        // This converts @Model rules to Sendable structs with pre-compiled regexes
+        let allParsedTransactions = parsingResult.transactions
+        let totalRows = allParsedTransactions.count
+        let errors = parsingResult.errors
+
+        // Phase 2: Build rules cache (fast, on MainActor - needs ModelContext)
         progress = CSVImportProgress(
             processedRows: 0,
-            totalRows: allParsedTransactions.count,
+            totalRows: totalRows,
             currentFile: "Preparing categorization...",
             stage: .categorizing
         )
@@ -300,10 +296,9 @@ class CSVImportService: ObservableObject {
         }
 
         // Phase 3: Delegate to BackgroundDataHandler for categorization + import
-        // CRITICAL: This moves the 15k-iteration loop OFF the MainActor!
         progress = CSVImportProgress(
             processedRows: 0,
-            totalRows: allParsedTransactions.count,
+            totalRows: totalRows,
             currentFile: "Categorizing & saving...",
             stage: .saving
         )
@@ -336,10 +331,58 @@ class CSVImportService: ObservableObject {
         )
     }
 
-    // MARK: - CSV Parsing (Synchronous - fast string operations)
+    // MARK: - Background Parsing
+
+    /// Result of background parsing operation
+    private struct ParsingResult: Sendable {
+        let transactions: [ParsedTransaction]
+        let errors: [CSVImportError]
+    }
+
+    /// Parse all CSV files in background to avoid blocking MainActor.
+    /// Updates progress on MainActor via explicit hops.
+    private func parseFilesInBackground(_ urls: [URL]) async -> ParsingResult {
+        // Capture what we need for background work
+        let urlCount = urls.count
+
+        // Run parsing in detached task (off MainActor)
+        let result = await Task.detached(priority: .userInitiated) { [self] in
+            var transactions: [ParsedTransaction] = []
+            var errors: [CSVImportError] = []
+
+            for (index, url) in urls.enumerated() {
+                // Update progress on MainActor
+                await MainActor.run {
+                    self.progress = CSVImportProgress(
+                        processedRows: index,
+                        totalRows: urlCount,
+                        currentFile: url.lastPathComponent,
+                        stage: .reading
+                    )
+                }
+
+                do {
+                    // parseCSVFile is nonisolated - runs on this background thread
+                    let parsed = try Self.parseCSVFile(url, sourceFile: url.lastPathComponent)
+                    transactions.append(contentsOf: parsed)
+                } catch let error as CSVImportError {
+                    errors.append(error)
+                } catch {
+                    errors.append(.fileReadFailed(url.lastPathComponent, error.localizedDescription))
+                }
+            }
+
+            return ParsingResult(transactions: transactions, errors: errors)
+        }.value
+
+        return result
+    }
+
+    // MARK: - CSV Parsing (nonisolated static - runs on background thread)
 
     /// Parse a single CSV file with automatic encoding detection.
-    private func parseCSVFile(_ url: URL, sourceFile: String) throws -> [ParsedTransaction] {
+    /// Made `nonisolated static` to allow calling from background Task.detached
+    private nonisolated static func parseCSVFile(_ url: URL, sourceFile: String) throws -> [ParsedTransaction] {
         // Check file size before loading (prevent memory exhaustion)
         let fileAttributes = try? FileManager.default.attributesOfItem(atPath: url.path)
         if let fileSize = fileAttributes?[.size] as? Int, fileSize > Self.maxFileSizeBytes {
@@ -397,7 +440,7 @@ class CSVImportService: ObservableObject {
     }
 
     /// Parse a single CSV line using custom parser (handles Rabobank quirks).
-    private func parseCSVLine(_ line: String, rowNumber: Int, sourceFile: String) throws -> ParsedTransaction? {
+    private nonisolated static func parseCSVLine(_ line: String, rowNumber: Int, sourceFile: String) throws -> ParsedTransaction? {
         let fields = parseCSVFields(line)
 
         // Rabobank CSVs should have 22+ columns
@@ -484,7 +527,7 @@ class CSVImportService: ObservableObject {
 
     /// Parse CSV fields handling quoted strings and escaped quotes correctly.
     /// Handles: "field", "field with ""quotes""", empty fields, etc.
-    private func parseCSVFields(_ line: String) -> [String] {
+    private nonisolated static func parseCSVFields(_ line: String) -> [String] {
         var fields: [String] = []
         var currentField = ""
         var insideQuotes = false
@@ -525,10 +568,10 @@ class CSVImportService: ObservableObject {
         return fields
     }
 
-    // MARK: - Parsing Helpers
+    // MARK: - Parsing Helpers (nonisolated static)
 
     /// Parse Dutch number format (+1.234,56 → 1234.56).
-    private func parseDutchAmount(_ amountStr: String) -> Decimal {
+    private nonisolated static func parseDutchAmount(_ amountStr: String) -> Decimal {
         guard !amountStr.isEmpty else { return 0 }
 
         // Remove thousands separator (dot), replace decimal comma with dot, remove +
@@ -588,10 +631,10 @@ class CSVImportService: ObservableObject {
         return nil  // Valid
     }
 
-    // MARK: - Static Detection Methods
+    // MARK: - Static Detection Methods (nonisolated for background thread access)
 
     /// Determine transaction type based on amount and counter party.
-    static func determineTransactionType(
+    nonisolated static func determineTransactionType(
         amount: Decimal,
         counterIBAN: String,
         iban: String
@@ -614,7 +657,7 @@ class CSVImportService: ObservableObject {
     /// Detect contributor for Inleg tracking with improved pattern matching.
     /// Detect which family member made a contribution to the joint account.
     /// Customize the patterns in FamilyAccountsConfig.swift for your family.
-    static func detectContributor(
+    nonisolated static func detectContributor(
         counterIBAN: String,
         counterName: String,
         description: String,

@@ -9,7 +9,7 @@
 //
 
 import Foundation
-import SwiftData
+@preconcurrency import SwiftData
 
 // MARK: - Export Format
 

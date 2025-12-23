@@ -10,7 +10,7 @@
 //
 
 import Foundation
-import SwiftData
+@preconcurrency import SwiftData
 
 // MARK: - CSV Import Result (Extended)
 

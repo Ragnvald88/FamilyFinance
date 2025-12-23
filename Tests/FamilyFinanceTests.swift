@@ -9,7 +9,7 @@
 //
 
 import XCTest
-import SwiftData
+@preconcurrency import SwiftData
 @testable import FamilyFinance
 
 @MainActor
@@ -29,7 +29,10 @@ final class FamilyFinanceTests: XCTestCase {
             CategorizationRule.self,
             Merchant.self,
             BudgetPeriod.self,
-            Liability.self
+            Liability.self,
+            TransactionSplit.self,
+            RecurringTransaction.self,
+            TransactionAuditLog.self
         ])
 
         let config = ModelConfiguration(
@@ -53,7 +56,7 @@ final class FamilyFinanceTests: XCTestCase {
     // MARK: - Dutch Number Parsing Tests
 
     func testParseDutchAmountPositive() {
-        let parser = DutchNumberParser()
+        let parser = DutchNumberParserHelper()
 
         XCTAssertEqual(parser.parse("+1.234,56"), Decimal(string: "1234.56"))
         XCTAssertEqual(parser.parse("+10,00"), Decimal(string: "10.00"))
@@ -61,14 +64,14 @@ final class FamilyFinanceTests: XCTestCase {
     }
 
     func testParseDutchAmountNegative() {
-        let parser = DutchNumberParser()
+        let parser = DutchNumberParserHelper()
 
         XCTAssertEqual(parser.parse("-1.234,56"), Decimal(string: "-1234.56"))
         XCTAssertEqual(parser.parse("-10,00"), Decimal(string: "-10.00"))
     }
 
     func testParseDutchAmountEdgeCases() {
-        let parser = DutchNumberParser()
+        let parser = DutchNumberParserHelper()
 
         XCTAssertEqual(parser.parse(""), Decimal.zero)
         XCTAssertEqual(parser.parse("0,00"), Decimal.zero)
@@ -77,7 +80,7 @@ final class FamilyFinanceTests: XCTestCase {
     }
 
     func testParseDutchAmountLargeNumbers() {
-        let parser = DutchNumberParser()
+        let parser = DutchNumberParserHelper()
 
         XCTAssertEqual(parser.parse("+100.000,00"), Decimal(string: "100000.00"))
         XCTAssertEqual(parser.parse("-1.000.000,50"), Decimal(string: "-1000000.50"))
@@ -180,6 +183,10 @@ final class FamilyFinanceTests: XCTestCase {
             description1: nil,
             description2: nil,
             description3: nil,
+            transactionCode: nil,
+            valueDate: nil,
+            returnReason: nil,
+            mandateReference: nil,
             transactionType: .expense,
             contributor: nil,
             sourceFile: "test.csv"
@@ -372,11 +379,14 @@ final class FamilyFinanceTests: XCTestCase {
         )
         modelContext.insert(account)
 
+        // Use fixed dates for deterministic unique keys
+        let baseDate = Date(timeIntervalSince1970: 1735084800) // 2024-12-25
+
         // Add transactions with different dates
         let t1 = Transaction(
             iban: "NL00TEST0000000001",
             sequenceNumber: 1,
-            date: Date().addingTimeInterval(-86400 * 5), // 5 days ago
+            date: baseDate.addingTimeInterval(-86400 * 5), // 5 days before
             amount: 100,
             balance: 100,
             transactionType: .income
@@ -387,7 +397,7 @@ final class FamilyFinanceTests: XCTestCase {
         let t2 = Transaction(
             iban: "NL00TEST0000000001",
             sequenceNumber: 2,
-            date: Date().addingTimeInterval(-86400 * 3), // 3 days ago
+            date: baseDate.addingTimeInterval(-86400 * 3), // 3 days before
             amount: -50,
             balance: 50,
             transactionType: .expense
@@ -398,7 +408,7 @@ final class FamilyFinanceTests: XCTestCase {
         let t3 = Transaction(
             iban: "NL00TEST0000000001",
             sequenceNumber: 3,
-            date: Date(), // Today (most recent)
+            date: baseDate, // Most recent (the base date itself)
             amount: 200,
             balance: 250,
             transactionType: .income
@@ -408,6 +418,9 @@ final class FamilyFinanceTests: XCTestCase {
 
         try modelContext.save()
 
+        // Need to refresh balance from transactions (cached balance mechanism)
+        account.refreshBalance()
+
         // Current balance should be from most recent transaction
         XCTAssertEqual(account.currentBalance, 250)
     }
@@ -415,10 +428,13 @@ final class FamilyFinanceTests: XCTestCase {
     // MARK: - Duplicate Detection Tests
 
     func testDuplicateDetection() throws {
+        // Use a fixed date for deterministic unique keys
+        let testDate = Date(timeIntervalSince1970: 1735084800) // 2024-12-25
+
         let t1 = Transaction(
             iban: "NL00TEST0000000001",
             sequenceNumber: 1,
-            date: Date(),
+            date: testDate,
             amount: 100,
             balance: 100,
             transactionType: .income
@@ -427,26 +443,31 @@ final class FamilyFinanceTests: XCTestCase {
 
         try modelContext.save()
 
-        // Try to insert duplicate
+        // SwiftData with @Attribute(.unique) performs upsert on conflict
+        // So inserting a duplicate should result in only 1 transaction
         let t2 = Transaction(
             iban: "NL00TEST0000000001",
             sequenceNumber: 1, // Same sequence number
-            date: Date(),
-            amount: 100,
-            balance: 100,
+            date: testDate,    // Same date = same unique key
+            amount: 200,       // Different amount
+            balance: 200,
             transactionType: .income
         )
+        modelContext.insert(t2)
+        try modelContext.save()
 
-        // Should fail due to unique constraint
-        XCTAssertThrowsError(try {
-            modelContext.insert(t2)
-            try modelContext.save()
-        }())
+        // Should only have 1 transaction (upsert replaced the first)
+        let descriptor = FetchDescriptor<Transaction>()
+        let fetched = try modelContext.fetch(descriptor)
+        XCTAssertEqual(fetched.count, 1)
     }
 
     // MARK: - Net Worth Calculation Tests
 
     func testNetWorthCalculation() async throws {
+        // Use fixed date for deterministic unique keys
+        let testDate = Date(timeIntervalSince1970: 1735084800) // 2024-12-25
+
         // Create accounts with balances
         let account1 = Account(
             iban: "NL00TEST0000000001",
@@ -459,7 +480,7 @@ final class FamilyFinanceTests: XCTestCase {
         let t1 = Transaction(
             iban: "NL00TEST0000000001",
             sequenceNumber: 1,
-            date: Date(),
+            date: testDate,
             amount: 5000,
             balance: 5000,
             transactionType: .income
@@ -478,7 +499,7 @@ final class FamilyFinanceTests: XCTestCase {
         let t2 = Transaction(
             iban: "NL00TEST0000000002",
             sequenceNumber: 1,
-            date: Date(),
+            date: testDate,
             amount: 10000,
             balance: 10000,
             transactionType: .income
@@ -491,11 +512,15 @@ final class FamilyFinanceTests: XCTestCase {
             name: "Mortgage",
             type: .mortgage,
             amount: 300000,
-            startDate: Date()
+            startDate: testDate
         )
         modelContext.insert(liability)
 
         try modelContext.save()
+
+        // Refresh account balances from transactions
+        account1.refreshBalance()
+        account2.refreshBalance()
 
         let queryService = TransactionQueryService(modelContext: modelContext)
         let netWorth = try await queryService.getNetWorth()
@@ -508,8 +533,8 @@ final class FamilyFinanceTests: XCTestCase {
 
 // MARK: - Test Helper Classes
 
-/// Helper for testing Dutch number parsing
-class DutchNumberParser {
+/// Helper for testing Dutch number parsing (named differently to avoid conflict)
+class DutchNumberParserHelper {
     func parse(_ string: String) -> Decimal? {
         guard !string.isEmpty else { return Decimal.zero }
 
@@ -528,16 +553,36 @@ class CSVFieldParser {
         var fields: [String] = []
         var currentField = ""
         var insideQuotes = false
+        var i = line.startIndex
 
-        for char in line {
+        while i < line.endIndex {
+            let char = line[i]
+
             if char == "\"" {
-                insideQuotes.toggle()
+                if insideQuotes {
+                    // Check if next char is also a quote (escaped quote)
+                    let nextIndex = line.index(after: i)
+                    if nextIndex < line.endIndex && line[nextIndex] == "\"" {
+                        // Escaped quote ("") - append a literal quote
+                        currentField.append("\"")
+                        i = line.index(after: nextIndex) // Skip both quotes
+                        continue
+                    } else {
+                        // End of quoted field
+                        insideQuotes = false
+                    }
+                } else {
+                    // Start of quoted field
+                    insideQuotes = true
+                }
             } else if char == "," && !insideQuotes {
                 fields.append(currentField)
                 currentField = ""
             } else {
                 currentField.append(char)
             }
+
+            i = line.index(after: i)
         }
 
         fields.append(currentField)
@@ -559,26 +604,26 @@ class RabobankDateParser {
 /// Helper for testing contributor detection
 class ContributorDetector {
     private let partner1IBAN = "NL00TEST0000000003"
-    private let partner2IBANPrefixes = ["NL00TEST00000040", "NL00TEST00000050"]
+    private let partner2IBAN = "NL00TEST0000000004"
 
     func detect(counterIBAN: String, counterName: String, sourceIBAN: String) -> Contributor? {
         let nameLower = counterName.lowercased()
 
+        // IBAN-based detection (most reliable)
         if counterIBAN == partner1IBAN {
             return .partner1
         }
-
-        for prefix in partner2IBANPrefixes {
-            if counterIBAN.hasPrefix(prefix) {
-                return .partner2
-            }
-        }
-
-        if nameLower.contains("smith") || nameLower.contains("a.h. smith") {
+        if counterIBAN == partner2IBAN {
             return .partner2
         }
 
-        if nameLower.contains("doe") && nameLower.prefix(10).contains("r.") {
+        // Name-based detection (fallback)
+        if nameLower.contains("smith") {
+            return .partner2
+        }
+
+        // Match "doe" for partner1 (J. Doe, R. Doe, etc.)
+        if nameLower.contains("doe") {
             return .partner1
         }
 

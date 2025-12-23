@@ -24,7 +24,6 @@ struct DashboardView: View {
     @StateObject private var viewModel: DashboardViewModel
     @State private var selectedYear: Int
     @State private var selectedMonth: Int = 0 // 0 = all months
-    @State private var isLoading = false
 
     // MARK: - Initialization
 
@@ -37,31 +36,46 @@ struct DashboardView: View {
     // MARK: - Body
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                // Header with filters
-                headerSection
+        ZStack {
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Header with filters
+                    headerSection
 
-                // Main KPIs
-                kpiCardsSection
+                    // Main KPIs
+                    kpiCardsSection
 
-                // Charts section
-                chartsSection
+                    // Charts section
+                    chartsSection
 
-                // Category breakdown
-                categorySection
+                    // Category breakdown
+                    categorySection
 
-                // Accounts overview
-                accountsSection
+                    // Accounts overview
+                    accountsSection
 
-                // Net worth
-                netWorthSection
+                    // Net worth
+                    netWorthSection
 
-                Spacer(minLength: 40)
+                    Spacer(minLength: 40)
+                }
+                .padding(24)
             }
-            .padding(24)
+            .background(Color(nsColor: .windowBackgroundColor))
+
+            // Loading overlay
+            if viewModel.isLoading {
+                Color.black.opacity(0.1)
+                    .ignoresSafeArea()
+                    .overlay {
+                        ProgressView("Loading...")
+                            .padding(24)
+                            .background(Color(nsColor: .controlBackgroundColor))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .shadow(radius: 4)
+                    }
+            }
         }
-        .background(Color(nsColor: .windowBackgroundColor))
         .task {
             await loadData()
         }
@@ -70,6 +84,14 @@ struct DashboardView: View {
         }
         .onChange(of: selectedMonth) { _, _ in
             Task { await loadData() }
+        }
+        .alert("Error", isPresented: .init(
+            get: { viewModel.errorMessage != nil },
+            set: { if !$0 { viewModel.dismissError() } }
+        )) {
+            Button("OK") { viewModel.dismissError() }
+        } message: {
+            Text(viewModel.errorMessage ?? "An unknown error occurred")
         }
     }
 
@@ -114,7 +136,7 @@ struct DashboardView: View {
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
-            .disabled(isLoading)
+            .disabled(viewModel.isLoading)
         }
         .padding(.bottom, 8)
     }
@@ -179,14 +201,14 @@ struct DashboardView: View {
                             y: .value("Income", Double(truncating: trend.income as NSNumber))
                         )
                         .foregroundStyle(.green)
-                        .symbol(Circle())
+                        .symbol(.circle)
 
                         LineMark(
                             x: .value("Month", trend.monthName),
                             y: .value("Expenses", Double(truncating: trend.expenses as NSNumber))
                         )
                         .foregroundStyle(.red)
-                        .symbol(Square())
+                        .symbol(.square)
                     }
                     .frame(height: 200)
                     .chartYAxis {
@@ -355,9 +377,6 @@ struct DashboardView: View {
     // MARK: - Helper Methods
 
     private func loadData() async {
-        isLoading = true
-        defer { isLoading = false }
-
         let filter = TransactionFilter(
             year: selectedYear,
             month: selectedMonth > 0 ? selectedMonth : nil
@@ -540,6 +559,8 @@ class DashboardViewModel: ObservableObject {
     @Published var monthlyTrends: [MonthlyTrend]?
     @Published var accountBalances: [AccountBalance]?
     @Published var netWorth: NetWorth?
+    @Published var errorMessage: String?
+    @Published var isLoading = false
 
     // MARK: - Dependencies
 
@@ -554,20 +575,35 @@ class DashboardViewModel: ObservableObject {
     // MARK: - Data Loading
 
     func loadData(filter: TransactionFilter, year: Int) async {
-        async let kpisTask = queryService.getDashboardKPIs(filter: filter)
-        async let categoriesTask = queryService.getCategorySummaries(filter: filter)
-        async let trendsTask = queryService.getMonthlyTrends(year: year)
-        async let accountsTask = queryService.getAccountBalances()
-        async let netWorthTask = queryService.getNetWorth()
+        isLoading = true
+        errorMessage = nil
 
+        // Use structured concurrency with proper error handling for each task
         do {
+            // Run all queries concurrently
+            async let kpisTask = queryService.getDashboardKPIs(filter: filter)
+            async let categoriesTask = queryService.getCategorySummaries(filter: filter)
+            async let trendsTask = queryService.getMonthlyTrends(year: year)
+            async let accountsTask = queryService.getAccountBalances()
+            async let netWorthTask = queryService.getNetWorth()
+
+            // Await results
             kpis = try await kpisTask
             categorySummaries = try await categoriesTask
             monthlyTrends = try await trendsTask
             accountBalances = try await accountsTask
             netWorth = try await netWorthTask
+
         } catch {
-            print("Error loading dashboard data: \(error)")
+            errorMessage = "Failed to load dashboard data: \(error.localizedDescription)"
+            print("Dashboard loading error: \(error)")
         }
+
+        isLoading = false
+    }
+
+    /// Clear error message
+    func dismissError() {
+        errorMessage = nil
     }
 }

@@ -9,7 +9,7 @@
 //
 
 import Foundation
-import SwiftData
+@preconcurrency import SwiftData
 
 // MARK: - Query Filters
 
@@ -611,14 +611,19 @@ class TransactionQueryService: ObservableObject {
     }
 
     /// Fetch budgets for given period
+    /// Note: SwiftData predicates don't support nil-coalescing (??) inside the closure,
+    /// so we must compute the monthValue outside and capture it properly.
     private func fetchBudgets(year: Int?, month: Int?) async throws -> [String: Decimal] {
         // First try to get period-specific budgets
         var budgets: [String: Decimal] = [:]
 
         if let year = year {
+            // Compute month value OUTSIDE predicate (SwiftData limitation)
+            let monthValue = month ?? 0
+
             let descriptor = FetchDescriptor<BudgetPeriod>(
                 predicate: #Predicate<BudgetPeriod> { budget in
-                    budget.year == year && (budget.month == (month ?? 0))
+                    budget.year == year && budget.month == monthValue
                 }
             )
 

@@ -1,5 +1,5 @@
 import XCTest
-import SwiftData
+@preconcurrency import SwiftData
 @testable import FamilyFinance
 
 /// Unit tests for the core data models following TDD approach.
@@ -37,10 +37,14 @@ final class TransactionModelTests: XCTestCase {
 
     /// Test that a Transaction can be initialized with all required fields
     func testTransactionInitialization() throws {
+        // Use a fixed date for deterministic unique key
+        let testDate = Date(timeIntervalSince1970: 1735084800) // 2024-12-25
+        let expectedKey = "NL00TEST0000000001-20241225-12345"
+
         let transaction = Transaction(
             iban: "NL00TEST0000000001",
             sequenceNumber: 12345,
-            date: Date(),
+            date: testDate,
             amount: Decimal(string: "-45.50")!,
             balance: Decimal(string: "1234.56")!,
             counterIBAN: "NL00TEST0000000099",
@@ -50,7 +54,7 @@ final class TransactionModelTests: XCTestCase {
             transactionType: .expense
         )
 
-        XCTAssertEqual(transaction.uniqueKey, "NL00TEST0000000001-12345")
+        XCTAssertEqual(transaction.uniqueKey, expectedKey)
         XCTAssertEqual(transaction.iban, "NL00TEST0000000001")
         XCTAssertEqual(transaction.autoCategory, "Boodschappen")
         XCTAssertEqual(transaction.transactionType, .expense)
@@ -77,10 +81,14 @@ final class TransactionModelTests: XCTestCase {
 
     /// Test that Transaction can be saved to SwiftData context
     func testTransactionPersistence() throws {
+        // Use a fixed date for deterministic unique key
+        let testDate = Date(timeIntervalSince1970: 1735084800) // 2024-12-25
+        let expectedKey = "NL00TEST0000000001-20241225-99999"
+
         let transaction = Transaction(
             iban: "NL00TEST0000000001",
             sequenceNumber: 99999,
-            date: Date(),
+            date: testDate,
             amount: Decimal(string: "-32.10")!,
             balance: Decimal(string: "1000.00")!,
             counterName: "Jumbo",
@@ -96,7 +104,7 @@ final class TransactionModelTests: XCTestCase {
         let fetched = try modelContext.fetch(descriptor)
 
         XCTAssertEqual(fetched.count, 1)
-        XCTAssertEqual(fetched.first?.uniqueKey, "NL00TEST0000000001-99999")
+        XCTAssertEqual(fetched.first?.uniqueKey, expectedKey)
     }
 
     /// Test effectiveCategory returns override when set, otherwise auto category
@@ -244,16 +252,11 @@ final class TransactionModelTests: XCTestCase {
             transactionType: .expense
         )
 
-        // Simulate direct date modification (BAD - but might happen)
-        transaction.date = Calendar.current.date(from: DateComponents(year: 2023, month: 3, day: 1))!
+        // Test that updateDate correctly syncs denormalized fields
+        let newDate = Calendar.current.date(from: DateComponents(year: 2023, month: 3, day: 1))!
+        transaction.updateDate(newDate)
 
-        // At this point year/month are stale
-        XCTAssertEqual(transaction.year, 2025) // Still old value
-        XCTAssertEqual(transaction.month, 6)   // Still old value
-
-        // Sync should fix this
-        transaction.syncDenormalizedFields()
-
+        // Year/month should now match the new date
         XCTAssertEqual(transaction.year, 2023)
         XCTAssertEqual(transaction.month, 3)
         XCTAssertEqual(transaction.indexedCategory, "Boodschappen")
@@ -300,7 +303,7 @@ final class TransactionModelTests: XCTestCase {
         modelContext.insert(category)
         try modelContext.save()
 
-        let descriptor = FetchDescriptor<Category>()
+        let descriptor = FetchDescriptor<FamilyFinance.Category>()
         let fetched = try modelContext.fetch(descriptor)
 
         XCTAssertEqual(fetched.count, 1)
@@ -351,10 +354,10 @@ final class TransactionModelTests: XCTestCase {
     func testRuleMatchingContains() {
         let rule = CategorizationRule(
             pattern: "albert heijn",
+            matchType: .contains,
             standardizedName: "Albert Heijn",
             targetCategory: "Boodschappen",
-            priority: 1,
-            matchType: .contains
+            priority: 1
         )
 
         XCTAssertTrue(rule.matches("ALBERT HEIJN 1234"))
@@ -366,10 +369,10 @@ final class TransactionModelTests: XCTestCase {
     func testRuleMatchingExact() {
         let rule = CategorizationRule(
             pattern: "albert heijn",
+            matchType: .exact,
             standardizedName: "Albert Heijn",
             targetCategory: "Boodschappen",
-            priority: 1,
-            matchType: .exact
+            priority: 1
         )
 
         XCTAssertTrue(rule.matches("Albert Heijn"))
@@ -380,10 +383,10 @@ final class TransactionModelTests: XCTestCase {
     func testInactiveRuleNoMatch() {
         let rule = CategorizationRule(
             pattern: "albert heijn",
+            matchType: .contains,
             standardizedName: "Albert Heijn",
             targetCategory: "Boodschappen",
             priority: 1,
-            matchType: .contains,
             isActive: false
         )
 

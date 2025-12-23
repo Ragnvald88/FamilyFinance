@@ -10,7 +10,7 @@
 //
 
 import Foundation
-import SwiftData
+@preconcurrency import SwiftData
 
 /// Repository for account operations with caching.
 ///

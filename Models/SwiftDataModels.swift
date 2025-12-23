@@ -11,7 +11,7 @@
 //
 
 import Foundation
-import SwiftData
+@preconcurrency import SwiftData
 
 // MARK: - Transaction Model
 
@@ -25,15 +25,15 @@ final class Transaction {
 
     // MARK: - Primary Identifiers
 
-    /// Rabobank IBAN (indexed for fast account filtering)
-    @Attribute(.indexed) var iban: String
+    /// Rabobank IBAN
+    var iban: String
 
     /// Sequence number from CSV (Volgnr)
     var sequenceNumber: Int
 
-    /// Transaction date (indexed for date range queries)
+    /// Transaction date
     /// ⚠️ WARNING: Use `updateDate(_:)` method to modify - never set directly!
-    @Attribute(.indexed) private(set) var date: Date
+    private(set) var date: Date
 
     /// Unique constraint: IBAN + date (YYYYMMDD) + sequence number
     /// This prevents collisions if bank resets sequence numbers.
@@ -135,12 +135,12 @@ final class Transaction {
         return autoCategory ?? "Niet Gecategoriseerd"
     }
 
-    /// Stored category for indexing (updated when autoCategory or categoryOverride changes)
+    /// Stored category for queries (updated when autoCategory or categoryOverride changes)
     /// Use this for queries, use effectiveCategory for display
-    @Attribute(.indexed) var indexedCategory: String
+    var indexedCategory: String
 
-    /// Transaction type (indexed for income/expense filtering)
-    @Attribute(.indexed) var transactionType: TransactionType
+    /// Transaction type for income/expense filtering
+    var transactionType: TransactionType
 
     // MARK: - Inleg (Contribution) Tracking
 
@@ -149,12 +149,12 @@ final class Transaction {
 
     // MARK: - Denormalized Date Fields (for query performance)
 
-    /// Year of transaction (indexed for efficient predicates)
+    /// Year of transaction for efficient predicates
     /// Avoids Calendar.current.component() in queries which causes O(n) scans
-    @Attribute(.indexed) var year: Int
+    var year: Int
 
-    /// Month of transaction (1-12, indexed for efficient predicates)
-    @Attribute(.indexed) var month: Int
+    /// Month of transaction (1-12) for efficient predicates
+    var month: Int
 
     /// Is this an income transaction?
     var isIncome: Bool {
@@ -180,7 +180,7 @@ final class Transaction {
     /// Split components for multi-category transactions (e.g., grocery receipt with produce + toiletries)
     /// If empty, transaction is unsplit and uses effectiveCategory
     /// NOTE: Cascade deletes splits when transaction is deleted
-    @Relationship(deleteRule: .cascade)
+    @Relationship(deleteRule: .cascade, inverse: \TransactionSplit.parentTransaction)
     var splits: [TransactionSplit]?
 
     /// Linked recurring transaction (if this is an instance of a recurring pattern)
@@ -361,16 +361,14 @@ final class Transaction {
     func createSplit(_ components: [(category: String, amount: Decimal)]) throws {
         // Validate sum matches transaction amount (with tolerance for decimal rounding)
         let sum = components.reduce(Decimal.zero) { $0 + $1.amount }
-        let tolerance = Decimal(string: "0.01")!  // Allow 1 cent tolerance for rounding errors
+        // Safe Decimal literal: 0.01 = 1 * 10^-2
+        let tolerance = Decimal(sign: .plus, exponent: -2, significand: 1)
         let difference = abs(sum - amount)
         guard difference <= tolerance else {
             throw SplitError.amountMismatch(expected: amount, actual: sum)
         }
 
-        // Clear existing splits
-        splits?.forEach { split in
-            // Mark for deletion - SwiftData will handle cascade
-        }
+        // Clear existing splits - SwiftData handles cascade deletion automatically
         splits = []
 
         // Create new splits
@@ -919,7 +917,7 @@ final class BudgetPeriod {
 final class TransactionSplit {
 
     /// The category this split portion belongs to
-    @Attribute(.indexed) var category: String
+    var category: String
 
     /// The amount allocated to this category (should be negative for expenses)
     var amount: Decimal
@@ -936,7 +934,7 @@ final class TransactionSplit {
     // MARK: - Relationships
 
     /// The parent transaction this split belongs to
-    /// NOTE: No inverse specified to avoid cascade/nullify conflict with Transaction.splits
+    @Relationship(deleteRule: .nullify)
     var parentTransaction: Transaction?
 
     // MARK: - Computed Properties
@@ -979,7 +977,7 @@ final class RecurringTransaction {
     var name: String
 
     /// Expected category
-    @Attribute(.indexed) var category: String
+    var category: String
 
     /// Expected amount (positive for income, negative for expenses)
     var expectedAmount: Decimal
@@ -991,7 +989,7 @@ final class RecurringTransaction {
     var expectedDay: Int?
 
     /// Next expected date
-    @Attribute(.indexed) var nextDueDate: Date
+    var nextDueDate: Date
 
     /// Is this recurring transaction still active?
     var isActive: Bool

@@ -10,7 +10,7 @@
 //
 
 import Foundation
-import SwiftData
+@preconcurrency import SwiftData
 
 // MARK: - Categorization Result
 
@@ -157,14 +157,15 @@ class CategorizationEngine {
 
     /// Bulk recategorization for all uncategorized transactions
     func recategorizeUncategorized() async throws -> Int {
-        let descriptor = FetchDescriptor<Transaction>(
-            predicate: #Predicate<Transaction> { transaction in
-                transaction.categoryOverride == nil &&
-                (transaction.autoCategory == nil || transaction.autoCategory == "Niet Gecategoriseerd")
-            }
-        )
+        // Simple predicate - fetch transactions without category override
+        let noOverridePredicate = #Predicate<Transaction> { $0.categoryOverride == nil }
+        let descriptor = FetchDescriptor<Transaction>(predicate: noOverridePredicate)
 
-        let uncategorized = try modelContext.fetch(descriptor)
+        // Filter in memory for complex conditions
+        let allNoOverride = try modelContext.fetch(descriptor)
+        let uncategorized = allNoOverride.filter { tx in
+            tx.autoCategory == nil || tx.autoCategory == "Niet Gecategoriseerd"
+        }
         var recategorizedCount = 0
 
         for transaction in uncategorized {
@@ -360,7 +361,8 @@ class DefaultRulesLoader {
 
     /// Match against hardcoded rules without database access.
     /// Used as fallback when database rules aren't loaded yet.
-    static func matchHardcodedRule(searchText: String) -> (category: String, standardizedName: String, pattern: String)? {
+    /// Note: nonisolated to allow calling from background threads
+    nonisolated static func matchHardcodedRule(searchText: String) -> (category: String, standardizedName: String, pattern: String)? {
         let lowerText = searchText.lowercased()
 
         for rule in defaultRules {

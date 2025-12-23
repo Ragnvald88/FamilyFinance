@@ -9,10 +9,17 @@
 //
 
 import SwiftUI
-import SwiftData
+@preconcurrency import SwiftData
 
 @main
 struct FamilyFinanceApp: App {
+
+    // MARK: - Environment Detection
+
+    /// Check if running in unit test environment
+    private static var isRunningTests: Bool {
+        NSClassFromString("XCTestCase") != nil
+    }
 
     // MARK: - SwiftData Container
 
@@ -33,9 +40,12 @@ struct FamilyFinanceApp: App {
             TransactionAuditLog.self
         ])
 
+        // Use in-memory database for tests to avoid file system issues
+        let isInMemory = isRunningTests
+
         let modelConfiguration = ModelConfiguration(
             schema: schema,
-            isStoredInMemoryOnly: false,
+            isStoredInMemoryOnly: isInMemory,
             allowsSave: true
         )
 
@@ -45,16 +55,18 @@ struct FamilyFinanceApp: App {
                 configurations: [modelConfiguration]
             )
 
-            // Initialize default data on first launch
-            let context = ModelContext(container)
-            Task { @MainActor in
-                try? await initializeDefaultData(context: context)
+            // Skip initialization for tests - they manage their own data
+            if !isRunningTests {
+                let context = ModelContext(container)
+                Task { @MainActor in
+                    try? await initializeDefaultData(context: context)
 
-                // Phase 2.2: Run data integrity validation on startup
-                let integrityService = DataIntegrityService(modelContext: context)
-                let report = try? await integrityService.performStartupValidation()
-                if let report = report, report.hasIssues {
-                    print("Data integrity: \(report.summary)")
+                    // Phase 2.2: Run data integrity validation on startup
+                    let integrityService = DataIntegrityService(modelContext: context)
+                    let report = try? await integrityService.performStartupValidation()
+                    if let report = report, report.hasIssues {
+                        print("Data integrity: \(report.summary)")
+                    }
                 }
             }
 
@@ -288,6 +300,8 @@ struct ContentView: View {
             DashboardViewWrapper()
         case .transactions:
             TransactionsListView()
+        case .transfers:
+            TransfersListView()
         case .categories:
             CategoriesListView()
         case .budgets:
@@ -307,26 +321,46 @@ struct ContentView: View {
 // MARK: - View Wrappers (Handle Service Initialization)
 
 /// Wrapper to initialize DashboardView with required services
+/// Uses @State to avoid recreating services on each render (fixes state mutation warning)
 struct DashboardViewWrapper: View {
     @Environment(\.modelContext) private var modelContext
+    @State private var queryService: TransactionQueryService?
 
     var body: some View {
-        let queryService = TransactionQueryService(modelContext: modelContext)
-        DashboardView(queryService: queryService)
+        Group {
+            if let service = queryService {
+                DashboardView(queryService: service)
+            } else {
+                ProgressView("Loading...")
+                    .onAppear {
+                        queryService = TransactionQueryService(modelContext: modelContext)
+                    }
+            }
+        }
     }
 }
 
 /// Wrapper to initialize ImportView with required services
+/// Uses @State to avoid recreating services on each render (fixes state mutation warning)
 struct ImportViewWrapper: View {
     @Environment(\.modelContext) private var modelContext
+    @State private var importService: CSVImportService?
 
     var body: some View {
-        let categorizationEngine = CategorizationEngine(modelContext: modelContext)
-        let importService = CSVImportService(
-            modelContainer: modelContext.container,
-            categorizationEngine: categorizationEngine
-        )
-        CSVImportView(importService: importService)
+        Group {
+            if let service = importService {
+                CSVImportView(importService: service)
+            } else {
+                ProgressView("Loading...")
+                    .onAppear {
+                        let categorizationEngine = CategorizationEngine(modelContext: modelContext)
+                        importService = CSVImportService(
+                            modelContainer: modelContext.container,
+                            categorizationEngine: categorizationEngine
+                        )
+                    }
+            }
+        }
     }
 }
 
@@ -485,6 +519,9 @@ struct SidebarView: View {
                 Label("Transactions", systemImage: "list.bullet.rectangle.fill")
                     .tag(AppTab.transactions)
 
+                Label("Transfers", systemImage: "arrow.left.arrow.right")
+                    .tag(AppTab.transfers)
+
                 Label("Merchants", systemImage: "building.2.fill")
                     .tag(AppTab.merchants)
             }
@@ -524,6 +561,7 @@ class AppState: ObservableObject {
 enum AppTab: Hashable {
     case dashboard
     case transactions
+    case transfers
     case categories
     case budgets
     case accounts
@@ -537,14 +575,22 @@ enum AppTab: Hashable {
 struct TransactionsListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Transaction.date, order: .reverse) private var transactions: [Transaction]
+    @Query(sort: \Account.iban) private var accounts: [Account]
+    @Query(sort: \Category.sortOrder) private var categories: [Category]
 
     @State private var searchText = ""
     @State private var selectedType: TransactionType? = nil
     @State private var selectedCategory: String? = nil
     @State private var selectedTransaction: Transaction?
+    @State private var showingAddSheet = false
+    @State private var showingDeleteConfirmation = false
+    @State private var transactionToDelete: Transaction?
 
     private var filteredTransactions: [Transaction] {
         transactions.filter { transaction in
+            // Exclude transfers from this view (they have their own tab)
+            guard transaction.transactionType != .transfer else { return false }
+
             // Search filter
             let matchesSearch = searchText.isEmpty ||
                 transaction.counterName?.localizedCaseInsensitiveContains(searchText) == true ||
@@ -574,17 +620,48 @@ struct TransactionsListView: View {
                 ContentUnavailableView(
                     "No Transactions",
                     systemImage: "list.bullet.rectangle",
-                    description: Text(searchText.isEmpty ? "Import CSV files to get started" : "No transactions match your search")
+                    description: Text(searchText.isEmpty ? "Import CSV files to get started or add a transaction manually" : "No transactions match your search")
                 )
             } else {
                 List(selection: $selectedTransaction) {
                     ForEach(filteredTransactions) { transaction in
                         TransactionRowView(transaction: transaction)
                             .tag(transaction)
+                            .contextMenu {
+                                Button("View Details") {
+                                    selectedTransaction = transaction
+                                }
+                                Divider()
+                                Button("Delete", role: .destructive) {
+                                    transactionToDelete = transaction
+                                    showingDeleteConfirmation = true
+                                }
+                            }
                     }
+                    .onDelete(perform: deleteTransactions)
                 }
                 .listStyle(.inset)
             }
+        }
+        .sheet(item: $selectedTransaction) { transaction in
+            TransactionDetailView(transaction: transaction)
+        }
+        .sheet(isPresented: $showingAddSheet) {
+            TransactionEditorSheet(accounts: accounts, categories: categories) { newTransaction in
+                modelContext.insert(newTransaction)
+                try? modelContext.save()
+            }
+        }
+        .alert("Delete Transaction", isPresented: $showingDeleteConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                if let transaction = transactionToDelete {
+                    modelContext.delete(transaction)
+                    try? modelContext.save()
+                }
+            }
+        } message: {
+            Text("Are you sure you want to delete this transaction? This cannot be undone.")
         }
     }
 
@@ -599,6 +676,11 @@ struct TransactionsListView: View {
                 Text("\(filteredTransactions.count) of \(transactions.count)")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+
+                Button(action: { showingAddSheet = true }) {
+                    Label("Add Transaction", systemImage: "plus")
+                }
+                .buttonStyle(.borderedProminent)
             }
 
             HStack(spacing: 12) {
@@ -613,12 +695,11 @@ struct TransactionsListView: View {
                 .background(Color(nsColor: .controlBackgroundColor))
                 .cornerRadius(8)
 
-                // Type filter
+                // Type filter (exclude transfers since they have their own tab)
                 Picker("Type", selection: $selectedType) {
                     Text("All Types").tag(nil as TransactionType?)
-                    ForEach(TransactionType.allCases, id: \.self) { type in
-                        Text(type.displayName).tag(type as TransactionType?)
-                    }
+                    Text("Expenses").tag(TransactionType.expense as TransactionType?)
+                    Text("Income").tag(TransactionType.income as TransactionType?)
                 }
                 .pickerStyle(.menu)
                 .frame(width: 150)
@@ -640,6 +721,156 @@ struct TransactionsListView: View {
         searchText = ""
         selectedType = nil
         selectedCategory = nil
+    }
+
+    private func deleteTransactions(at offsets: IndexSet) {
+        for index in offsets {
+            modelContext.delete(filteredTransactions[index])
+        }
+        try? modelContext.save()
+    }
+}
+
+// MARK: - Transaction Editor Sheet
+
+struct TransactionEditorSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    let accounts: [Account]
+    let categories: [Category]
+    let onSave: (Transaction) -> Void
+
+    @State private var selectedAccount: Account?
+    @State private var date = Date()
+    @State private var amount: String = ""
+    @State private var transactionType: TransactionType = .expense
+    @State private var counterName: String = ""
+    @State private var description: String = ""
+    @State private var selectedCategory: String = ""
+    @State private var notes: String = ""
+
+    private var isValid: Bool {
+        selectedAccount != nil && !amount.isEmpty && amountValue != 0
+    }
+
+    private var amountValue: Decimal {
+        Decimal(string: amount.replacingOccurrences(of: ",", with: ".")) ?? 0
+    }
+
+    private var categoryNames: [String] {
+        categories.filter { $0.type == transactionType }.map(\.name).sorted()
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Button("Cancel") {
+                    dismiss()
+                }
+                .keyboardShortcut(.cancelAction)
+
+                Spacer()
+
+                Text("New Transaction")
+                    .font(.headline)
+
+                Spacer()
+
+                Button("Save") {
+                    saveTransaction()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(!isValid)
+            }
+            .padding()
+
+            Divider()
+
+            // Form
+            Form {
+                Section("Account") {
+                    Picker("Account", selection: $selectedAccount) {
+                        Text("Select Account").tag(nil as Account?)
+                        ForEach(accounts) { account in
+                            Text("\(account.name ?? account.iban)")
+                                .tag(account as Account?)
+                        }
+                    }
+                }
+
+                Section("Transaction Details") {
+                    DatePicker("Date", selection: $date, displayedComponents: .date)
+
+                    Picker("Type", selection: $transactionType) {
+                        Text("Expense").tag(TransactionType.expense)
+                        Text("Income").tag(TransactionType.income)
+                    }
+                    .pickerStyle(.segmented)
+
+                    TextField("Amount", text: $amount)
+                        .help("Enter a positive number")
+
+                    TextField("Counter Party Name", text: $counterName)
+                        .help("Name of the merchant or person")
+
+                    TextField("Description", text: $description)
+                }
+
+                Section("Categorization") {
+                    Picker("Category", selection: $selectedCategory) {
+                        Text("Select Category").tag("")
+                        ForEach(categoryNames, id: \.self) { name in
+                            Text(name).tag(name)
+                        }
+                    }
+                }
+
+                Section("Notes") {
+                    TextEditor(text: $notes)
+                        .frame(height: 80)
+                }
+            }
+            .formStyle(.grouped)
+        }
+        .frame(width: 500, height: 550)
+        .onAppear {
+            // Default to first account if available
+            selectedAccount = accounts.first
+        }
+    }
+
+    private func saveTransaction() {
+        guard let account = selectedAccount else { return }
+
+        // Calculate the actual amount (negative for expenses)
+        var finalAmount = amountValue
+        if transactionType == .expense && finalAmount > 0 {
+            finalAmount = -finalAmount
+        } else if transactionType == .income && finalAmount < 0 {
+            finalAmount = -finalAmount
+        }
+
+        // Generate a unique sequence number based on timestamp
+        let sequenceNumber = Int(Date().timeIntervalSince1970 * 1000) % 1000000
+
+        let transaction = Transaction(
+            iban: account.iban,
+            sequenceNumber: sequenceNumber,
+            date: date,
+            amount: finalAmount,
+            balance: account.currentBalance + finalAmount,
+            counterName: counterName.isEmpty ? nil : counterName,
+            autoCategory: selectedCategory.isEmpty ? "Niet Gecategoriseerd" : selectedCategory,
+            transactionType: transactionType
+        )
+
+        transaction.description1 = description.isEmpty ? nil : description
+        transaction.notes = notes.isEmpty ? nil : notes
+        transaction.account = account
+
+        onSave(transaction)
+        dismiss()
     }
 }
 
@@ -807,6 +1038,10 @@ struct CategoriesListView: View {
     @Query(sort: \Category.sortOrder) private var categories: [Category]
 
     @State private var selectedType: TransactionType? = nil
+    @State private var showingAddSheet = false
+    @State private var editingCategory: Category?
+    @State private var showingDeleteConfirmation = false
+    @State private var categoryToDelete: Category?
 
     private var filteredCategories: [Category] {
         if let type = selectedType {
@@ -831,6 +1066,11 @@ struct CategoriesListView: View {
                 }
                 .pickerStyle(.segmented)
                 .frame(width: 250)
+
+                Button(action: { showingAddSheet = true }) {
+                    Label("Add Category", systemImage: "plus")
+                }
+                .buttonStyle(.borderedProminent)
             }
             .padding()
 
@@ -840,10 +1080,53 @@ struct CategoriesListView: View {
             List {
                 ForEach(filteredCategories) { category in
                     CategoryRowView(category: category)
+                        .contextMenu {
+                            Button("Edit") {
+                                editingCategory = category
+                            }
+                            Divider()
+                            Button("Delete", role: .destructive) {
+                                categoryToDelete = category
+                                showingDeleteConfirmation = true
+                            }
+                        }
+                        .onTapGesture(count: 2) {
+                            editingCategory = category
+                        }
                 }
+                .onDelete(perform: deleteCategories)
             }
             .listStyle(.inset)
         }
+        .sheet(isPresented: $showingAddSheet) {
+            CategoryEditorSheet(category: nil) { newCategory in
+                modelContext.insert(newCategory)
+                try? modelContext.save()
+            }
+        }
+        .sheet(item: $editingCategory) { category in
+            CategoryEditorSheet(category: category) { _ in
+                try? modelContext.save()
+            }
+        }
+        .alert("Delete Category", isPresented: $showingDeleteConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                if let category = categoryToDelete {
+                    modelContext.delete(category)
+                    try? modelContext.save()
+                }
+            }
+        } message: {
+            Text("Are you sure you want to delete this category? Transactions using this category will be set to 'Uncategorized'.")
+        }
+    }
+
+    private func deleteCategories(at offsets: IndexSet) {
+        for index in offsets {
+            modelContext.delete(filteredCategories[index])
+        }
+        try? modelContext.save()
     }
 }
 
@@ -879,6 +1162,163 @@ struct CategoryRowView: View {
             }
         }
         .padding(.vertical, 4)
+    }
+}
+
+// MARK: - Category Editor Sheet
+
+struct CategoryEditorSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    let category: Category?
+    let onSave: (Category) -> Void
+
+    @State private var name: String = ""
+    @State private var type: TransactionType = .expense
+    @State private var monthlyBudget: String = ""
+    @State private var icon: String = "square.grid.2x2"
+    @State private var color: String = "3B82F6"
+    @State private var sortOrder: Int = 100
+
+    private var isValid: Bool {
+        !name.isEmpty
+    }
+
+    private var budgetValue: Decimal {
+        Decimal(string: monthlyBudget.replacingOccurrences(of: ",", with: ".")) ?? 0
+    }
+
+    // Common SF Symbols for categories
+    private let availableIcons = [
+        "cart.fill", "fork.knife", "bag.fill", "car.fill", "house.fill",
+        "bolt.fill", "shield.fill", "heart.fill", "gamecontroller.fill",
+        "figure.walk", "airplane", "gift.fill", "dollarsign.circle.fill",
+        "building.2.fill", "briefcase.fill", "graduationcap.fill",
+        "stethoscope", "pawprint.fill", "leaf.fill", "drop.fill",
+        "flame.fill", "snowflake", "sun.max.fill", "moon.fill",
+        "star.fill", "bell.fill", "tag.fill", "creditcard.fill",
+        "banknote.fill", "percent", "chart.bar.fill", "square.grid.2x2"
+    ]
+
+    private let availableColors = [
+        "3B82F6", "EF4444", "10B981", "F59E0B", "6366F1",
+        "EC4899", "8B5CF6", "14B8A6", "F97316", "84CC16"
+    ]
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Button("Cancel") {
+                    dismiss()
+                }
+                .keyboardShortcut(.cancelAction)
+
+                Spacer()
+
+                Text(category == nil ? "New Category" : "Edit Category")
+                    .font(.headline)
+
+                Spacer()
+
+                Button("Save") {
+                    saveCategory()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(!isValid)
+            }
+            .padding()
+
+            Divider()
+
+            // Form
+            Form {
+                Section("Basic Info") {
+                    TextField("Name", text: $name)
+
+                    Picker("Type", selection: $type) {
+                        Text("Expense").tag(TransactionType.expense)
+                        Text("Income").tag(TransactionType.income)
+                    }
+
+                    TextField("Monthly Budget", text: $monthlyBudget)
+                        .help("Leave empty for no budget")
+                }
+
+                Section("Appearance") {
+                    // Icon picker
+                    Picker("Icon", selection: $icon) {
+                        ForEach(availableIcons, id: \.self) { iconName in
+                            Label {
+                                Text(iconName.replacingOccurrences(of: ".fill", with: "").replacingOccurrences(of: ".", with: " ").capitalized)
+                            } icon: {
+                                Image(systemName: iconName)
+                            }
+                            .tag(iconName)
+                        }
+                    }
+
+                    // Color picker
+                    HStack {
+                        Text("Color")
+                        Spacer()
+                        ForEach(availableColors, id: \.self) { colorHex in
+                            Circle()
+                                .fill(Color(hex: colorHex))
+                                .frame(width: 24, height: 24)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.primary, lineWidth: color == colorHex ? 2 : 0)
+                                )
+                                .onTapGesture {
+                                    color = colorHex
+                                }
+                        }
+                    }
+                }
+
+                Section("Options") {
+                    Stepper("Sort Order: \(sortOrder)", value: $sortOrder, in: 1...1000)
+                }
+            }
+            .formStyle(.grouped)
+        }
+        .frame(width: 500, height: 500)
+        .onAppear {
+            if let category = category {
+                name = category.name
+                type = category.type
+                if category.monthlyBudget > 0 {
+                    monthlyBudget = "\(category.monthlyBudget)"
+                }
+                icon = category.icon ?? "square.grid.2x2"
+                color = category.color ?? "3B82F6"
+                sortOrder = category.sortOrder
+            }
+        }
+    }
+
+    private func saveCategory() {
+        if let existing = category {
+            existing.name = name
+            existing.type = type
+            existing.monthlyBudget = budgetValue
+            existing.icon = icon
+            existing.color = color
+            existing.sortOrder = sortOrder
+            onSave(existing)
+        } else {
+            let newCategory = Category(
+                name: name,
+                type: type,
+                monthlyBudget: budgetValue,
+                sortOrder: sortOrder
+            )
+            newCategory.icon = icon
+            newCategory.color = color
+            onSave(newCategory)
+        }
+        dismiss()
     }
 }
 
@@ -1136,13 +1576,136 @@ struct MerchantRowView: View {
     }
 }
 
+// MARK: - Transfers List View
+
+struct TransfersListView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \Transaction.date, order: .reverse) private var allTransactions: [Transaction]
+
+    @State private var searchText = ""
+    @State private var selectedTransaction: Transaction?
+
+    // Filter to only transfers (enum comparison not allowed in @Query predicate)
+    private var transfers: [Transaction] {
+        allTransactions.filter { $0.transactionType == .transfer }
+    }
+
+    private var filteredTransfers: [Transaction] {
+        if searchText.isEmpty {
+            return transfers
+        }
+        return transfers.filter { transaction in
+            transaction.counterName?.localizedCaseInsensitiveContains(searchText) == true ||
+            transaction.standardizedName?.localizedCaseInsensitiveContains(searchText) == true ||
+            transaction.effectiveCategory.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Text("Internal Transfers")
+                    .font(.system(size: 28, weight: .bold))
+
+                Spacer()
+
+                Text("\(filteredTransfers.count) of \(transfers.count)")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .padding()
+
+            // Search
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField("Search transfers...", text: $searchText)
+                    .textFieldStyle(.plain)
+            }
+            .padding(8)
+            .background(Color(nsColor: .controlBackgroundColor))
+            .cornerRadius(8)
+            .padding(.horizontal)
+            .padding(.bottom)
+
+            Divider()
+
+            // Transfers list
+            if filteredTransfers.isEmpty {
+                ContentUnavailableView(
+                    "No Transfers",
+                    systemImage: "arrow.left.arrow.right",
+                    description: Text("Internal transfers between your accounts will appear here")
+                )
+            } else {
+                List(selection: $selectedTransaction) {
+                    ForEach(filteredTransfers) { transaction in
+                        TransferRowView(transaction: transaction)
+                            .tag(transaction)
+                    }
+                }
+                .listStyle(.inset)
+            }
+        }
+        .sheet(item: $selectedTransaction) { transaction in
+            TransactionDetailView(transaction: transaction)
+        }
+    }
+}
+
+struct TransferRowView: View {
+    let transaction: Transaction
+
+    private var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.locale = Locale(identifier: "nl_NL")
+        return formatter
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            // Transfer icon
+            Image(systemName: "arrow.left.arrow.right.circle.fill")
+                .font(.title2)
+                .foregroundStyle(.blue)
+
+            // Info
+            VStack(alignment: .leading, spacing: 2) {
+                Text(transaction.standardizedName ?? transaction.counterName ?? "Transfer")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                Text(dateFormatter.string(from: transaction.date))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            // Amount (show both directions)
+            Text(transaction.amount.toCurrencyString())
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundStyle(transaction.amount >= 0 ? .green : .primary)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
 // MARK: - Rules List View
 
 struct RulesListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \CategorizationRule.priority) private var rules: [CategorizationRule]
+    @Query(sort: \Category.sortOrder) private var categories: [Category]
 
     @State private var searchText = ""
+    @State private var showingAddSheet = false
+    @State private var editingRule: CategorizationRule?
+    @State private var showingDeleteConfirmation = false
+    @State private var ruleToDelete: CategorizationRule?
 
     private var filteredRules: [CategorizationRule] {
         if searchText.isEmpty {
@@ -1166,8 +1729,26 @@ struct RulesListView: View {
                 Text("\(rules.count) rules")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+
+                Button(action: { showingAddSheet = true }) {
+                    Label("Add Rule", systemImage: "plus")
+                }
+                .buttonStyle(.borderedProminent)
             }
             .padding()
+
+            // Search
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField("Search rules...", text: $searchText)
+                    .textFieldStyle(.plain)
+            }
+            .padding(8)
+            .background(Color(nsColor: .controlBackgroundColor))
+            .cornerRadius(8)
+            .padding(.horizontal)
+            .padding(.bottom)
 
             Divider()
 
@@ -1176,17 +1757,75 @@ struct RulesListView: View {
                 ContentUnavailableView(
                     "No Custom Rules",
                     systemImage: "slider.horizontal.3",
-                    description: Text("The app uses built-in rules for categorization.\nCustom rules will appear here.")
+                    description: Text("Click 'Add Rule' to create a custom categorization rule.\nThe app also uses built-in rules automatically.")
                 )
             } else {
                 List {
                     ForEach(filteredRules) { rule in
                         RuleRowView(rule: rule)
+                            .contextMenu {
+                                Button("Edit") {
+                                    editingRule = rule
+                                }
+                                Button("Duplicate") {
+                                    duplicateRule(rule)
+                                }
+                                Divider()
+                                Button("Delete", role: .destructive) {
+                                    ruleToDelete = rule
+                                    showingDeleteConfirmation = true
+                                }
+                            }
+                            .onTapGesture(count: 2) {
+                                editingRule = rule
+                            }
                     }
+                    .onDelete(perform: deleteRules)
                 }
                 .listStyle(.inset)
             }
         }
+        .sheet(isPresented: $showingAddSheet) {
+            RuleEditorSheet(rule: nil, categories: categories) { newRule in
+                modelContext.insert(newRule)
+                try? modelContext.save()
+            }
+        }
+        .sheet(item: $editingRule) { rule in
+            RuleEditorSheet(rule: rule, categories: categories) { _ in
+                try? modelContext.save()
+            }
+        }
+        .alert("Delete Rule", isPresented: $showingDeleteConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                if let rule = ruleToDelete {
+                    modelContext.delete(rule)
+                    try? modelContext.save()
+                }
+            }
+        } message: {
+            Text("Are you sure you want to delete this rule? This cannot be undone.")
+        }
+    }
+
+    private func deleteRules(at offsets: IndexSet) {
+        for index in offsets {
+            modelContext.delete(filteredRules[index])
+        }
+        try? modelContext.save()
+    }
+
+    private func duplicateRule(_ rule: CategorizationRule) {
+        let newRule = CategorizationRule(
+            pattern: rule.pattern + " (copy)",
+            matchType: rule.matchType,
+            standardizedName: rule.standardizedName,
+            targetCategory: rule.targetCategory,
+            priority: rule.priority + 1
+        )
+        modelContext.insert(newRule)
+        try? modelContext.save()
     }
 }
 
@@ -1217,9 +1856,19 @@ struct RuleRowView: View {
                         .monospaced()
                 }
 
-                Text("→ " + rule.targetCategory)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 4) {
+                    if let standardized = rule.standardizedName {
+                        Text("→ \(standardized)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text("•")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Text(rule.targetCategory)
+                        .font(.caption)
+                        .foregroundStyle(.blue)
+                }
             }
 
             Spacer()
@@ -1237,6 +1886,127 @@ struct RuleRowView: View {
                 .frame(width: 8, height: 8)
         }
         .padding(.vertical, 4)
+    }
+}
+
+// MARK: - Rule Editor Sheet
+
+struct RuleEditorSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    let rule: CategorizationRule?
+    let categories: [Category]
+    let onSave: (CategorizationRule) -> Void
+
+    @State private var pattern: String = ""
+    @State private var matchType: RuleMatchType = .contains
+    @State private var standardizedName: String = ""
+    @State private var targetCategory: String = ""
+    @State private var priority: Int = 50
+    @State private var isActive: Bool = true
+
+    private var isValid: Bool {
+        !pattern.isEmpty && !targetCategory.isEmpty
+    }
+
+    private var categoryNames: [String] {
+        categories.map(\.name).sorted()
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Button("Cancel") {
+                    dismiss()
+                }
+                .keyboardShortcut(.cancelAction)
+
+                Spacer()
+
+                Text(rule == nil ? "New Rule" : "Edit Rule")
+                    .font(.headline)
+
+                Spacer()
+
+                Button("Save") {
+                    saveRule()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(!isValid)
+            }
+            .padding()
+
+            Divider()
+
+            // Form
+            Form {
+                Section("Pattern Matching") {
+                    TextField("Pattern", text: $pattern)
+                        .help("The text pattern to match against transaction names")
+
+                    Picker("Match Type", selection: $matchType) {
+                        ForEach(RuleMatchType.allCases, id: \.self) { type in
+                            Text(type.displayName).tag(type)
+                        }
+                    }
+                }
+
+                Section("Categorization") {
+                    Picker("Category", selection: $targetCategory) {
+                        Text("Select Category").tag("")
+                        ForEach(categoryNames, id: \.self) { name in
+                            Text(name).tag(name)
+                        }
+                    }
+
+                    TextField("Standardized Name (optional)", text: $standardizedName)
+                        .help("A cleaned-up merchant name to use instead of the original")
+                }
+
+                Section("Options") {
+                    Stepper("Priority: \(priority)", value: $priority, in: 1...1000)
+                        .help("Lower numbers = higher priority (matched first)")
+
+                    Toggle("Active", isOn: $isActive)
+                }
+            }
+            .formStyle(.grouped)
+        }
+        .frame(width: 450, height: 400)
+        .onAppear {
+            if let rule = rule {
+                pattern = rule.pattern
+                matchType = rule.matchType
+                standardizedName = rule.standardizedName ?? ""
+                targetCategory = rule.targetCategory
+                priority = rule.priority
+                isActive = rule.isActive
+            }
+        }
+    }
+
+    private func saveRule() {
+        if let existing = rule {
+            existing.pattern = pattern
+            existing.matchType = matchType
+            existing.standardizedName = standardizedName.isEmpty ? nil : standardizedName
+            existing.targetCategory = targetCategory
+            existing.priority = priority
+            existing.isActive = isActive
+            onSave(existing)
+        } else {
+            let newRule = CategorizationRule(
+                pattern: pattern,
+                matchType: matchType,
+                standardizedName: standardizedName.isEmpty ? nil : standardizedName,
+                targetCategory: targetCategory,
+                priority: priority
+            )
+            newRule.isActive = isActive
+            onSave(newRule)
+        }
+        dismiss()
     }
 }
 
@@ -1280,6 +2050,11 @@ struct GeneralSettingsView: View {
 }
 
 struct DataSettingsView: View {
+    @Environment(\.modelContext) private var modelContext
+    @State private var isExporting = false
+    @State private var exportMessage: String?
+    @State private var showExportAlert = false
+
     var body: some View {
         Form {
             Section("Database") {
@@ -1288,7 +2063,7 @@ struct DataSettingsView: View {
                         .foregroundStyle(.secondary)
                 }
                 Button("Open Database Folder") {
-                    // Open folder
+                    openDatabaseFolder()
                 }
             }
 
@@ -1296,8 +2071,125 @@ struct DataSettingsView: View {
                 Toggle("Auto-detect encoding", isOn: .constant(true))
                 Toggle("Skip duplicates", isOn: .constant(true))
             }
+
+            Section("Export") {
+                Button("Export Transactions to CSV...") {
+                    exportTransactionsToCSV()
+                }
+                .disabled(isExporting)
+
+                Button("Export Rules to CSV...") {
+                    exportRulesToCSV()
+                }
+                .disabled(isExporting)
+
+                Button("Export to JSON (Backup)...") {
+                    exportToJSON()
+                }
+                .disabled(isExporting)
+
+                if isExporting {
+                    HStack {
+                        ProgressView()
+                            .scaleEffect(0.7)
+                        Text("Exporting...")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
         }
         .padding()
+        .alert("Export", isPresented: $showExportAlert) {
+            Button("OK") { }
+        } message: {
+            Text(exportMessage ?? "Export completed successfully")
+        }
+    }
+
+    private func openDatabaseFolder() {
+        let path = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("Family Finance")
+        if let path = path {
+            NSWorkspace.shared.open(path)
+        }
+    }
+
+    private func exportTransactionsToCSV() {
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.commaSeparatedText]
+        panel.nameFieldStringValue = "transactions_\(dateStamp()).csv"
+
+        panel.begin { response in
+            if response == .OK, let url = panel.url {
+                Task { @MainActor in
+                    isExporting = true
+                    let exportService = ExportService(modelContext: modelContext)
+                    do {
+                        try await exportService.exportToCSV(url: url)
+                        exportMessage = "Transactions exported successfully"
+                        showExportAlert = true
+                    } catch {
+                        exportMessage = "Export failed: \(error.localizedDescription)"
+                        showExportAlert = true
+                    }
+                    isExporting = false
+                }
+            }
+        }
+    }
+
+    private func exportRulesToCSV() {
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.commaSeparatedText]
+        panel.nameFieldStringValue = "categorization_rules_\(dateStamp()).csv"
+
+        panel.begin { response in
+            if response == .OK, let url = panel.url {
+                Task { @MainActor in
+                    isExporting = true
+                    let exportService = ExportService(modelContext: modelContext)
+                    do {
+                        try await exportService.exportRulesToCSV(url: url)
+                        exportMessage = "Rules exported successfully"
+                        showExportAlert = true
+                    } catch {
+                        exportMessage = "Export failed: \(error.localizedDescription)"
+                        showExportAlert = true
+                    }
+                    isExporting = false
+                }
+            }
+        }
+    }
+
+    private func exportToJSON() {
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.json]
+        panel.nameFieldStringValue = "family_finance_backup_\(dateStamp()).json"
+
+        panel.begin { response in
+            if response == .OK, let url = panel.url {
+                Task { @MainActor in
+                    isExporting = true
+                    let exportService = ExportService(modelContext: modelContext)
+                    do {
+                        try await exportService.exportToJSON(url: url)
+                        exportMessage = "Backup exported successfully"
+                        showExportAlert = true
+                    } catch {
+                        exportMessage = "Export failed: \(error.localizedDescription)"
+                        showExportAlert = true
+                    }
+                    isExporting = false
+                }
+            }
+        }
+    }
+
+    private func dateStamp() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: Date())
     }
 }
 

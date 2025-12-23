@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/schemas/settings.schema.json",
+  "model": "claude-sonnet-4-20250514",
+  "permissions": {
+    "allowedTools": [
+      "Read",
+      "Write(*.swift)",
+      "Write(*.md)",
+      "Write(*.json)",
+      "Bash(xcodebuild *)",
+      "Bash(swift *)",
+      "Bash(git *)",
+      "Bash(open *)",
+      "Bash(cat *)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(grep *)"
+    ],
+    "deny": [
+      "Write(Configuration/FamilyAccountsConfig.swift)"
+    ]
+  }
+}

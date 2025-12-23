@@ -42,8 +42,9 @@ Carthage/Build/
 # VS Code
 .vscode/
 
-# Claude Code
-.claude/
+# Claude Code - Keep commands, ignore personal settings
+.claude/settings.local.json
+.claude/CLAUDE.local.md
 
 # Build products
 build/
@@ -53,7 +54,7 @@ build/
 # Uncomment to ignore your personal configuration
 # Configuration/FamilyAccountsConfig.swift
 
-# CSV files
+# CSV files (contain personal financial data!)
 *.csv
 
 # Database files

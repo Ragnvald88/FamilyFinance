@@ -9,6 +9,7 @@
 //
 
 import SwiftUI
+import Charts
 @preconcurrency import SwiftData
 
 @main
@@ -310,6 +311,8 @@ struct ContentView: View {
             AccountsListView()
         case .merchants:
             MerchantsListView()
+        case .insights:
+            InsightsViewWrapper()
         case .rules:
             RulesListView()
         case .import:
@@ -358,6 +361,26 @@ struct ImportViewWrapper: View {
                             modelContainer: modelContext.container,
                             categorizationEngine: categorizationEngine
                         )
+                    }
+            }
+        }
+    }
+}
+
+/// Wrapper to initialize InsightsView with required services
+/// Uses @State to avoid recreating services on each render (fixes state mutation warning)
+struct InsightsViewWrapper: View {
+    @Environment(\.modelContext) private var modelContext
+    @State private var queryService: TransactionQueryService?
+
+    var body: some View {
+        Group {
+            if let service = queryService {
+                InsightsView(queryService: service)
+            } else {
+                ProgressView("Loading...")
+                    .onAppear {
+                        queryService = TransactionQueryService(modelContext: modelContext)
                     }
             }
         }
@@ -532,6 +555,9 @@ struct SidebarView: View {
 
                 Label("Categories", systemImage: "square.grid.2x2.fill")
                     .tag(AppTab.categories)
+
+                Label("Insights", systemImage: "chart.bar.xaxis")
+                    .tag(AppTab.insights)
             }
 
             Section("Accounts") {
@@ -566,6 +592,7 @@ enum AppTab: Hashable {
     case budgets
     case accounts
     case merchants
+    case insights
     case rules
     case `import`
 }
@@ -2007,6 +2034,618 @@ struct RuleEditorSheet: View {
             onSave(newRule)
         }
         dismiss()
+    }
+}
+
+// MARK: - Insights View
+
+struct InsightsView: View {
+
+    // MARK: - Environment
+
+    @Environment(\.modelContext) private var modelContext
+
+    // MARK: - State
+
+    @StateObject private var viewModel: InsightsViewModel
+    @State private var selectedTimeframe: TimeframeFilter = .year
+    @State private var isLoading = false
+
+    // MARK: - Initialization
+
+    init(queryService: TransactionQueryService) {
+        _viewModel = StateObject(wrappedValue: InsightsViewModel(queryService: queryService))
+    }
+
+    // MARK: - Body
+
+    var body: some View {
+        ZStack {
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Header
+                    headerSection
+
+                    // Key metrics cards
+                    metricsSection
+
+                    // Spending trends chart
+                    spendingTrendsSection
+
+                    // Category breakdown
+                    categoryBreakdownSection
+
+                    // Month-over-month comparison
+                    monthComparisonSection
+
+                    // Top merchants
+                    topMerchantsSection
+
+                    Spacer(minLength: 40)
+                }
+                .padding(24)
+            }
+            .background(Color(nsColor: .windowBackgroundColor))
+
+            // Loading overlay
+            if isLoading {
+                Color.black.opacity(0.1)
+                    .ignoresSafeArea()
+                    .overlay {
+                        ProgressView("Analyzing data...")
+                            .padding(24)
+                            .background(Color(nsColor: .controlBackgroundColor))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .shadow(radius: 4)
+                    }
+            }
+        }
+        .task {
+            await loadInsights()
+        }
+        .onChange(of: selectedTimeframe) { _, _ in
+            Task { await loadInsights() }
+        }
+    }
+
+    // MARK: - Header Section
+
+    private var headerSection: some View {
+        VStack(spacing: 16) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Financial Insights")
+                        .font(.system(size: 28, weight: .bold))
+
+                    Text("Analyze your spending patterns and track your financial goals")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                // Timeframe picker
+                Picker("Timeframe", selection: $selectedTimeframe) {
+                    Text("6 Months").tag(TimeframeFilter.sixMonths)
+                    Text("Year").tag(TimeframeFilter.year)
+                    Text("All Time").tag(TimeframeFilter.allTime)
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 250)
+            }
+        }
+    }
+
+    // MARK: - Metrics Section
+
+    private var metricsSection: some View {
+        LazyVGrid(columns: [
+            GridItem(.flexible()),
+            GridItem(.flexible()),
+            GridItem(.flexible()),
+            GridItem(.flexible())
+        ], spacing: 16) {
+            MetricCard(
+                title: "Monthly Average",
+                value: viewModel.monthlyAverage.toCurrencyString(),
+                change: viewModel.monthlyAverageChange,
+                icon: "calendar",
+                color: .blue
+            )
+
+            MetricCard(
+                title: "Savings Rate",
+                value: String(format: "%.1f%%", viewModel.savingsRate),
+                change: viewModel.savingsRateChange,
+                icon: "banknote",
+                color: .green
+            )
+
+            MetricCard(
+                title: "Top Category",
+                value: viewModel.topCategory.name,
+                change: nil,
+                icon: "square.grid.2x2",
+                color: Color(hex: viewModel.topCategory.color)
+            )
+
+            MetricCard(
+                title: "Transactions",
+                value: "\(viewModel.totalTransactions)",
+                change: viewModel.transactionCountChange,
+                icon: "list.bullet.rectangle",
+                color: .purple
+            )
+        }
+    }
+
+    // MARK: - Spending Trends Section
+
+    private var spendingTrendsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Spending Trends")
+                .font(.title2)
+                .fontWeight(.semibold)
+
+            Chart(viewModel.monthlySpending) { data in
+                BarMark(
+                    x: .value("Month", data.month),
+                    y: .value("Amount", abs(data.amount))
+                )
+                .foregroundStyle(.red.opacity(0.8))
+                .cornerRadius(4)
+            }
+            .frame(height: 200)
+            .chartXAxis {
+                AxisMarks(values: .automatic(desiredCount: 6)) { value in
+                    AxisGridLine()
+                    AxisValueLabel {
+                        if let month = value.as(String.self) {
+                            Text(month)
+                                .font(.caption)
+                        }
+                    }
+                }
+            }
+            .chartYAxis {
+                AxisMarks { value in
+                    AxisGridLine()
+                    AxisValueLabel {
+                        if let amount = value.as(Double.self) {
+                            Text(Decimal(amount).toCurrencyString())
+                                .font(.caption)
+                        }
+                    }
+                }
+            }
+            .padding()
+            .background(Color(nsColor: .controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+        }
+    }
+
+    // MARK: - Category Breakdown Section
+
+    private var categoryBreakdownSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Category Breakdown")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+
+                Spacer()
+
+                Text("Top 10 categories")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            VStack(spacing: 8) {
+                ForEach(viewModel.topCategories) { category in
+                    CategoryBreakdownRow(
+                        category: category,
+                        totalSpending: viewModel.totalCategorySpending
+                    )
+                }
+            }
+            .padding()
+            .background(Color(nsColor: .controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+        }
+    }
+
+    // MARK: - Month Comparison Section
+
+    private var monthComparisonSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Month-over-Month Changes")
+                .font(.title2)
+                .fontWeight(.semibold)
+
+            LazyVGrid(columns: [
+                GridItem(.flexible()),
+                GridItem(.flexible())
+            ], spacing: 12) {
+                ForEach(viewModel.monthOverMonthComparisons) { comparison in
+                    MonthComparisonCard(comparison: comparison)
+                }
+            }
+        }
+    }
+
+    // MARK: - Top Merchants Section
+
+    private var topMerchantsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Top Merchants")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+
+                Spacer()
+
+                Text("By total spending")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            LazyVStack(spacing: 8) {
+                ForEach(viewModel.topMerchants) { merchant in
+                    TopMerchantRow(merchant: merchant)
+                }
+            }
+            .padding()
+            .background(Color(nsColor: .controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+        }
+    }
+
+    // MARK: - Loading Function
+
+    @MainActor
+    private func loadInsights() async {
+        isLoading = true
+        await viewModel.loadInsights(timeframe: selectedTimeframe)
+        isLoading = false
+    }
+}
+
+// MARK: - Supporting Views
+
+struct MetricCard: View {
+    let title: String
+    let value: String
+    let change: Double?
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        VStack(spacing: 12) {
+            HStack {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundStyle(color)
+
+                Spacer()
+
+                if let change = change {
+                    HStack(spacing: 2) {
+                        Image(systemName: change >= 0 ? "arrowtriangle.up.fill" : "arrowtriangle.down.fill")
+                            .font(.caption2)
+                        Text(String(format: "%.1f%%", abs(change)))
+                            .font(.caption2)
+                            .fontWeight(.medium)
+                    }
+                    .foregroundStyle(change >= 0 ? .green : .red)
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(value)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .lineLimit(1)
+
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding()
+        .background(Color(nsColor: .controlBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+    }
+}
+
+struct CategoryBreakdownRow: View {
+    let category: CategoryInsight
+    let totalSpending: Decimal
+
+    private var percentage: Double {
+        guard totalSpending > 0 else { return 0 }
+        return Double(truncating: (category.amount / totalSpending * 100) as NSNumber)
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            // Category icon and name
+            HStack(spacing: 8) {
+                Image(systemName: category.icon)
+                    .foregroundStyle(Color(hex: category.color))
+                    .frame(width: 20)
+
+                Text(category.name)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+            }
+            .frame(width: 150, alignment: .leading)
+
+            // Progress bar
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(height: 6)
+
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color(hex: category.color))
+                        .frame(width: geometry.size.width * (percentage / 100), height: 6)
+                }
+            }
+            .frame(height: 6)
+
+            // Amount and percentage
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(category.amount.toCurrencyString())
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+
+                Text(String(format: "%.1f%%", percentage))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(width: 80, alignment: .trailing)
+        }
+    }
+}
+
+struct MonthComparisonCard: View {
+    let comparison: MonthComparison
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: comparison.icon)
+                    .foregroundStyle(Color(hex: comparison.color))
+
+                Text(comparison.category)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .lineLimit(1)
+
+                Spacer()
+            }
+
+            Text(comparison.currentAmount.toCurrencyString())
+                .font(.title3)
+                .fontWeight(.bold)
+
+            HStack(spacing: 4) {
+                if comparison.changeAmount != 0 {
+                    Image(systemName: comparison.changeAmount > 0 ? "arrowtriangle.up.fill" : "arrowtriangle.down.fill")
+                        .font(.caption2)
+                        .foregroundStyle(comparison.changeAmount > 0 ? .red : .green)
+
+                    Text("\(String(format: "%.1f%%", abs(comparison.changePercentage))) vs last month")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("No change")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding()
+        .background(Color(nsColor: .controlBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+    }
+}
+
+struct TopMerchantRow: View {
+    let merchant: MerchantInsight
+
+    var body: some View {
+        HStack(spacing: 12) {
+            // Rank
+            Text("#\(merchant.rank)")
+                .font(.caption)
+                .fontWeight(.bold)
+                .foregroundStyle(.secondary)
+                .frame(width: 24)
+
+            // Merchant info
+            VStack(alignment: .leading, spacing: 2) {
+                Text(merchant.name)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                Text("\(merchant.transactionCount) transactions")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            // Amount
+            Text(merchant.totalAmount.toCurrencyString())
+                .font(.subheadline)
+                .fontWeight(.semibold)
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+// MARK: - View Models and Data Structures
+
+@MainActor
+class InsightsViewModel: ObservableObject {
+    @Published var monthlyAverage: Decimal = 0
+    @Published var monthlyAverageChange: Double? = nil
+    @Published var savingsRate: Double = 0
+    @Published var savingsRateChange: Double? = nil
+    @Published var topCategory: CategoryInsight = CategoryInsight.placeholder
+    @Published var totalTransactions: Int = 0
+    @Published var transactionCountChange: Double? = nil
+    @Published var monthlySpending: [MonthlySpendingData] = []
+    @Published var topCategories: [CategoryInsight] = []
+    @Published var totalCategorySpending: Decimal = 0
+    @Published var monthOverMonthComparisons: [MonthComparison] = []
+    @Published var topMerchants: [MerchantInsight] = []
+
+    private let queryService: TransactionQueryService
+
+    init(queryService: TransactionQueryService) {
+        self.queryService = queryService
+    }
+
+    func loadInsights(timeframe: TimeframeFilter) async {
+        let endDate = Date()
+        let startDate: Date
+
+        switch timeframe {
+        case .sixMonths:
+            startDate = Calendar.current.date(byAdding: .month, value: -6, to: endDate) ?? endDate
+        case .year:
+            startDate = Calendar.current.date(byAdding: .year, value: -1, to: endDate) ?? endDate
+        case .allTime:
+            startDate = Calendar.current.date(byAdding: .year, value: -10, to: endDate) ?? endDate
+        }
+
+        // Load all insights in parallel
+        async let monthlyData = queryService.getMonthlySpending(from: startDate, to: endDate)
+        async let categoryData = queryService.getCategoryBreakdown(from: startDate, to: endDate)
+        async let merchantData = queryService.getMerchantStats(from: startDate, to: endDate)
+        async let monthComparisons = queryService.getMonthOverMonthComparisons()
+
+        do {
+            let monthly = try await monthlyData
+            let categories = try await categoryData
+            let merchants = try await merchantData
+            let comparisons = try await monthComparisons
+
+            // Update UI data
+            updateMonthlyMetrics(monthly)
+            updateCategoryData(categories)
+            updateMerchantData(merchants)
+            updateMonthComparisons(comparisons)
+
+        } catch {
+            print("Failed to load insights: \(error)")
+        }
+    }
+
+    private func updateMonthlyMetrics(_ monthlyData: [MonthlySpendingData]) {
+        monthlySpending = monthlyData
+
+        let expenses = monthlyData.filter { $0.amount < 0 }
+        let totalExpenses = expenses.reduce(Decimal.zero) { $0 + abs($1.amount) }
+        monthlyAverage = expenses.count > 0 ? totalExpenses / Decimal(expenses.count) : 0
+
+        // Calculate savings rate (simplified)
+        let totalIncome = monthlyData.filter { $0.amount > 0 }.reduce(Decimal.zero) { $0 + $1.amount }
+        if totalIncome > 0 {
+            savingsRate = Double(truncating: ((totalIncome - totalExpenses) / totalIncome * 100) as NSNumber)
+        }
+
+        totalTransactions = monthlyData.reduce(0) { $0 + $1.transactionCount }
+
+        // Calculate changes (simplified - compare with previous period)
+        if expenses.count >= 2 {
+            let recent = expenses.prefix(3).reduce(Decimal.zero) { $0 + abs($1.amount) } / 3
+            let older = expenses.dropFirst(3).prefix(3).reduce(Decimal.zero) { $0 + abs($1.amount) } / 3
+            if older > 0 {
+                monthlyAverageChange = Double(truncating: ((recent - older) / older * 100) as NSNumber)
+            }
+        }
+    }
+
+    private func updateCategoryData(_ categories: [CategoryInsight]) {
+        topCategories = Array(categories.prefix(10))
+        totalCategorySpending = categories.reduce(Decimal.zero) { $0 + $1.amount }
+        topCategory = categories.first ?? CategoryInsight.placeholder
+    }
+
+    private func updateMerchantData(_ merchants: [MerchantInsight]) {
+        topMerchants = Array(merchants.prefix(10))
+    }
+
+    private func updateMonthComparisons(_ comparisons: [MonthComparison]) {
+        monthOverMonthComparisons = Array(comparisons.prefix(6))
+    }
+}
+
+struct MonthlySpendingData: Identifiable {
+    let id = UUID()
+    let month: String
+    let amount: Decimal
+    let transactionCount: Int
+}
+
+struct CategoryInsight: Identifiable {
+    let id = UUID()
+    let name: String
+    let amount: Decimal
+    let icon: String
+    let color: String
+    let transactionCount: Int
+
+    static let placeholder = CategoryInsight(
+        name: "Niet Gecategoriseerd",
+        amount: 0,
+        icon: "questionmark.circle.fill",
+        color: "9CA3AF",
+        transactionCount: 0
+    )
+}
+
+struct MonthComparison: Identifiable {
+    let id = UUID()
+    let category: String
+    let currentAmount: Decimal
+    let previousAmount: Decimal
+    let changeAmount: Decimal
+    let changePercentage: Double
+    let icon: String
+    let color: String
+}
+
+struct MerchantInsight: Identifiable {
+    let id = UUID()
+    let rank: Int
+    let name: String
+    let totalAmount: Decimal
+    let transactionCount: Int
+    let category: String
+}
+
+enum TimeframeFilter: CaseIterable {
+    case sixMonths
+    case year
+    case allTime
+
+    var displayName: String {
+        switch self {
+        case .sixMonths: return "6 Months"
+        case .year: return "Year"
+        case .allTime: return "All Time"
+        }
     }
 }
 

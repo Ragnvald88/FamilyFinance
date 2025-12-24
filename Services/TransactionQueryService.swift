@@ -610,6 +610,203 @@ class TransactionQueryService: ObservableObject {
         return result
     }
 
+    // MARK: - Insights Analytics Methods
+
+    /// Get monthly spending data for insights charts
+    func getMonthlySpending(from startDate: Date, to endDate: Date) async throws -> [MonthlySpendingData] {
+        let calendar = Calendar.current
+        let filter = TransactionFilter(
+            transactionType: .expense,
+            dateRange: DateInterval(start: startDate, end: endDate)
+        )
+
+        let transactions = try await fetchTransactions(filter: filter)
+
+        // Group by month
+        var monthlyData: [String: (amount: Decimal, count: Int)] = [:]
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM yyyy"
+        formatter.locale = Locale(identifier: "nl_NL")
+
+        for transaction in transactions {
+            let monthKey = formatter.string(from: transaction.date)
+            if var existing = monthlyData[monthKey] {
+                existing.amount += transaction.amount
+                existing.count += 1
+                monthlyData[monthKey] = existing
+            } else {
+                monthlyData[monthKey] = (amount: transaction.amount, count: 1)
+            }
+        }
+
+        return monthlyData.map { key, value in
+            MonthlySpendingData(month: key, amount: value.amount, transactionCount: value.count)
+        }.sorted { $0.month < $1.month }
+    }
+
+    /// Get category breakdown for insights
+    func getCategoryBreakdown(from startDate: Date, to endDate: Date) async throws -> [CategoryInsight] {
+        let filter = TransactionFilter(
+            transactionType: .expense,
+            dateRange: DateInterval(start: startDate, end: endDate)
+        )
+
+        let transactions = try await fetchTransactions(filter: filter)
+
+        // Group by category
+        var categoryData: [String: (amount: Decimal, count: Int, icon: String, color: String)] = [:]
+
+        // Fetch category metadata
+        let categoryDescriptor = FetchDescriptor<Category>()
+        let categories = try modelContext.fetch(categoryDescriptor)
+        let categoryLookup = Dictionary(uniqueKeysWithValues: categories.map {
+            ($0.name, (icon: $0.icon ?? "square.grid.2x2", color: $0.color ?? "3B82F6"))
+        })
+
+        for transaction in transactions {
+            let category = transaction.effectiveCategory
+            let meta = categoryLookup[category] ?? (icon: "questionmark.circle.fill", color: "9CA3AF")
+
+            if var existing = categoryData[category] {
+                existing.amount += abs(transaction.amount)
+                existing.count += 1
+                categoryData[category] = existing
+            } else {
+                categoryData[category] = (
+                    amount: abs(transaction.amount),
+                    count: 1,
+                    icon: meta.icon,
+                    color: meta.color
+                )
+            }
+        }
+
+        return categoryData.map { key, value in
+            CategoryInsight(
+                name: key,
+                amount: value.amount,
+                icon: value.icon,
+                color: value.color,
+                transactionCount: value.count
+            )
+        }.sorted { $0.amount > $1.amount }
+    }
+
+    /// Get merchant stats for insights
+    func getMerchantStats(from startDate: Date, to endDate: Date) async throws -> [MerchantInsight] {
+        let filter = TransactionFilter(
+            transactionType: .expense,
+            dateRange: DateInterval(start: startDate, end: endDate)
+        )
+
+        let transactions = try await fetchTransactions(filter: filter)
+
+        // Group by merchant
+        var merchantData: [String: (amount: Decimal, count: Int, category: String)] = [:]
+
+        for transaction in transactions {
+            let merchantName = transaction.standardizedName ?? transaction.counterName ?? "Unknown"
+
+            if var existing = merchantData[merchantName] {
+                existing.amount += abs(transaction.amount)
+                existing.count += 1
+                merchantData[merchantName] = existing
+            } else {
+                merchantData[merchantName] = (
+                    amount: abs(transaction.amount),
+                    count: 1,
+                    category: transaction.effectiveCategory
+                )
+            }
+        }
+
+        return merchantData.enumerated().map { index, element in
+            let (name, data) = element
+            return MerchantInsight(
+                rank: index + 1,
+                name: name,
+                totalAmount: data.amount,
+                transactionCount: data.count,
+                category: data.category
+            )
+        }.sorted { $0.totalAmount > $1.totalAmount }
+    }
+
+    /// Get month-over-month comparisons
+    func getMonthOverMonthComparisons() async throws -> [MonthComparison] {
+        let calendar = Calendar.current
+        let now = Date()
+
+        // Get current month and previous month
+        let currentMonth = calendar.component(.month, from: now)
+        let currentYear = calendar.component(.year, from: now)
+
+        guard let previousMonth = calendar.date(byAdding: .month, value: -1, to: now) else {
+            return []
+        }
+
+        let prevMonth = calendar.component(.month, from: previousMonth)
+        let prevYear = calendar.component(.year, from: previousMonth)
+
+        // Get transactions for both months
+        let currentFilter = TransactionFilter(
+            year: currentYear,
+            month: currentMonth,
+            transactionType: .expense
+        )
+
+        let previousFilter = TransactionFilter(
+            year: prevYear,
+            month: prevMonth,
+            transactionType: .expense
+        )
+
+        let currentTransactions = try await fetchTransactions(filter: currentFilter)
+        let previousTransactions = try await fetchTransactions(filter: previousFilter)
+
+        // Group by category for both months
+        func groupByCategory(_ transactions: [Transaction]) -> [String: Decimal] {
+            var result: [String: Decimal] = [:]
+            for transaction in transactions {
+                let category = transaction.effectiveCategory
+                result[category, default: 0] += abs(transaction.amount)
+            }
+            return result
+        }
+
+        let currentCategories = groupByCategory(currentTransactions)
+        let previousCategories = groupByCategory(previousTransactions)
+
+        // Find top categories to compare
+        let topCategories = Array(currentCategories.sorted { $0.value > $1.value }.prefix(6))
+
+        // Fetch category metadata
+        let categoryDescriptor = FetchDescriptor<Category>()
+        let categories = try modelContext.fetch(categoryDescriptor)
+        let categoryLookup = Dictionary(uniqueKeysWithValues: categories.map {
+            ($0.name, (icon: $0.icon ?? "square.grid.2x2", color: $0.color ?? "3B82F6"))
+        })
+
+        return topCategories.map { categoryName, currentAmount in
+            let previousAmount = previousCategories[categoryName] ?? 0
+            let changeAmount = currentAmount - previousAmount
+            let changePercentage = previousAmount > 0 ? Double(truncating: (changeAmount / previousAmount * 100) as NSNumber) : 0
+            let meta = categoryLookup[categoryName] ?? (icon: "questionmark.circle.fill", color: "9CA3AF")
+
+            return MonthComparison(
+                category: categoryName,
+                currentAmount: currentAmount,
+                previousAmount: previousAmount,
+                changeAmount: changeAmount,
+                changePercentage: changePercentage,
+                icon: meta.icon,
+                color: meta.color
+            )
+        }
+    }
+
+    // MARK: - Budget Operations
+
     /// Fetch budgets for given period
     /// Note: SwiftData predicates don't support nil-coalescing (??) inside the closure,
     /// so we must compute the monthValue outside and capture it properly.

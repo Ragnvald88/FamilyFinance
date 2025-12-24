@@ -1,61 +1,55 @@
----
-description: Review code changes for quality, patterns, and issues
-argument-hint: File path or "all" for full review
----
+# 🔬 Code Review & Improve
 
-# Code Review
+You are a senior code reviewer analyzing the FamilyFinance codebase. Be constructive but thorough.
 
-Perform a thorough code review checking for Family Finance patterns and quality.
+## Review Focus
 
-## Review Target: $ARGUMENTS
+$ARGUMENTS
 
 ## Review Checklist
 
-### SwiftData Compliance
-- [ ] No direct `date` assignment on Transaction (use `updateDate()`)
-- [ ] All enums are `Sendable`
-- [ ] `@ModelActor` used for background operations
-- [ ] Relationships have proper delete rules
-- [ ] Indexed fields for query performance
-
-### Concurrency Safety
-- [ ] `@MainActor` on UI-facing services
-- [ ] `@ModelActor` for data handlers
-- [ ] No ModelContext access across threads
-- [ ] Sendable DTOs for cross-actor transfer
-
-### Error Handling
-- [ ] No `fatalError` for recoverable errors
-- [ ] No force unwrapping (`!`) without justification
-- [ ] User-facing error messages in Dutch where appropriate
-- [ ] Graceful fallbacks for database issues
-
-### Code Style
-- [ ] Functional patterns where appropriate (map, filter, reduce)
-- [ ] Comments for regex patterns and complex logic
-- [ ] MARK comments for code organization
-- [ ] Consistent naming (Dutch for user-facing, English for code)
-
 ### Performance
-- [ ] Indexed fields used in predicates
 - [ ] No Calendar computations in SwiftData predicates
-- [ ] Batch operations for large data sets
-- [ ] Caching where appropriate
+- [ ] Uses indexed fields (year, month) for queries
+- [ ] Heavy operations in background (@ModelActor)
+- [ ] Lazy loading for lists (LazyVStack)
+- [ ] No N+1 query patterns
+
+### Concurrency
+- [ ] All public types are Sendable
+- [ ] @MainActor for UI-touching code only
+- [ ] No data races in async operations
+- [ ] ModelContext not shared across actors
+
+### SwiftUI
+- [ ] State properly scoped (@State vs @StateObject)
+- [ ] No heavy work in body getter
+- [ ] Animation values are Equatable
+- [ ] Views are small and focused (<200 lines)
+
+### Code Quality
+- [ ] No force unwraps (!)
+- [ ] Errors handled gracefully
+- [ ] Comments explain WHY, not WHAT
+- [ ] MARK comments for organization
 
 ### Dutch Banking Specifics
-- [ ] Dutch number format handled correctly
-- [ ] Encoding fallback chain (latin-1 → cp1252 → utf-8)
-- [ ] IBANs in FamilyAccountsConfig, not hardcoded
-- [ ] Inleg detection working correctly
-
-### Testing
-- [ ] Unit tests for new logic
-- [ ] Edge cases covered
-- [ ] Test names describe behavior
+- [ ] Number parsing handles +/-1.234,56 format
+- [ ] CSV encoding tries latin-1 first
+- [ ] IBAN validation uses mod-97
 
 ## Output Format
 
-Provide review as:
-1. **Critical Issues** - Must fix before merge
-2. **Suggestions** - Improvements to consider
-3. **Praise** - Well-done aspects
+For each issue found:
+
+```
+📍 File: [filename]
+🔴 Severity: Critical/High/Medium/Low
+📝 Issue: [Description]
+💡 Fix: [Suggested change]
+```
+
+After review, create a summary with:
+1. Total issues by severity
+2. Top 3 priority fixes
+3. Quick wins (easy fixes with high impact)

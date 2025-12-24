@@ -300,7 +300,7 @@ struct ContentView: View {
         case .dashboard:
             DashboardViewWrapper()
         case .transactions:
-            TransactionsListView()
+            OptimizedTransactionsListView()
         case .transfers:
             TransfersListView()
         case .categories:

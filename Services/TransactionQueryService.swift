@@ -805,6 +805,115 @@ class TransactionQueryService: ObservableObject {
         }
     }
 
+    // MARK: - High-Performance Pagination Methods (for 15k+ records)
+
+    /// Get paginated transactions with database-level filtering and sorting
+    /// Optimized for large datasets with virtual scrolling support
+    func getTransactionsPaginated(
+        filter: TransactionFilter,
+        offset: Int = 0,
+        limit: Int = 100
+    ) async throws -> [Transaction] {
+        let predicate = buildPredicate(for: filter)
+
+        var descriptor = FetchDescriptor<Transaction>(
+            predicate: predicate,
+            sortBy: [SortDescriptor(\Transaction.date, order: .reverse)]
+        )
+
+        // Apply pagination at database level for performance
+        descriptor.fetchOffset = offset
+        descriptor.fetchLimit = limit
+
+        var transactions = try modelContext.fetch(descriptor)
+
+        // Apply remaining in-memory filters (search text, complex conditions)
+        transactions = applyInMemoryFilters(transactions, filter: filter)
+
+        return transactions
+    }
+
+    /// Get total count of transactions matching filter (for pagination UI)
+    func getTransactionsCount(filter: TransactionFilter) async throws -> Int {
+        let predicate = buildPredicate(for: filter)
+        let descriptor = FetchDescriptor<Transaction>(predicate: predicate)
+
+        let transactions = try modelContext.fetch(descriptor)
+        let filteredTransactions = applyInMemoryFilters(transactions, filter: filter)
+
+        return filteredTransactions.count
+    }
+
+    /// Stream transactions in chunks for very large datasets (50k+ records)
+    /// Returns async sequence for memory-efficient processing
+    func streamTransactions(
+        filter: TransactionFilter,
+        chunkSize: Int = 500
+    ) -> AsyncStream<[Transaction]> {
+        AsyncStream<[Transaction]> { continuation in
+            Task { @MainActor in
+                var offset = 0
+                var hasMore = true
+
+                while hasMore {
+                    do {
+                        let chunk = try await getTransactionsPaginated(
+                            filter: filter,
+                            offset: offset,
+                            limit: chunkSize
+                        )
+
+                        if chunk.isEmpty || chunk.count < chunkSize {
+                            hasMore = false
+                        }
+
+                        continuation.yield(chunk)
+                        offset += chunkSize
+
+                        if !hasMore {
+                            continuation.finish()
+                        }
+
+                    } catch {
+                        continuation.finish(throwing: error)
+                        break
+                    }
+                }
+            }
+        }
+    }
+
+    /// Get transactions with intelligent pre-loading for smooth scrolling
+    /// Pre-fetches next page when user scrolls near end of current page
+    func getTransactionsWithPreload(
+        filter: TransactionFilter,
+        currentOffset: Int,
+        pageSize: Int = 100,
+        preloadTrigger: Double = 0.8 // Preload when 80% through current page
+    ) async throws -> (current: [Transaction], preloaded: [Transaction]) {
+
+        // Get current page
+        let currentTransactions = try await getTransactionsPaginated(
+            filter: filter,
+            offset: currentOffset,
+            limit: pageSize
+        )
+
+        // Preload next page if we have a full current page
+        let preloadedTransactions: [Transaction]
+        if currentTransactions.count == pageSize {
+            preloadedTransactions = try await getTransactionsPaginated(
+                filter: filter,
+                offset: currentOffset + pageSize,
+                limit: pageSize
+            )
+        } else {
+            preloadedTransactions = []
+        }
+
+        return (current: currentTransactions, preloaded: preloadedTransactions)
+    }
+
     // MARK: - Budget Operations
 
     /// Fetch budgets for given period

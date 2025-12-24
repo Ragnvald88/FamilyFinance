@@ -18,7 +18,10 @@ import SwiftUI
 /// - Drag-and-drop condition construction and parentheses grouping
 struct AdvancedBooleanLogicBuilder: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
     @Query(sort: \Category.sortOrder) private var categories: [Category]
+
+    let existingRule: EnhancedCategorizationRule?
 
     @State private var ruleName = "Advanced Rule"
     @State private var targetCategory = ""
@@ -26,6 +29,14 @@ struct AdvancedBooleanLogicBuilder: View {
     @State private var showingAddCondition = false
     @State private var previewTransactionsCount = 0
     @State private var showingPreview = false
+
+    // Error handling state
+    @State private var showingError = false
+    @State private var errorMessage = ""
+
+    init(existingRule: EnhancedCategorizationRule? = nil) {
+        self.existingRule = existingRule
+    }
 
     var body: some View {
         NavigationStack {
@@ -54,6 +65,14 @@ struct AdvancedBooleanLogicBuilder: View {
             ConditionEditorSheet { condition in
                 conditions.append(condition)
             }
+        }
+        .onAppear {
+            setupForExistingRule()
+        }
+        .alert("Error", isPresented: $showingError) {
+            Button("OK") { }
+        } message: {
+            Text(errorMessage)
         }
     }
 
@@ -271,7 +290,7 @@ struct AdvancedBooleanLogicBuilder: View {
 
         ToolbarItem(placement: .cancellationAction) {
             Button("Cancel") {
-                // TODO: Handle cancel action with proper navigation
+                dismiss()
             }
         }
     }
@@ -302,31 +321,111 @@ struct AdvancedBooleanLogicBuilder: View {
     }
 
     private func saveAdvancedRule() {
-        // TODO: Convert BooleanCondition array to EnhancedCategorizationRule with advanced tier
-        // This will integrate with the existing enhanced rule system
-
         print("📝 Saving advanced Boolean logic rule:")
         print("   Name: \(ruleName)")
         print("   Target Category: \(targetCategory)")
         print("   Conditions: \(conditions.count)")
         print("   Logic: \(generateLogicExpression())")
 
-        // For now, create a simple enhanced rule as proof of concept
-        // TODO: Implement full Boolean logic persistence
-        let enhancedRule = EnhancedCategorizationRule(
-            name: ruleName,
-            targetCategory: targetCategory,
-            tier: .advanced,
-            priority: 50
-        )
+        let enhancedRule: EnhancedCategorizationRule
+        let isEditing = existingRule != nil
 
-        modelContext.insert(enhancedRule)
+        if let existingRule = existingRule {
+            // Update existing rule
+            enhancedRule = existingRule
+            enhancedRule.name = ruleName
+            enhancedRule.targetCategory = targetCategory
+            enhancedRule.modifiedAt = Date()
+
+            // Clear existing conditions
+            if let oldConditions = enhancedRule.conditions {
+                for condition in oldConditions {
+                    modelContext.delete(condition)
+                }
+            }
+        } else {
+            // Create new rule
+            enhancedRule = EnhancedCategorizationRule(
+                name: ruleName,
+                targetCategory: targetCategory,
+                tier: .advanced,
+                priority: 50
+            )
+            modelContext.insert(enhancedRule)
+        }
+
+        // Set the root logical connector (default to AND if not specified)
+        enhancedRule.rootLogicalConnector = .and
+
+        // Convert BooleanCondition structs to RuleCondition models
+        var ruleConditions: [RuleCondition] = []
+
+        for (index, booleanCondition) in conditions.enumerated() {
+            // Convert BooleanCondition to RuleCondition
+            let ruleCondition = RuleCondition(
+                field: booleanCondition.field,
+                operator: booleanCondition.operator,
+                value: booleanCondition.value,
+                logicalConnector: booleanCondition.connector,
+                sortOrder: index
+            )
+
+            // Set the parent relationship
+            ruleCondition.parentRule = enhancedRule
+
+            modelContext.insert(ruleCondition)
+            ruleConditions.append(ruleCondition)
+        }
+
+        // Set the conditions relationship on the enhanced rule
+        enhancedRule.conditions = ruleConditions
 
         do {
             try modelContext.save()
-            print("✅ Advanced rule saved successfully")
+            print("✅ Advanced rule \(isEditing ? "updated" : "saved") successfully with \(ruleConditions.count) conditions")
+
+            // Clear the form and dismiss after successful save
+            if !isEditing {
+                ruleName = "Advanced Rule"
+                targetCategory = ""
+                conditions.removeAll()
+                previewTransactionsCount = 0
+                showingPreview = false
+            }
+            dismiss()
         } catch {
-            print("❌ Failed to save advanced rule: \(error)")
+            // Clean up on error
+            if !isEditing {
+                // Only delete if we created a new rule
+                modelContext.delete(enhancedRule)
+            }
+            for condition in ruleConditions {
+                modelContext.delete(condition)
+            }
+
+            // Show user-facing error
+            errorMessage = "Failed to \(isEditing ? "update" : "save") advanced rule: \(error.localizedDescription)"
+            showingError = true
+        }
+    }
+
+    private func setupForExistingRule() {
+        guard let existingRule = existingRule else { return }
+
+        // Populate form with existing rule data
+        ruleName = existingRule.name
+        targetCategory = existingRule.targetCategory
+
+        // Convert RuleCondition models back to BooleanCondition structs
+        if let ruleConditions = existingRule.conditions {
+            conditions = ruleConditions.sorted { $0.sortOrder < $1.sortOrder }.map { ruleCondition in
+                BooleanCondition(
+                    field: ruleCondition.field,
+                    operator: ruleCondition.operator,
+                    value: ruleCondition.value,
+                    connector: ruleCondition.logicalConnector
+                )
+            }
         }
     }
 }
@@ -449,11 +548,16 @@ struct BooleanConditionRow: View {
 // MARK: - Logical Connector Picker
 
 struct LogicalConnectorPicker: View {
-    let connector: LogicalConnector
+    @State private var selectedConnector: LogicalConnector
     let onChange: (LogicalConnector) -> Void
 
+    init(connector: LogicalConnector, onChange: @escaping (LogicalConnector) -> Void) {
+        self._selectedConnector = State(initialValue: connector)
+        self.onChange = onChange
+    }
+
     var body: some View {
-        Picker("Logical Connector", selection: .constant(connector)) {
+        Picker("Logical Connector", selection: $selectedConnector) {
             ForEach(LogicalConnector.allCases, id: \.self) { connectorType in
                 Text(connectorType.displayName)
                     .tag(connectorType)
@@ -461,7 +565,7 @@ struct LogicalConnectorPicker: View {
         }
         .pickerStyle(.segmented)
         .frame(width: 120)
-        .onChange(of: connector) { newValue in
+        .onChange(of: selectedConnector) { newValue in
             onChange(newValue)
         }
     }

@@ -112,12 +112,11 @@ class RuleMigrationService {
         }
 
         return RuleMigrationSuggestion(
-            legacyRule: legacyRule,
+            from: legacyRule,
             recommendedTier: canMigrateToSimple ? .simple : .advanced,
             enhancedConfig: enhancedConfig,
             estimatedImprovement: calculateImprovementPotential(legacyRule),
-            conflicts: conflicts,
-            hasConflicts: !conflicts.isEmpty
+            conflicts: conflicts
         )
     }
 
@@ -146,7 +145,7 @@ class RuleMigrationService {
                     result.migratedCount += 1
                 } catch {
                     result.errorCount += 1
-                    result.errors.append("Failed to migrate '\(suggestion.legacyRule.pattern)': \(error.localizedDescription)")
+                    result.errors.append("Failed to migrate '\(suggestion.legacyPattern)': \(error.localizedDescription)")
                 }
             }
 
@@ -163,7 +162,10 @@ class RuleMigrationService {
 
     /// Migrate a single rule based on suggestion.
     private func migrateSingleRule(_ suggestion: RuleMigrationSuggestion) async throws {
-        let legacyRule = suggestion.legacyRule
+        // Fetch the legacy rule by ID to maintain consistency
+        guard let legacyRule = try modelContext.registeredModel(for: suggestion.legacyRuleId) as? CategorizationRule else {
+            throw MigrationError.legacyRuleNotFound
+        }
 
         // Create enhanced rule name
         let enhancedName = generateRuleName(from: legacyRule)
@@ -176,11 +178,11 @@ class RuleMigrationService {
         // Create enhanced rule
         let enhancedRule = EnhancedCategorizationRule(
             name: finalName,
-            targetCategory: legacyRule.targetCategory,
+            targetCategory: suggestion.legacyTargetCategory,
             tier: suggestion.recommendedTier,
-            priority: legacyRule.priority,
-            isActive: legacyRule.isActive,
-            notes: generateMigrationNotes(legacyRule, suggestion),
+            priority: suggestion.legacyPriority,
+            isActive: suggestion.legacyIsActive,
+            notes: generateMigrationNotes(suggestion),
             createdBy: "Migration Service"
         )
 
@@ -339,16 +341,18 @@ class RuleMigrationService {
         }
     }
 
-    private func generateMigrationNotes(_ legacyRule: CategorizationRule, _ suggestion: RuleMigrationSuggestion) -> String {
-        var notes = "Migrated from legacy rule (Priority: \(legacyRule.priority))"
+    private func generateMigrationNotes(_ suggestion: RuleMigrationSuggestion) -> String {
+        var notes = "Migrated from legacy rule '\(suggestion.legacyPattern)' (Priority: \(suggestion.legacyPriority))"
 
-        if let originalNotes = legacyRule.notes {
-            notes += "\nOriginal notes: \(originalNotes)"
-        }
+        // Note: Legacy rule original notes would need to be fetched separately if needed
+        // For now, we focus on migration metadata
 
         if suggestion.hasConflicts {
             notes += "\nPotential improvements: \(suggestion.conflicts.joined(separator: ", "))"
         }
+
+        notes += "\nMigration tier: \(suggestion.recommendedTier.displayName)"
+        notes += "\nEstimated improvement: \(Int(suggestion.estimatedImprovement * 100))%"
 
         return notes
     }
@@ -397,12 +401,38 @@ struct MigrationAnalysis: Sendable {
 
 /// Suggestion for migrating a single legacy rule.
 struct RuleMigrationSuggestion: Sendable {
-    let legacyRule: CategorizationRule
+    // Store rule data instead of @Model reference for Sendable compliance
+    let legacyRuleId: PersistentIdentifier
+    let legacyPattern: String
+    let legacyTargetCategory: String
+    let legacyMatchType: RuleMatchType
+    let legacyPriority: Int
+    let legacyIsActive: Bool
+
     let recommendedTier: RuleTier
     let enhancedConfig: SimpleRuleConfig?
     let estimatedImprovement: Double // 0.0 - 1.0
     let conflicts: [String]
     let hasConflicts: Bool
+
+    /// Convenience initializer that extracts data from CategorizationRule
+    init(from legacyRule: CategorizationRule,
+         recommendedTier: RuleTier,
+         enhancedConfig: SimpleRuleConfig? = nil,
+         estimatedImprovement: Double,
+         conflicts: [String]) {
+        self.legacyRuleId = legacyRule.persistentModelID
+        self.legacyPattern = legacyRule.pattern
+        self.legacyTargetCategory = legacyRule.targetCategory
+        self.legacyMatchType = legacyRule.matchType
+        self.legacyPriority = legacyRule.priority
+        self.legacyIsActive = legacyRule.isActive
+        self.recommendedTier = recommendedTier
+        self.enhancedConfig = enhancedConfig
+        self.estimatedImprovement = estimatedImprovement
+        self.conflicts = conflicts
+        self.hasConflicts = !conflicts.isEmpty
+    }
 
     /// User-friendly description of the migration
     var migrationDescription: String {
@@ -477,6 +507,7 @@ enum MigrationError: Error, LocalizedError {
     case noMigrationToRollback
     case invalidConfiguration
     case backupFailed
+    case legacyRuleNotFound
 
     var errorDescription: String? {
         switch self {
@@ -488,6 +519,8 @@ enum MigrationError: Error, LocalizedError {
             return "Invalid rule configuration during migration"
         case .backupFailed:
             return "Failed to create backup before migration"
+        case .legacyRuleNotFound:
+            return "Legacy rule not found in database during migration"
         }
     }
 }

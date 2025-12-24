@@ -27,6 +27,10 @@ struct SimpleRuleBuilderView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
+    // MARK: - Existing Rule (for editing)
+
+    let existingRule: EnhancedCategorizationRule?
+
     // MARK: - State
 
     @State private var ruleName = ""
@@ -56,6 +60,12 @@ struct SimpleRuleBuilderView: View {
 
     @Query(sort: \Account.sortOrder) private var accounts: [Account]
     @Query(sort: \Category.sortOrder) private var categories: [Category]
+
+    // MARK: - Initialization
+
+    init(existingRule: EnhancedCategorizationRule? = nil) {
+        self.existingRule = existingRule
+    }
 
     // MARK: - Validation
 
@@ -97,8 +107,11 @@ struct SimpleRuleBuilderView: View {
                 .padding(DesignTokens.Spacing.xl)
             }
             .background(Color(nsColor: .windowBackgroundColor))
-            .navigationTitle("Create Simple Rule")
+            .navigationTitle(existingRule == nil ? "Create Simple Rule" : "Edit Simple Rule")
             .navigationBarTitleDisplayMode(.large)
+            .onAppear {
+                setupForExistingRule()
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") {
@@ -646,18 +659,34 @@ struct SimpleRuleBuilderView: View {
         guard isValidRule else { return }
 
         do {
-            // Create enhanced rule
-            let enhancedRule = EnhancedCategorizationRule(
-                name: ruleName,
-                targetCategory: targetCategory,
-                tier: .simple,
-                priority: Int(priority),
-                isActive: isActive,
-                notes: notes.isEmpty ? nil : notes,
-                createdBy: "User"
-            )
+            let enhancedRule: EnhancedCategorizationRule
+            let isEditing = existingRule != nil
 
-            // Configure simple rule
+            if let existingRule = existingRule {
+                // Update existing rule
+                enhancedRule = existingRule
+                enhancedRule.name = ruleName
+                enhancedRule.targetCategory = targetCategory
+                enhancedRule.priority = Int(priority)
+                enhancedRule.isActive = isActive
+                enhancedRule.notes = notes.isEmpty ? nil : notes
+                enhancedRule.modifiedAt = Date()
+                enhancedRule.modifiedBy = "User"
+            } else {
+                // Create new enhanced rule
+                enhancedRule = EnhancedCategorizationRule(
+                    name: ruleName,
+                    targetCategory: targetCategory,
+                    tier: .simple,
+                    priority: Int(priority),
+                    isActive: isActive,
+                    notes: notes.isEmpty ? nil : notes,
+                    createdBy: "User"
+                )
+                modelContext.insert(enhancedRule)
+            }
+
+            // Configure simple rule (both create and edit)
             let config = SimpleRuleConfig(
                 accountFilter: selectedAccount?.iban,
                 targetField: targetField,
@@ -669,13 +698,45 @@ struct SimpleRuleBuilderView: View {
             )
             enhancedRule.simpleConfig = config
 
-            modelContext.insert(enhancedRule)
             try modelContext.save()
 
+            print("✅ Simple rule \(isEditing ? "updated" : "saved") successfully")
             dismiss()
         } catch {
-            errorMessage = "Failed to save rule: \(error.localizedDescription)"
+            print("❌ Failed to \(existingRule == nil ? "save" : "update") rule: \(error)")
+            errorMessage = "Failed to \(existingRule == nil ? "save" : "update") rule: \(error.localizedDescription)"
             showingError = true
         }
+    }
+
+    private func setupForExistingRule() {
+        guard let existingRule = existingRule,
+              existingRule.tier == .simple,
+              let config = existingRule.simpleConfig else { return }
+
+        // Populate form fields with existing rule data
+        ruleName = existingRule.name
+        targetCategory = existingRule.targetCategory
+        priority = Double(existingRule.priority)
+        isActive = existingRule.isActive
+        notes = existingRule.notes ?? ""
+
+        // Populate simple config fields
+        targetField = config.targetField
+        matchType = config.matchType
+        pattern = config.pattern
+        enableAmountFilter = config.amountMin != nil || config.amountMax != nil
+        amountMin = config.amountMin?.description ?? ""
+        amountMax = config.amountMax?.description ?? ""
+        transactionTypeFilter = config.transactionTypeFilter
+
+        // Find the selected account if specified
+        if let accountIBAN = config.accountFilter {
+            selectedAccount = accounts.first { $0.iban == accountIBAN }
+        } else {
+            selectedAccount = nil
+        }
+
+        print("📝 Populated form for editing rule: \(existingRule.name)")
     }
 }

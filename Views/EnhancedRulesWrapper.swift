@@ -24,6 +24,9 @@ struct EnhancedRulesWrapper: View {
     @State private var complexityMode: RuleComplexityMode = .simple
     @State private var showingMigrationAlert = false
     @State private var showingAdvancedFeatures = false
+    @State private var showingSimpleRuleBuilder = false
+    @State private var showingAdvancedRuleBuilder = false
+    @State private var showingAIInsights = false
 
     // MARK: - Legacy Data for Migration
 
@@ -49,6 +52,15 @@ struct EnhancedRulesWrapper: View {
             .onAppear {
                 checkForMigration()
             }
+        }
+        .sheet(isPresented: $showingSimpleRuleBuilder) {
+            SimpleRuleBuilderView()
+        }
+        .sheet(isPresented: $showingAdvancedRuleBuilder) {
+            AdvancedBooleanLogicBuilder()
+        }
+        .sheet(isPresented: $showingAIInsights) {
+            AIRuleInsightsView(modelContext: modelContext)
         }
         .alert("Enhanced Rules Available", isPresented: $showingMigrationAlert) {
             Button("Use Enhanced System") {
@@ -120,7 +132,7 @@ struct EnhancedRulesWrapper: View {
             case .enhanced:
                 if enhancedRules.isEmpty {
                     EnhancedRulesEmptyState {
-                        // Create first enhanced rule
+                        showingSimpleRuleBuilder = true
                     }
                 } else {
                     RulesManagementView()
@@ -152,22 +164,32 @@ struct EnhancedRulesWrapper: View {
 
             Menu {
                 Button("Simple Rule") {
-                    // Create simple rule
+                    showingSimpleRuleBuilder = true
                 }
 
                 if complexityMode != .simple {
                     Button("Enhanced Rule") {
-                        // Create enhanced rule
+                        showingSimpleRuleBuilder = true  // SimpleRuleBuilderView handles enhanced too
                     }
                 }
 
                 if complexityMode == .advanced {
                     Button("Advanced Logic Rule") {
-                        // Create advanced rule
+                        showingAdvancedRuleBuilder = true
                     }
                 }
             } label: {
                 Image(systemName: "plus")
+            }
+
+            // AI Insights button for advanced mode
+            if complexityMode == .advanced {
+                Button {
+                    showingAIInsights = true
+                } label: {
+                    Image(systemName: "brain.head.profile")
+                }
+                .help("AI Rule Intelligence")
             }
         }
     }
@@ -461,32 +483,10 @@ private struct FeatureRow: View {
 // MARK: - Advanced Rules View
 
 private struct AdvancedRulesView: View {
+    @Environment(\.modelContext) private var modelContext
+
     var body: some View {
-        VStack(spacing: DesignTokens.Spacing.xl) {
-            Image(systemName: "brain")
-                .font(.system(size: 64))
-                .foregroundStyle(.purple)
-
-            VStack(spacing: DesignTokens.Spacing.m) {
-                Text("Advanced Rule Builder")
-                    .font(.title)
-                    .fontWeight(.bold)
-
-                Text("Create complex Boolean expressions with unlimited nesting and advanced logic operators.")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-
-                Text("Coming Soon...")
-                    .font(.title2)
-                    .foregroundStyle(.purple)
-                    .padding(DesignTokens.Spacing.l)
-                    .background(Color.purple.opacity(0.1))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-            }
-        }
-        .padding(DesignTokens.Spacing.xl)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        AIRuleInsightsView(modelContext: modelContext)
     }
 }
 

@@ -37,6 +37,16 @@ struct RulesManagementView: View {
     @State private var showingAdvancedBuilder = false
     @State private var showingMigration = false
     @State private var showingBulkActions = false
+    @State private var editingRule: EnhancedCategorizationRule?
+
+    // Error handling state
+    @State private var showingError = false
+    @State private var errorMessage = ""
+    @State private var errorTitle = "Error"
+
+    // Performance optimization - cached statistics
+    @State private var cachedStatistics: RuleStatistics?
+    @State private var lastStatisticsUpdate: Date = .distantPast
 
     @State private var selectedRules = Set<String>()
     @State private var isReordering = false
@@ -80,12 +90,22 @@ struct RulesManagementView: View {
     }
 
     private var ruleStatistics: RuleStatistics {
+        // Use cached statistics if they're fresh (updated within last 5 seconds)
+        let cacheValidityDuration: TimeInterval = 5.0
+        let now = Date()
+
+        if let cached = cachedStatistics,
+           now.timeIntervalSince(lastStatisticsUpdate) < cacheValidityDuration {
+            return cached
+        }
+
+        // Recompute statistics
         let active = enhancedRules.filter { $0.isActive }.count
         let simple = enhancedRules.filter { $0.tier == .simple }.count
         let advanced = enhancedRules.filter { $0.tier == .advanced }.count
         let totalMatches = enhancedRules.reduce(0) { $0 + $1.matchCount }
 
-        return RuleStatistics(
+        let newStatistics = RuleStatistics(
             totalRules: enhancedRules.count,
             activeRules: active,
             simpleRules: simple,
@@ -93,6 +113,12 @@ struct RulesManagementView: View {
             legacyRules: legacyRules.count,
             totalMatches: totalMatches
         )
+
+        // Update cache
+        cachedStatistics = newStatistics
+        lastStatisticsUpdate = now
+
+        return newStatistics
     }
 
     // MARK: - Body
@@ -178,11 +204,18 @@ struct RulesManagementView: View {
                 setupServices()
             }
         }
+        .sheet(item: $editingRule) { rule in
+            if rule.tier == .simple {
+                SimpleRuleBuilderView(existingRule: rule)
+            } else {
+                AdvancedBooleanLogicBuilder(existingRule: rule)
+            }
+        }
         .sheet(isPresented: $showingSimpleBuilder) {
             SimpleRuleBuilderView()
         }
         .sheet(isPresented: $showingAdvancedBuilder) {
-            AdvancedRuleBuilderView()
+            AdvancedBooleanLogicBuilder()
         }
         .sheet(isPresented: $showingMigration) {
             MigrationView(
@@ -201,6 +234,11 @@ struct RulesManagementView: View {
                 deleteSelectedRules()
             }
             Button("Cancel", role: .cancel) { }
+        }
+        .alert(errorTitle, isPresented: $showingError) {
+            Button("OK") { }
+        } message: {
+            Text(errorMessage)
         }
     }
 
@@ -322,26 +360,30 @@ struct RulesManagementView: View {
     // MARK: - Rules List
 
     private var rulesListView: some View {
-        List {
-            ForEach(filteredEnhancedRules, id: \.self) { rule in
-                RuleRow(
-                    rule: rule,
-                    isSelected: selectedRules.contains(rule.id?.uuidString ?? ""),
-                    isReordering: isReordering,
-                    onSelectionToggle: { toggleRuleSelection(rule) },
-                    onEdit: { editRule(rule) },
-                    onDelete: { deleteRule(rule) },
-                    onToggleActive: { toggleRuleActive(rule) },
-                    onTest: { testRule(rule) }
-                )
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                .listRowBackground(Color.clear)
-                .animation(DesignTokens.Animation.spring, value: isReordering)
+        ScrollView {
+            LazyVStack(spacing: 1) {
+                ForEach(filteredEnhancedRules, id: \.self) { rule in
+                    RuleRow(
+                        rule: rule,
+                        isSelected: selectedRules.contains(rule.id?.uuidString ?? ""),
+                        isReordering: isReordering,
+                        onSelectionToggle: { toggleRuleSelection(rule) },
+                        onEdit: { editRule(rule) },
+                        onDelete: { deleteRule(rule) },
+                        onToggleActive: { toggleRuleActive(rule) },
+                        onTest: { testRule(rule) }
+                    )
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 16)
+                    .background(Color.clear)
+                    .animation(DesignTokens.Animation.spring, value: isReordering)
+                }
+                // Note: onMove functionality requires List, so disable reordering for LazyVStack
+                // If reordering is critical, consider implementing custom drag and drop
             }
-            .onMove(perform: isReordering ? moveRules : nil)
+            .padding(.top, 8)
         }
-        .listStyle(.plain)
-        .environment(\.editMode, .constant(isReordering ? .active : .inactive))
+        .background(Color(nsColor: .windowBackgroundColor))
     }
 
     // MARK: - Empty States
@@ -436,9 +478,9 @@ struct RulesManagementView: View {
                     isAnalyzingMigration = false
                 }
             } catch {
-                print("Failed to analyze migration: \(error)")
                 await MainActor.run {
                     isAnalyzingMigration = false
+                    showError(title: "Migration Analysis Failed", message: "Unable to analyze legacy rules for migration: \(error.localizedDescription)")
                 }
             }
         }
@@ -465,8 +507,9 @@ struct RulesManagementView: View {
         do {
             try modelContext.save()
             selectedRules.removeAll()
+            invalidateStatisticsCache()
         } catch {
-            print("Failed to update rules: \(error)")
+            showError(title: "Update Failed", message: "Unable to update rules: \(error.localizedDescription)")
         }
     }
 
@@ -482,20 +525,19 @@ struct RulesManagementView: View {
         do {
             try modelContext.save()
             selectedRules.removeAll()
+            invalidateStatisticsCache()
         } catch {
-            print("Failed to delete rules: \(error)")
+            showError(title: "Delete Failed", message: "Unable to delete selected rules: \(error.localizedDescription)")
         }
     }
 
     private func editRule(_ rule: EnhancedCategorizationRule) {
-        // Implementation depends on rule tier
+        editingRule = rule
         switch rule.tier {
         case .simple:
-            // Open simple rule builder with prefilled data
-            break
+            showingSimpleBuilder = true
         case .advanced:
-            // Open advanced rule builder with prefilled data
-            break
+            showingAdvancedBuilder = true
         }
     }
 
@@ -504,8 +546,9 @@ struct RulesManagementView: View {
 
         do {
             try modelContext.save()
+            invalidateStatisticsCache()
         } catch {
-            print("Failed to delete rule: \(error)")
+            showError(title: "Delete Failed", message: "Unable to delete rule: \(error.localizedDescription)")
         }
     }
 
@@ -515,8 +558,9 @@ struct RulesManagementView: View {
 
         do {
             try modelContext.save()
+            invalidateStatisticsCache()
         } catch {
-            print("Failed to update rule: \(error)")
+            showError(title: "Update Failed", message: "Unable to toggle rule status: \(error.localizedDescription)")
         }
     }
 
@@ -536,8 +580,9 @@ struct RulesManagementView: View {
 
         do {
             try modelContext.save()
+            invalidateStatisticsCache()
         } catch {
-            print("Failed to reorder rules: \(error)")
+            showError(title: "Reorder Failed", message: "Unable to reorder rules: \(error.localizedDescription)")
         }
     }
 
@@ -555,6 +600,22 @@ struct RulesManagementView: View {
 
     private func exportRules() {
         // Implementation for exporting current rules
+    }
+
+    // MARK: - Error Handling
+
+    private func showError(title: String = "Error", message: String) {
+        errorTitle = title
+        errorMessage = message
+        showingError = true
+    }
+
+    // MARK: - Performance Optimization
+
+    /// Invalidate statistics cache when rules are modified
+    private func invalidateStatisticsCache() {
+        cachedStatistics = nil
+        lastStatisticsUpdate = .distantPast
     }
 }
 
@@ -633,27 +694,6 @@ private struct RuleStatistics {
 }
 
 // MARK: - Placeholder Views
-
-private struct AdvancedRuleBuilderView: View {
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            VStack {
-                Text("Advanced Rule Builder")
-                    .font(.title)
-                Text("Coming Soon - Visual rule builder with AND/OR logic")
-                    .foregroundStyle(.secondary)
-            }
-            .navigationTitle("Advanced Rule")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-            }
-        }
-    }
-}
 
 private struct MigrationView: View {
     let analysis: MigrationAnalysis?

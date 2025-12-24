@@ -498,7 +498,6 @@ struct EnhancedKPICard: View {
             Image(systemName: icon)
                 .font(DesignTokens.Typography.title.bold())
                 .foregroundStyle(color)
-                .symbolEffect(.pulse.wholeSymbol, options: .speed(0.5).repeat(false))
 
             Spacer()
 

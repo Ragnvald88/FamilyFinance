@@ -312,8 +312,9 @@ struct FamilyFinanceApp: App {
         // Load default categories only for Phase 1
         try loadDefaultCategories(context: context)
 
-        // Load default accounts
-        try loadDefaultAccounts(context: context)
+        // NOTE: Removed auto-creation of default accounts for better empty state UX
+        // Users should only see accounts after importing their own data
+        // try loadDefaultAccounts(context: context)
 
         print("Default data initialized successfully")
     }

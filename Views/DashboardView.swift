@@ -322,22 +322,48 @@ struct DashboardView: View {
     // MARK: - Accounts Section
 
     private var accountsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Accounts")
-                .font(.headline)
-                .foregroundStyle(.primary)
+        // Only show accounts section if there are accounts with actual data
+        if let accounts = viewModel.accountBalances, !accounts.isEmpty {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.m) {
+                Text("Accounts")
+                    .font(DesignTokens.Typography.headline)
+                    .foregroundStyle(.primary)
 
-            if let accounts = viewModel.accountBalances {
-                LazyVStack(spacing: 8) {
+                LazyVStack(spacing: DesignTokens.Spacing.s) {
                     ForEach(accounts) { account in
                         AccountRow(account: account)
                     }
                 }
             }
+            .padding(DesignTokens.Spacing.l)
+            .primaryCard()
+        } else {
+            // Show empty state guidance instead of empty account list
+            VStack(spacing: DesignTokens.Spacing.l) {
+                Image(systemName: "building.columns.circle")
+                    .font(.system(size: 48))
+                    .foregroundStyle(.secondary)
+
+                VStack(spacing: DesignTokens.Spacing.s) {
+                    Text("No Bank Accounts Yet")
+                        .font(DesignTokens.Typography.headline)
+                        .foregroundStyle(.primary)
+
+                    Text("Import your bank statements to see account balances and transaction history")
+                        .font(DesignTokens.Typography.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+
+                EnhancedButton("Import Bank Data", icon: "square.and.arrow.down", style: .primary) {
+                    // Navigate to import tab
+                    // TODO: Add navigation to import
+                }
+            }
+            .padding(DesignTokens.Spacing.xl)
+            .frame(maxWidth: .infinity)
+            .primaryCard()
         }
-        .padding()
-        .background(Color(nsColor: .controlBackgroundColor))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     // MARK: - Net Worth Section

@@ -141,7 +141,7 @@ struct DashboardView: View {
         .padding(.bottom, 8)
     }
 
-    // MARK: - KPI Cards Section
+    // MARK: - KPI Cards Section (Enhanced with Animations)
 
     private var kpiCardsSection: some View {
         LazyVGrid(columns: [
@@ -149,39 +149,56 @@ struct DashboardView: View {
             GridItem(.flexible()),
             GridItem(.flexible()),
             GridItem(.flexible())
-        ], spacing: 16) {
-            KPICard(
-                title: "Inkomen",
-                value: viewModel.kpis?.totalIncome.toCurrencyString() ?? "—",
-                icon: "arrow.down.circle.fill",
-                color: .green,
-                trend: nil
-            )
+        ], spacing: DesignTokens.Spacing.l) {
 
-            KPICard(
-                title: "Uitgaven",
-                value: viewModel.kpis?.totalExpenses.toCurrencyString() ?? "—",
-                icon: "arrow.up.circle.fill",
-                color: .red,
-                trend: nil
-            )
+            if viewModel.isLoading && viewModel.kpis == nil {
+                // Skeleton loading states
+                ForEach(0..<4, id: \.self) { index in
+                    SkeletonCard()
+                        .staggeredAppearance(index: index, totalItems: 4)
+                }
+            } else {
+                // Animated KPI cards with staggered appearance
+                Group {
+                    EnhancedKPICard(
+                        title: "Inkomen",
+                        value: viewModel.kpis?.totalIncome ?? 0,
+                        icon: "arrow.down.circle.fill",
+                        color: .green,
+                        trend: nil,
+                        index: 0
+                    )
 
-            KPICard(
-                title: "Gespaard",
-                value: viewModel.kpis?.netSavings.toCurrencyString() ?? "—",
-                icon: "banknote.fill",
-                color: .blue,
-                trend: nil
-            )
+                    EnhancedKPICard(
+                        title: "Uitgaven",
+                        value: abs(viewModel.kpis?.totalExpenses ?? 0),
+                        icon: "arrow.up.circle.fill",
+                        color: .red.opacity(0.85),
+                        trend: nil,
+                        index: 1
+                    )
 
-            KPICard(
-                title: "Spaarrate",
-                value: viewModel.kpis?.savingsRateFormatted ?? "—",
-                icon: "percent",
-                color: .orange,
-                trend: nil
-            )
+                    EnhancedKPICard(
+                        title: "Gespaard",
+                        value: viewModel.kpis?.netSavings ?? 0,
+                        icon: "banknote.fill",
+                        color: .blue,
+                        trend: nil,
+                        index: 2
+                    )
+
+                    EnhancedKPICard(
+                        title: "Spaarrate",
+                        percentage: Double(truncating: ((viewModel.kpis?.savingsRate ?? 0) * 100) as NSNumber),
+                        icon: "percent",
+                        color: .orange,
+                        trend: nil,
+                        index: 3
+                    )
+                }
+            }
         }
+        .animation(DesignTokens.Animation.spring, value: viewModel.kpis != nil)
     }
 
     // MARK: - Charts Section
@@ -413,7 +430,166 @@ struct DashboardView: View {
     }
 }
 
-// MARK: - KPI Card Component
+// MARK: - Enhanced KPI Card Component (App Store Quality)
+
+/// Enhanced KPI card with animations, hover effects, and design tokens
+struct EnhancedKPICard: View {
+    let title: String
+    let value: Decimal?
+    let percentage: Double?
+    let icon: String
+    let color: Color
+    let trend: Double?
+    let index: Int
+
+    @State private var isHovered = false
+    @State private var hasAppeared = false
+
+    init(title: String, value: Decimal? = nil, percentage: Double? = nil, icon: String, color: Color, trend: Double?, index: Int) {
+        self.title = title
+        self.value = value
+        self.percentage = percentage
+        self.icon = icon
+        self.color = color
+        self.trend = trend
+        self.index = index
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.m) {
+            // Header with icon and trend
+            headerSection
+
+            // Value section with animated numbers
+            valueSection
+        }
+        .padding(DesignTokens.Spacing.l)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(cardBackground)
+        .primaryCard()
+        .scaleEffect(isHovered ? 1.02 : 1.0)
+        .shadow(
+            color: isHovered ? DesignTokens.Shadow.elevated.color : DesignTokens.Shadow.primary.color,
+            radius: isHovered ? DesignTokens.Shadow.elevated.radius : DesignTokens.Shadow.primary.radius,
+            x: 0,
+            y: isHovered ? DesignTokens.Shadow.elevated.y : DesignTokens.Shadow.primary.y
+        )
+        .animation(DesignTokens.Animation.springFast, value: isHovered)
+        .onHover { hovering in
+            withAnimation(DesignTokens.Animation.springFast) {
+                isHovered = hovering
+            }
+        }
+        .opacity(hasAppeared ? 1.0 : 0.0)
+        .offset(y: hasAppeared ? 0 : 20)
+        .onAppear {
+            withAnimation(
+                DesignTokens.Animation.spring.delay(Double(index) * 0.1)
+            ) {
+                hasAppeared = true
+            }
+        }
+    }
+
+    // MARK: - Header Section
+
+    private var headerSection: some View {
+        HStack {
+            Image(systemName: icon)
+                .font(DesignTokens.Typography.title.bold())
+                .foregroundStyle(color)
+                .symbolEffect(.pulse.wholeSymbol, options: .speed(0.5).repeat(false))
+
+            Spacer()
+
+            if let trend = trend {
+                trendIndicator(trend: trend)
+            }
+        }
+    }
+
+    // MARK: - Value Section
+
+    private var valueSection: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+            Text(title)
+                .font(DesignTokens.Typography.caption)
+                .foregroundStyle(.secondary)
+
+            // Animated value display
+            if let value = value {
+                AnimatedNumber(
+                    value: value,
+                    font: DesignTokens.Typography.currencyLarge
+                )
+            } else if let percentage = percentage {
+                AnimatedPercentage(
+                    value: percentage,
+                    font: DesignTokens.Typography.currencyLarge
+                )
+            }
+        }
+    }
+
+    // MARK: - Trend Indicator
+
+    private func trendIndicator(trend: Double) -> some View {
+        HStack(spacing: DesignTokens.Spacing.xs) {
+            Image(systemName: trend >= 0 ? "arrow.up.right" : "arrow.down.right")
+                .font(DesignTokens.Typography.caption2)
+            Text(String(format: "%.1f%%", abs(trend)))
+                .font(DesignTokens.Typography.caption2)
+                .fontWeight(.medium)
+        }
+        .foregroundStyle(trend >= 0 ? DesignTokens.Colors.success : DesignTokens.Colors.error)
+        .padding(.horizontal, DesignTokens.Spacing.s)
+        .padding(.vertical, DesignTokens.Spacing.xs)
+        .background(
+            (trend >= 0 ? DesignTokens.Colors.success : DesignTokens.Colors.error)
+                .opacity(DesignTokens.Opacity.light)
+        )
+        .clipShape(Capsule())
+    }
+
+    // MARK: - Card Background
+
+    private var cardBackground: Color {
+        if isHovered {
+            return DesignTokens.Colors.cardBackground.opacity(0.95)
+        } else {
+            return DesignTokens.Colors.cardBackground
+        }
+    }
+}
+
+// MARK: - Animated Percentage Component
+
+struct AnimatedPercentage: View {
+    let value: Double
+    let font: Font
+
+    @State private var displayValue: Double = 0
+
+    var body: some View {
+        Text(String(format: "%.1f%%", displayValue))
+            .font(font)
+            .monospacedDigit()
+            .fontWeight(.bold)
+            .foregroundStyle(.primary)
+            .onChange(of: value) { _, newValue in
+                withAnimation(DesignTokens.Animation.numberTicker) {
+                    displayValue = newValue
+                }
+            }
+            .onAppear {
+                withAnimation(DesignTokens.Animation.numberTicker.delay(0.5)) {
+                    displayValue = value
+                }
+            }
+    }
+}
+
+// MARK: - Legacy KPI Card (Keep for Compatibility)
 
 struct KPICard: View {
     let title: String
@@ -423,40 +599,37 @@ struct KPICard: View {
     let trend: Double?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.m) {
             HStack {
                 Image(systemName: icon)
-                    .font(.title2)
+                    .font(DesignTokens.Typography.title)
                     .foregroundStyle(color)
 
                 Spacer()
 
                 if let trend = trend {
-                    HStack(spacing: 4) {
+                    HStack(spacing: DesignTokens.Spacing.xs) {
                         Image(systemName: trend >= 0 ? "arrow.up.right" : "arrow.down.right")
                         Text(String(format: "%.1f%%", abs(trend)))
                     }
-                    .font(.caption)
+                    .font(DesignTokens.Typography.caption)
                     .foregroundStyle(trend >= 0 ? .green : .red)
                 }
             }
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                 Text(title)
-                    .font(.caption)
+                    .font(DesignTokens.Typography.caption)
                     .foregroundStyle(.secondary)
 
                 Text(value)
-                    .font(.title2)
-                    .fontWeight(.bold)
+                    .font(DesignTokens.Typography.currencyLarge)
                     .foregroundStyle(.primary)
             }
         }
-        .padding()
+        .padding(DesignTokens.Spacing.l)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(nsColor: .controlBackgroundColor))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.05), radius: 2, y: 1)
+        .primaryCard()
     }
 }
 

@@ -51,11 +51,23 @@ final class EnhancedCategorizationRule {
     var simpleConfig: SimpleRuleConfig? {
         get {
             guard let data = simpleConfigData else { return nil }
-            return try? JSONDecoder().decode(SimpleRuleConfig.self, from: data)
+            do {
+                return try JSONDecoder().decode(SimpleRuleConfig.self, from: data)
+            } catch {
+                print("⚠️ Failed to decode simple rule config: \(error)")
+                // Clear corrupted data
+                simpleConfigData = nil
+                return nil
+            }
         }
         set {
-            simpleConfigData = try? JSONEncoder().encode(newValue)
-            modifiedAt = Date()
+            do {
+                simpleConfigData = try JSONEncoder().encode(newValue)
+                modifiedAt = Date()
+            } catch {
+                print("⚠️ Failed to encode simple rule config: \(error)")
+                // Keep existing data if encoding fails
+            }
         }
     }
 

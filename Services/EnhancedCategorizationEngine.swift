@@ -92,22 +92,27 @@ class EnhancedCategorizationEngine {
         }
 
         // Try enhanced rules first
-        if let enhancedRules = try? await getActiveEnhancedRules(), !enhancedRules.isEmpty {
-            for rule in enhancedRules {
-                if await evaluateRule(rule, against: transaction) {
-                    let evaluationTime = CFAbsoluteTimeGetCurrent() - startTime
-                    rule.recordMatch() // Update statistics
+        do {
+            let enhancedRules = try await getActiveEnhancedRules()
+            if !enhancedRules.isEmpty {
+                for rule in enhancedRules {
+                    if await evaluateRule(rule, against: transaction) {
+                        let evaluationTime = CFAbsoluteTimeGetCurrent() - startTime
+                        rule.recordMatch() // Update statistics
 
-                    return EnhancedCategorizationResult(
-                        category: rule.targetCategory,
-                        standardizedName: extractStandardizedName(rule, transaction),
-                        matchedRuleName: rule.name,
-                        ruleComplexity: rule.complexityLevel,
-                        confidence: calculateConfidence(rule: rule, transaction: transaction),
-                        evaluationTime: evaluationTime
-                    )
+                        return EnhancedCategorizationResult(
+                            category: rule.targetCategory,
+                            standardizedName: extractStandardizedName(rule, transaction),
+                            matchedRuleName: rule.name,
+                            ruleComplexity: rule.complexityLevel,
+                            confidence: calculateConfidence(rule: rule, transaction: transaction),
+                            evaluationTime: evaluationTime
+                        )
+                    }
                 }
             }
+        } catch {
+            print("⚠️ Enhanced rules fetch failed: \(error), falling back to legacy rules")
         }
 
         // Fallback to legacy engine if available

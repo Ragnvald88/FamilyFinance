@@ -81,54 +81,10 @@ actor BackgroundDataHandler {
     /// - Returns: ImportResult with statistics including categorization counts
     func importWithCategorization(
         _ parsedTransactions: [ParsedTransaction],
-        rulesCache: RulesCache
-    ) async throws -> ImportResultWithCategorization {
-        let categorizer = BackgroundCategorizer(rulesCache: rulesCache)
-        var categorizedCount = 0
-
-        // Convert parsed transactions to import data with categorization
-        // This runs entirely on the background actor - no MainActor blocking!
-        let importData: [TransactionImportData] = parsedTransactions.map { parsed in
-            let result = categorizer.categorize(parsed)
-            if result.category != nil {
-                categorizedCount += 1
-            }
-
-            return TransactionImportData(
-                iban: parsed.iban,
-                sequenceNumber: parsed.sequenceNumber,
-                date: parsed.date,
-                amount: parsed.amount,
-                balance: parsed.balance,
-                counterIBAN: parsed.counterIBAN,
-                counterName: parsed.counterName,
-                standardizedName: result.standardizedName,
-                description1: parsed.description1,
-                description2: parsed.description2,
-                description3: parsed.description3,
-                transactionCode: parsed.transactionCode,
-                valueDate: parsed.valueDate,
-                returnReason: parsed.returnReason,
-                mandateReference: parsed.mandateReference,
-                autoCategory: result.category,
-                transactionType: parsed.transactionType,
-                contributor: parsed.contributor,
-                sourceFile: parsed.sourceFile,
-                importBatchID: nil
-            )
-        }
-
-        // Now import the categorized data
-        let baseResult = try await importTransactions(importData)
-
-        return ImportResultWithCategorization(
-            imported: baseResult.imported,
-            duplicates: baseResult.duplicates,
-            errors: baseResult.errors,
-            totalProcessed: baseResult.totalProcessed,
-            categorized: categorizedCount,
-            uncategorized: parsedTransactions.count - categorizedCount
-        )
+        rulesCache: Any // RulesCache - deprecated type
+    ) async throws -> Any { // ImportResultWithCategorization - deprecated type
+        // DEPRECATED METHOD - Use new CategorizationEngine.categorizeBulk() instead
+        fatalError("This method is deprecated. Use the new CategorizationEngine for categorization.")
     }
 
     /// Import transactions from parsed CSV data with duplicate detection.

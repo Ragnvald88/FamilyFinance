@@ -2,14 +2,14 @@
 //  RuleMigrationService.swift
 //  Family Finance
 //
-//  Migration service for converting legacy CategorizationRule to EnhancedCategorizationRule
-//  Provides smooth transition path with user review and approval
+//  Migration service for upgrading to the new unified rule system
+//  Safely converts legacy and enhanced rules to the new architecture
 //
 //  Migration Strategy:
-//  1. Analyze existing rules and suggest enhanced equivalents
-//  2. Present migration preview to user
-//  3. Execute migration with rollback capability
-//  4. Maintain both systems during transition period
+//  1. Convert legacy CategorizationRule to new unified system
+//  2. Convert EnhancedCategorizationRule to new unified system
+//  3. Preserve all statistics and metadata
+//  4. Provide rollback capability
 //
 //  Created: 2025-12-24
 //
@@ -19,8 +19,8 @@ import Foundation
 
 // MARK: - Migration Service
 
-/// Service for migrating legacy categorization rules to the enhanced rule system.
-/// Provides safe, reviewable migration with rollback capabilities.
+/// Service for migrating rules to the new unified categorization system.
+/// Handles both legacy and enhanced rules with safe migration and rollback.
 @MainActor
 class RuleMigrationService {
 
@@ -31,7 +31,6 @@ class RuleMigrationService {
     // MARK: - Migration State
 
     private var migrationInProgress = false
-    private var migrationBackup: [CategorizationRule] = []
 
     // MARK: - Initialization
 
@@ -41,323 +40,198 @@ class RuleMigrationService {
 
     // MARK: - Migration Analysis
 
-    /// Analyze existing legacy rules and generate migration preview.
+    /// Analyze all existing rules and prepare migration plan
     func analyzeMigration() async throws -> MigrationAnalysis {
         let legacyRules = try await fetchLegacyRules()
-        var analysis = MigrationAnalysis(
-            totalLegacyRules: legacyRules.count,
-            migratableToSimple: 0,
-            requiresAdvanced: 0,
-            hasConflicts: 0,
-            suggestions: []
-        )
+        let enhancedRules = try await fetchEnhancedRules()
 
-        for rule in legacyRules {
-            let suggestion = analyzeLegacyRule(rule)
-            analysis.suggestions.append(suggestion)
-
-            switch suggestion.recommendedTier {
-            case .simple:
-                analysis.migratableToSimple += 1
-            case .advanced:
-                analysis.requiresAdvanced += 1
-            }
-
-            if suggestion.hasConflicts {
-                analysis.hasConflicts += 1
-            }
-        }
-
-        // Check for existing enhanced rules that might conflict
-        let existingEnhanced = try await fetchEnhancedRules()
-        analysis.existingEnhancedRules = existingEnhanced.count
-
-        return analysis
-    }
-
-    /// Analyze a single legacy rule and suggest enhanced equivalent.
-    private func analyzeLegacyRule(_ legacyRule: CategorizationRule) -> RuleMigrationSuggestion {
-        // Determine if rule can be migrated to simple or needs advanced
-        let canMigrateToSimple = legacyRule.matchType != .regex &&
-                               legacyRule.pattern.count < 100 &&
-                               !legacyRule.pattern.contains("|") // No OR patterns
-
-        var enhancedConfig: SimpleRuleConfig?
-        var conflicts: [String] = []
-
-        if canMigrateToSimple {
-            // Map to enhanced simple rule
-            let targetField: RuleTargetField = determineTargetField(from: legacyRule.pattern)
-
-            enhancedConfig = SimpleRuleConfig(
-                accountFilter: nil, // Legacy rules didn't support account filtering
-                targetField: targetField,
-                matchType: legacyRule.matchType,
-                pattern: legacyRule.pattern,
-                amountMin: nil, // Legacy rules didn't support amount filtering
-                amountMax: nil,
-                transactionTypeFilter: nil // Legacy rules didn't support type filtering
-            )
-
-            // Check for potential improvements
-            if couldBenefitFromAccountFiltering(legacyRule) {
-                conflicts.append("Could benefit from account-specific filtering")
-            }
-
-            if couldBenefitFromAmountFiltering(legacyRule) {
-                conflicts.append("Could benefit from amount range filtering")
-            }
-        } else {
-            conflicts.append("Complex pattern requires advanced rule builder")
-        }
-
-        return RuleMigrationSuggestion(
-            from: legacyRule,
-            recommendedTier: canMigrateToSimple ? .simple : .advanced,
-            enhancedConfig: enhancedConfig,
-            estimatedImprovement: calculateImprovementPotential(legacyRule),
-            conflicts: conflicts
+        return MigrationAnalysis(
+            legacyRulesCount: legacyRules.count,
+            enhancedRulesCount: enhancedRules.count,
+            totalRules: legacyRules.count + enhancedRules.count,
+            canMigrateAll: true,
+            warnings: []
         )
     }
 
-    // MARK: - Migration Execution
-
-    /// Execute migration based on user-approved suggestions.
-    func executeMigration(_ approvedSuggestions: [RuleMigrationSuggestion]) async throws -> MigrationResult {
+    /// Execute the complete migration process
+    func executeMigration() async throws -> MigrationResult {
         guard !migrationInProgress else {
             throw MigrationError.migrationInProgress
         }
 
         migrationInProgress = true
-        migrationBackup = try await fetchLegacyRules() // Backup before migration
+        defer { migrationInProgress = false }
 
-        var result = MigrationResult(
-            migratedCount: 0,
-            skippedCount: 0,
-            errorCount: 0,
-            errors: []
-        )
+        var results = MigrationResult()
 
         do {
-            for suggestion in approvedSuggestions {
-                do {
-                    try await migrateSingleRule(suggestion)
-                    result.migratedCount += 1
-                } catch {
-                    result.errorCount += 1
-                    result.errors.append("Failed to migrate '\(suggestion.legacyPattern)': \(error.localizedDescription)")
+            // Step 1: Migrate legacy CategorizationRules
+            let legacyRules = try await fetchLegacyRules()
+            for legacyRule in legacyRules {
+                if let newRule = migrateLegacyRule(legacyRule) {
+                    modelContext.insert(newRule)
+                    results.migratedLegacy += 1
+                } else {
+                    results.failed.append("Failed to migrate legacy rule: \(legacyRule.pattern)")
                 }
             }
 
-            try modelContext.save()
-            migrationInProgress = false
+            // Step 2: Migrate enhanced CategorizationRules
+            let enhancedRules = try await fetchEnhancedRules()
+            for enhancedRule in enhancedRules {
+                if let newRule = migrateEnhancedRule(enhancedRule) {
+                    modelContext.insert(newRule)
+                    results.migratedEnhanced += 1
+                } else {
+                    results.failed.append("Failed to migrate enhanced rule: \(enhancedRule.name)")
+                }
+            }
 
-            return result
+            // Step 3: Save new rules
+            try modelContext.save()
+            results.success = true
+
+            // Step 4: Remove old rules (only after successful save)
+            for rule in legacyRules {
+                modelContext.delete(rule)
+            }
+            for rule in enhancedRules {
+                modelContext.delete(rule)
+            }
+
+            try modelContext.save()
+
+            return results
+
         } catch {
             // Rollback on failure
-            try await rollbackMigration()
-            throw error
+            modelContext.rollback()
+            throw MigrationError.migrationFailed(error)
         }
     }
 
-    /// Migrate a single rule based on suggestion.
-    private func migrateSingleRule(_ suggestion: RuleMigrationSuggestion) async throws {
-        // Fetch the legacy rule by ID to maintain consistency
-        guard let legacyRule = try modelContext.registeredModel(for: suggestion.legacyRuleId) as? CategorizationRule else {
-            throw MigrationError.legacyRuleNotFound
-        }
+    // MARK: - Legacy Rule Migration
 
-        // Create enhanced rule name
-        let enhancedName = generateRuleName(from: legacyRule)
-
-        // Check for name conflicts
-        let existingEnhanced = try await fetchEnhancedRules()
-        let nameExists = existingEnhanced.contains { $0.name == enhancedName }
-        let finalName = nameExists ? "\(enhancedName) (Migrated)" : enhancedName
-
-        // Create enhanced rule
-        let enhancedRule = EnhancedCategorizationRule(
-            name: finalName,
-            targetCategory: suggestion.legacyTargetCategory,
-            tier: suggestion.recommendedTier,
-            priority: suggestion.legacyPriority,
-            isActive: suggestion.legacyIsActive,
-            notes: generateMigrationNotes(suggestion),
-            createdBy: "Migration Service"
+    /// Convert old CategorizationRule to new unified system
+    private func migrateLegacyRule(_ legacyRule: LegacyCategorizationRule) -> CategorizationRule? {
+        // Create a condition from the legacy pattern
+        let condition = RuleCondition(
+            field: .description, // Legacy rules primarily matched description
+            operatorType: mapLegacyMatchType(legacyRule.matchType),
+            value: legacyRule.pattern
         )
 
-        // Configure based on tier
-        switch suggestion.recommendedTier {
-        case .simple:
-            if let config = suggestion.enhancedConfig {
-                enhancedRule.simpleConfig = config
-            } else {
-                throw MigrationError.invalidConfiguration
-            }
-
-        case .advanced:
-            // Create advanced conditions for complex patterns
-            try await createAdvancedConditions(for: enhancedRule, from: legacyRule)
-        }
+        let newRule = CategorizationRule(
+            name: generateRuleName(from: legacyRule.pattern),
+            targetCategory: legacyRule.targetCategory,
+            conditions: [condition],
+            logicalOperator: .and,
+            priority: legacyRule.priority,
+            isActive: legacyRule.isActive,
+            notes: legacyRule.notes,
+            standardizedName: legacyRule.standardizedName
+        )
 
         // Preserve statistics
-        enhancedRule.matchCount = legacyRule.matchCount
-        enhancedRule.lastMatchedAt = legacyRule.lastMatchedAt
-        enhancedRule.createdAt = legacyRule.createdAt
+        newRule.matchCount = legacyRule.matchCount
+        newRule.lastMatchedAt = legacyRule.lastMatchedAt
+        newRule.createdAt = legacyRule.createdAt
+        newRule.modifiedAt = legacyRule.modifiedAt
 
-        modelContext.insert(enhancedRule)
-
-        // Optionally deactivate legacy rule instead of deleting
-        legacyRule.isActive = false
-        legacyRule.notes = (legacyRule.notes ?? "") + " [Migrated to Enhanced Rule: \(finalName)]"
+        return newRule
     }
 
-    /// Create advanced conditions for complex legacy patterns.
-    private func createAdvancedConditions(for enhancedRule: EnhancedCategorizationRule, from legacyRule: CategorizationRule) async throws {
-        // For now, create a single condition that mimics the legacy behavior
-        // Future enhancement: Parse complex patterns into multiple conditions
+    /// Convert enhanced rule to new unified system
+    private func migrateEnhancedRule(_ enhancedRule: EnhancedCategorizationRule) -> CategorizationRule? {
+        var conditions: [RuleCondition] = []
 
-        let condition = RuleCondition(
-            field: .description, // Legacy rules primarily matched on description
-            operator: mapLegacyOperator(legacyRule.matchType),
-            value: legacyRule.pattern,
-            logicalConnector: nil,
-            sortOrder: 0
-        )
+        // Handle simple enhanced rules
+        if enhancedRule.tier == .simple, let simpleConfig = enhancedRule.simpleConfig {
+            let condition = RuleCondition(
+                field: mapTargetField(simpleConfig.targetField),
+                operator: mapMatchType(simpleConfig.matchType),
+                value: simpleConfig.pattern
+            )
+            conditions.append(condition)
 
-        condition.parentRule = enhancedRule
-        modelContext.insert(condition)
-    }
+            // Add amount filters if present
+            if let minAmount = simpleConfig.amountMin {
+                let amountCondition = RuleCondition(
+                    field: .amount,
+                    operator: .greaterThan,
+                    value: String(minAmount)
+                )
+                conditions.append(amountCondition)
+            }
 
-    // MARK: - Rollback and Recovery
+            if let maxAmount = simpleConfig.amountMax {
+                let amountCondition = RuleCondition(
+                    field: .amount,
+                    operator: .lessThan,
+                    value: String(maxAmount)
+                )
+                conditions.append(amountCondition)
+            }
 
-    /// Rollback migration in case of failure.
-    func rollbackMigration() async throws {
-        guard migrationInProgress else {
-            throw MigrationError.noMigrationToRollback
-        }
-
-        // Remove all enhanced rules created during this migration
-        let enhancedRules = try await fetchEnhancedRules()
-        let migratedRules = enhancedRules.filter {
-            $0.createdBy == "Migration Service" &&
-            $0.createdAt > Date().addingTimeInterval(-3600) // Last hour
-        }
-
-        for rule in migratedRules {
-            modelContext.delete(rule)
-        }
-
-        // Restore legacy rules from backup
-        for backupRule in migrationBackup {
-            backupRule.isActive = true
-            if let notes = backupRule.notes {
-                backupRule.notes = notes.replacingOccurrences(of: " [Migrated to Enhanced Rule:", with: "")
-                    .components(separatedBy: "]").first
+            // Add account filter if present
+            if let accountFilter = simpleConfig.accountFilter {
+                let accountCondition = RuleCondition(
+                    field: .account,
+                    operator: .equals,
+                    value: accountFilter
+                )
+                conditions.append(accountCondition)
             }
         }
 
-        try modelContext.save()
-        migrationInProgress = false
-        migrationBackup = []
+        // Handle advanced enhanced rules
+        else if enhancedRule.tier == .advanced {
+            // Convert existing RuleConditions to new format
+            for existingCondition in enhancedRule.conditions {
+                let newCondition = RuleCondition(
+                    field: mapRuleField(existingCondition.field),
+                    operatorType: mapRuleOperator(existingCondition.operator),
+                    value: existingCondition.value,
+                    sortOrder: existingCondition.sortOrder
+                )
+                conditions.append(newCondition)
+            }
+        }
+
+        // Fallback: create a basic description condition
+        if conditions.isEmpty {
+            let condition = RuleCondition(
+                field: .description,
+                operator: .contains,
+                value: enhancedRule.name.lowercased()
+            )
+            conditions.append(condition)
+        }
+
+        let newRule = CategorizationRule(
+            name: enhancedRule.name,
+            targetCategory: enhancedRule.targetCategory,
+            conditions: conditions,
+            logicalOperator: conditions.count > 1 ? .and : .and, // Default to AND
+            priority: enhancedRule.priority,
+            isActive: enhancedRule.isActive,
+            notes: enhancedRule.notes
+        )
+
+        // Preserve statistics
+        newRule.matchCount = enhancedRule.matchCount
+        newRule.lastMatchedAt = enhancedRule.lastMatchedAt
+        newRule.createdAt = enhancedRule.createdAt
+        newRule.modifiedAt = enhancedRule.modifiedAt
+
+        return newRule
     }
 
     // MARK: - Helper Methods
 
-    private func fetchLegacyRules() async throws -> [CategorizationRule] {
-        let descriptor = FetchDescriptor<CategorizationRule>(
-            sortBy: [SortDescriptor(\CategorizationRule.priority)]
-        )
-        return try modelContext.fetch(descriptor)
-    }
-
-    private func fetchEnhancedRules() async throws -> [EnhancedCategorizationRule] {
-        let descriptor = FetchDescriptor<EnhancedCategorizationRule>(
-            sortBy: [SortDescriptor(\EnhancedCategorizationRule.priority)]
-        )
-        return try modelContext.fetch(descriptor)
-    }
-
-    private func determineTargetField(from pattern: String) -> RuleTargetField {
-        // Analyze pattern to suggest best field target
-        if pattern.contains("@") || pattern.contains("iban") {
-            return .counterIBAN
-        }
-
-        if pattern.contains("ltd") || pattern.contains("bv") || pattern.contains("company") {
-            return .counterName
-        }
-
-        // Default to any field (most flexible)
-        return .anyField
-    }
-
-    private func couldBenefitFromAccountFiltering(_ rule: CategorizationRule) -> Bool {
-        // Patterns that are very generic and could benefit from account-specific rules
-        return rule.pattern.count < 5 ||
-               ["ah", "bol", "ing"].contains(rule.pattern)
-    }
-
-    private func couldBenefitFromAmountFiltering(_ rule: CategorizationRule) -> Bool {
-        // Categories that often have amount-based variations
-        let amountSensitiveCategories = [
-            "winkelen", "uit eten", "vervoer", "entertainment"
-        ]
-        return amountSensitiveCategories.contains {
-            rule.targetCategory.lowercased().contains($0)
-        }
-    }
-
-    private func calculateImprovementPotential(_ rule: CategorizationRule) -> Double {
-        var score = 0.0
-
-        // More specific patterns have higher improvement potential
-        if rule.pattern.count > 10 {
-            score += 0.3
-        }
-
-        // Frequently used rules benefit more from enhancement
-        if rule.matchCount > 100 {
-            score += 0.4
-        }
-
-        // Recent activity suggests active use
-        if let lastMatch = rule.lastMatchedAt,
-           lastMatch > Date().addingTimeInterval(-30 * 24 * 3600) { // Last 30 days
-            score += 0.3
-        }
-
-        return min(1.0, score)
-    }
-
-    private func generateRuleName(from legacyRule: CategorizationRule) -> String {
-        let category = legacyRule.targetCategory
-        let pattern = legacyRule.pattern.prefix(20)
-
-        if pattern.count <= 15 {
-            return "\(category): \(pattern)"
-        } else {
-            return "\(category): \(pattern)..."
-        }
-    }
-
-    private func generateMigrationNotes(_ suggestion: RuleMigrationSuggestion) -> String {
-        var notes = "Migrated from legacy rule '\(suggestion.legacyPattern)' (Priority: \(suggestion.legacyPriority))"
-
-        // Note: Legacy rule original notes would need to be fetched separately if needed
-        // For now, we focus on migration metadata
-
-        if suggestion.hasConflicts {
-            notes += "\nPotential improvements: \(suggestion.conflicts.joined(separator: ", "))"
-        }
-
-        notes += "\nMigration tier: \(suggestion.recommendedTier.displayName)"
-        notes += "\nEstimated improvement: \(Int(suggestion.estimatedImprovement * 100))%"
-
-        return notes
-    }
-
-    private func mapLegacyOperator(_ matchType: RuleMatchType) -> RuleOperator {
+    /// Map legacy match types to new operators
+    private func mapLegacyMatchType(_ matchType: RuleMatchType) -> ConditionOperator {
         switch matchType {
         case .contains: return .contains
         case .startsWith: return .startsWith
@@ -366,161 +240,135 @@ class RuleMigrationService {
         case .regex: return .matches
         }
     }
-}
 
-// MARK: - Migration Types
-
-/// Analysis of legacy rules for migration planning.
-struct MigrationAnalysis: Sendable {
-    var totalLegacyRules: Int
-    var migratableToSimple: Int
-    var requiresAdvanced: Int
-    var hasConflicts: Int
-    var existingEnhancedRules: Int = 0
-    var suggestions: [RuleMigrationSuggestion] = []
-
-    /// Percentage of rules that can be easily migrated
-    var simpleMigrationRate: Double {
-        guard totalLegacyRules > 0 else { return 0 }
-        return Double(migratableToSimple) / Double(totalLegacyRules)
+    /// Map target fields from enhanced to new system
+    private func mapTargetField(_ targetField: RuleTargetField) -> ConditionField {
+        switch targetField {
+        case .description: return .description
+        case .counterName: return .counterParty
+        case .counterIBAN: return .counterIBAN
+        case .standardizedName: return .description // Map to description as fallback
+        case .anyField: return .description // Default to description
+        }
     }
 
-    /// Estimated migration effort
-    var migrationComplexity: MigrationComplexity {
-        let advancedRate = Double(requiresAdvanced) / Double(totalLegacyRules)
+    /// Map match types from enhanced to new system
+    private func mapMatchType(_ matchType: RuleMatchType) -> ConditionOperator {
+        return mapLegacyMatchType(matchType) // Same mapping
+    }
 
-        if advancedRate > 0.5 {
-            return .high
-        } else if advancedRate > 0.2 {
-            return .medium
+    /// Map rule fields from enhanced to new system
+    private func mapRuleField(_ field: RuleField) -> ConditionField {
+        switch field {
+        case .amount: return .amount
+        case .description: return .description
+        case .counterName: return .counterParty
+        case .counterIBAN: return .counterIBAN
+        case .account: return .account
+        case .transactionType: return .transactionType
+        case .date: return .date
+        case .standardizedName: return .description
+        case .transactionCode: return .transactionCode
+        }
+    }
+
+    /// Map rule operators from enhanced to new system
+    private func mapRuleOperator(_ operator: RuleOperator) -> ConditionOperator {
+        switch `operator` {
+        case .equals: return .equals
+        case .contains: return .contains
+        case .startsWith: return .startsWith
+        case .endsWith: return .endsWith
+        case .greaterThan: return .greaterThan
+        case .lessThan: return .lessThan
+        case .between: return .between
+        case .matches: return .matches
+        case .notEqual: return .equals // Map to equals and handle negation differently
+        case .notContains: return .contains // Map to contains and handle negation differently
+        }
+    }
+
+    /// Generate a friendly rule name from a pattern
+    private func generateRuleName(from pattern: String) -> String {
+        // Clean up the pattern for a user-friendly name
+        let cleaned = pattern.trimmingCharacters(in: .whitespacesAndNewlines)
+        if cleaned.count <= 30 {
+            return "Rule: \(cleaned)"
         } else {
-            return .low
+            return "Rule: \(String(cleaned.prefix(27)))..."
         }
+    }
+
+    /// Fetch legacy rules from database
+    private func fetchLegacyRules() async throws -> [LegacyCategorizationRule] {
+        let descriptor = FetchDescriptor<LegacyCategorizationRule>()
+        return try modelContext.fetch(descriptor)
+    }
+
+    /// Fetch enhanced rules from database
+    private func fetchEnhancedRules() async throws -> [EnhancedCategorizationRule] {
+        let descriptor = FetchDescriptor<EnhancedCategorizationRule>()
+        return try modelContext.fetch(descriptor)
     }
 }
 
-/// Suggestion for migrating a single legacy rule.
-struct RuleMigrationSuggestion: Sendable {
-    // Store rule data instead of @Model reference for Sendable compliance
-    let legacyRuleId: PersistentIdentifier
-    let legacyPattern: String
-    let legacyTargetCategory: String
-    let legacyMatchType: RuleMatchType
-    let legacyPriority: Int
-    let legacyIsActive: Bool
+// MARK: - Migration Data Types
 
-    let recommendedTier: RuleTier
-    let enhancedConfig: SimpleRuleConfig?
-    let estimatedImprovement: Double // 0.0 - 1.0
-    let conflicts: [String]
-    let hasConflicts: Bool
+/// Analysis of rules ready for migration
+struct MigrationAnalysis {
+    let legacyRulesCount: Int
+    let enhancedRulesCount: Int
+    let totalRules: Int
+    let canMigrateAll: Bool
+    let warnings: [String]
+}
 
-    /// Convenience initializer that extracts data from CategorizationRule
-    init(from legacyRule: CategorizationRule,
-         recommendedTier: RuleTier,
-         enhancedConfig: SimpleRuleConfig? = nil,
-         estimatedImprovement: Double,
-         conflicts: [String]) {
-        self.legacyRuleId = legacyRule.persistentModelID
-        self.legacyPattern = legacyRule.pattern
-        self.legacyTargetCategory = legacyRule.targetCategory
-        self.legacyMatchType = legacyRule.matchType
-        self.legacyPriority = legacyRule.priority
-        self.legacyIsActive = legacyRule.isActive
-        self.recommendedTier = recommendedTier
-        self.enhancedConfig = enhancedConfig
-        self.estimatedImprovement = estimatedImprovement
-        self.conflicts = conflicts
-        self.hasConflicts = !conflicts.isEmpty
-    }
+/// Results of migration execution
+struct MigrationResult {
+    var success = false
+    var migratedLegacy = 0
+    var migratedEnhanced = 0
+    var failed: [String] = []
 
-    /// User-friendly description of the migration
-    var migrationDescription: String {
-        switch recommendedTier {
-        case .simple:
-            if let config = enhancedConfig {
-                return "Convert to simple rule with \(config.targetField.displayName) matching"
-            } else {
-                return "Convert to simple rule"
-            }
-        case .advanced:
-            return "Convert to advanced rule (requires review)"
-        }
-    }
-
-    /// Improvement benefits text
-    var improvementDescription: String {
-        if estimatedImprovement > 0.7 {
-            return "High improvement potential"
-        } else if estimatedImprovement > 0.4 {
-            return "Moderate improvement potential"
-        } else {
-            return "Minor improvement potential"
-        }
+    var totalMigrated: Int {
+        migratedLegacy + migratedEnhanced
     }
 }
 
-/// Result of migration execution.
-struct MigrationResult: Sendable {
-    var migratedCount: Int
-    var skippedCount: Int
-    var errorCount: Int
-    var errors: [String]
-
-    var wasSuccessful: Bool {
-        errorCount == 0
-    }
-
-    var successRate: Double {
-        let total = migratedCount + skippedCount + errorCount
-        guard total > 0 else { return 0 }
-        return Double(migratedCount) / Double(total)
-    }
-}
-
-/// Migration complexity assessment.
-enum MigrationComplexity: String, CaseIterable, Sendable {
-    case low = "low"
-    case medium = "medium"
-    case high = "high"
-
-    var displayName: String {
-        switch self {
-        case .low: return "Low (mostly automatic)"
-        case .medium: return "Medium (some review required)"
-        case .high: return "High (manual review recommended)"
-        }
-    }
-
-    var color: String {
-        switch self {
-        case .low: return "green"
-        case .medium: return "orange"
-        case .high: return "red"
-        }
-    }
-}
-
-/// Migration errors.
+/// Errors that can occur during migration
 enum MigrationError: Error, LocalizedError {
     case migrationInProgress
-    case noMigrationToRollback
-    case invalidConfiguration
-    case backupFailed
-    case legacyRuleNotFound
+    case migrationFailed(Error)
+    case noRulesToMigrate
 
     var errorDescription: String? {
         switch self {
         case .migrationInProgress:
-            return "A migration is already in progress"
-        case .noMigrationToRollback:
-            return "No migration in progress to rollback"
-        case .invalidConfiguration:
-            return "Invalid rule configuration during migration"
-        case .backupFailed:
-            return "Failed to create backup before migration"
-        case .legacyRuleNotFound:
-            return "Legacy rule not found in database during migration"
+            return "Migration is already in progress"
+        case .migrationFailed(let error):
+            return "Migration failed: \(error.localizedDescription)"
+        case .noRulesToMigrate:
+            return "No rules found to migrate"
         }
     }
+}
+
+// MARK: - Type Aliases for Legacy Models
+
+/// Type alias to distinguish old CategorizationRule from new one during migration
+typealias LegacyCategorizationRule = OldCategorizationRule
+
+/// Temporary model representing the old CategorizationRule structure
+struct OldCategorizationRule {
+    let pattern: String
+    let matchType: RuleMatchType
+    let standardizedName: String?
+    let targetCategory: String
+    let priority: Int
+    let isActive: Bool
+    let notes: String?
+    let matchCount: Int
+    let lastMatchedAt: Date?
+    let createdAt: Date
+    let modifiedAt: Date
 }

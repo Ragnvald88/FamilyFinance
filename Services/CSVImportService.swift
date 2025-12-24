@@ -287,13 +287,8 @@ class CSVImportService: ObservableObject {
             stage: .categorizing
         )
 
-        let rulesCache: RulesCache
-        do {
-            rulesCache = try await categorizationEngine.buildRulesCache()
-        } catch {
-            // Fallback to hardcoded rules if database fetch fails
-            rulesCache = categorizationEngine.buildHardcodedRulesCache()
-        }
+        // The new CategorizationEngine handles caching internally
+        // No external cache building needed
 
         // Phase 3: Delegate to BackgroundDataHandler for categorization + import
         progress = CSVImportProgress(
@@ -303,11 +298,41 @@ class CSVImportService: ObservableObject {
             stage: .saving
         )
 
+        // Use the new high-performance categorization engine for bulk processing
+        let categorizationResults = await categorizationEngine.categorizeBulk(allParsedTransactions)
+
+        // Create import data with categorization results
+        let transactionData = zip(allParsedTransactions, categorizationResults).map { parsed, result in
+            TransactionImportData(
+                iban: parsed.iban,
+                sequenceNumber: parsed.sequenceNumber,
+                date: parsed.date,
+                amount: parsed.amount,
+                balance: parsed.balance,
+                counterIBAN: parsed.counterIBAN,
+                counterName: parsed.counterName,
+                standardizedName: result.standardizedName,
+                description1: parsed.description1,
+                description2: parsed.description2,
+                description3: parsed.description3,
+                transactionCode: parsed.transactionCode,
+                valueDate: parsed.valueDate,
+                returnReason: parsed.returnReason,
+                mandateReference: parsed.mandateReference,
+                autoCategory: result.category, // Apply categorization from new engine
+                transactionType: parsed.transactionType,
+                contributor: parsed.contributor,
+                sourceFile: parsed.sourceFile,
+                importBatchID: UUID() // Generate unique batch ID for this import
+            )
+        }
+
         let handler = BackgroundDataHandler(modelContainer: modelContainer)
-        let importResult = try await handler.importWithCategorization(
-            allParsedTransactions,
-            rulesCache: rulesCache
-        )
+        let importResult = try await handler.importTransactions(transactionData)
+
+        // Calculate categorization statistics from our results
+        let categorizedCount = categorizationResults.filter { $0.category != nil }.count
+        let uncategorizedCount = categorizationResults.count - categorizedCount
 
         progress = CSVImportProgress(
             processedRows: importResult.imported,
@@ -324,8 +349,8 @@ class CSVImportService: ObservableObject {
             duplicates: importResult.duplicates,
             errors: errors,
             duration: duration,
-            categorized: importResult.categorized,
-            uncategorized: importResult.uncategorized,
+            categorized: categorizedCount,
+            uncategorized: uncategorizedCount,
             batchID: batchID,
             filesProcessed: urls.count
         )

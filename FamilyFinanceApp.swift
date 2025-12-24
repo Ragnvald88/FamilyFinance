@@ -1914,7 +1914,7 @@ struct RulesListView: View {
             return rules
         }
         return rules.filter {
-            $0.pattern.localizedCaseInsensitiveContains(searchText) ||
+            $0.name.localizedCaseInsensitiveContains(searchText) ||
             $0.targetCategory.localizedCaseInsensitiveContains(searchText)
         }
     }
@@ -2019,12 +2019,25 @@ struct RulesListView: View {
     }
 
     private func duplicateRule(_ rule: CategorizationRule) {
+        // Duplicate rule conditions
+        let duplicatedConditions = rule.conditions.map { condition in
+            RuleCondition(
+                field: condition.field,
+                operatorType: condition.operatorType,
+                value: condition.value,
+                sortOrder: condition.sortOrder
+            )
+        }
+
         let newRule = CategorizationRule(
-            pattern: rule.pattern + " (copy)",
-            matchType: rule.matchType,
-            standardizedName: rule.standardizedName,
+            name: rule.name + " (copy)",
             targetCategory: rule.targetCategory,
-            priority: rule.priority + 1
+            conditions: duplicatedConditions,
+            logicalOperator: rule.logicalOperator,
+            priority: rule.priority + 1,
+            isActive: rule.isActive,
+            notes: rule.notes,
+            standardizedName: rule.standardizedName
         )
         modelContext.insert(newRule)
         try? modelContext.save()
@@ -2048,11 +2061,11 @@ struct RuleRowView: View {
             // Info
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 4) {
-                    Text(rule.matchType.displayName)
+                    Text("Conditions")
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
-                    Text("\"" + rule.pattern + "\"")
+                    Text(rule.displaySummary)
                         .font(.subheadline)
                         .fontWeight(.medium)
                         .monospaced()
@@ -2178,8 +2191,9 @@ struct RuleEditorSheet: View {
         .frame(width: 450, height: 400)
         .onAppear {
             if let rule = rule {
-                pattern = rule.pattern
-                matchType = rule.matchType
+                // DEPRECATED: Legacy rule editing - will be replaced with new rule editor
+                // pattern = rule.pattern // OLD MODEL
+                // matchType = rule.matchType // OLD MODEL
                 standardizedName = rule.standardizedName ?? ""
                 targetCategory = rule.targetCategory
                 priority = rule.priority
@@ -2190,23 +2204,18 @@ struct RuleEditorSheet: View {
 
     private func saveRule() {
         if let existing = rule {
-            existing.pattern = pattern
-            existing.matchType = matchType
+            // DEPRECATED: Legacy rule editing - will be replaced with new rule editor
+            // existing.pattern = pattern // OLD MODEL
+            // existing.matchType = matchType // OLD MODEL
             existing.standardizedName = standardizedName.isEmpty ? nil : standardizedName
             existing.targetCategory = targetCategory
             existing.priority = priority
             existing.isActive = isActive
             onSave(existing)
         } else {
-            let newRule = CategorizationRule(
-                pattern: pattern,
-                matchType: matchType,
-                standardizedName: standardizedName.isEmpty ? nil : standardizedName,
-                targetCategory: targetCategory,
-                priority: priority
-            )
-            newRule.isActive = isActive
-            onSave(newRule)
+            // DEPRECATED: Legacy rule creation - will be replaced with new rule editor
+            // Temporarily disable new rule creation until new UI is ready
+            print("Legacy rule creation disabled - use new rule system")
         }
         dismiss()
     }
@@ -3989,7 +3998,7 @@ struct SimplifiedRulesView: View {
             return rules
         }
         return rules.filter {
-            $0.pattern.localizedCaseInsensitiveContains(searchText) ||
+            $0.name.localizedCaseInsensitiveContains(searchText) ||
             $0.targetCategory.localizedCaseInsensitiveContains(searchText)
         }
     }

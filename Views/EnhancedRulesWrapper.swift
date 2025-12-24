@@ -21,14 +21,10 @@ struct EnhancedRulesWrapper: View {
 
     // MARK: - State
 
-    @State private var complexityMode: RuleComplexityMode = .simple
-    @State private var showingMigrationAlert = false
-    @State private var showingAdvancedFeatures = false
     @State private var showingSimpleRuleBuilder = false
     @State private var showingAdvancedRuleBuilder = false
-    @State private var showingAIInsights = false
 
-    // MARK: - Legacy Data for Migration
+    // MARK: - Data Queries
 
     @Query(sort: \CategorizationRule.priority) private var legacyRules: [CategorizationRule]
     @Query(sort: \EnhancedCategorizationRule.priority) private var enhancedRules: [EnhancedCategorizationRule]
@@ -37,12 +33,13 @@ struct EnhancedRulesWrapper: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // Header with complexity selector
-                headerSection
-
-                // Progressive disclosure based on complexity
-                contentSection
+            // Direct access to rules management
+            if enhancedRules.isEmpty {
+                EnhancedRulesEmptyState {
+                    showingSimpleRuleBuilder = true
+                }
+            } else {
+                RulesManagementView()
             }
             .navigationTitle("Categorization Rules")
             .navigationBarTitleDisplayMode(.large)
@@ -50,7 +47,7 @@ struct EnhancedRulesWrapper: View {
                 toolbarContent
             }
             .onAppear {
-                checkForMigration()
+                // Migration check removed - will implement in new system
             }
         }
         .sheet(isPresented: $showingSimpleRuleBuilder) {
@@ -59,355 +56,31 @@ struct EnhancedRulesWrapper: View {
         .sheet(isPresented: $showingAdvancedRuleBuilder) {
             AdvancedBooleanLogicBuilder()
         }
-        .sheet(isPresented: $showingAIInsights) {
-            AIRuleInsightsView(modelContext: modelContext)
-        }
-        .alert("Enhanced Rules Available", isPresented: $showingMigrationAlert) {
-            Button("Use Enhanced System") {
-                withAnimation(.spring(response: 0.5)) {
-                    complexityMode = .enhanced
-                }
-            }
-            Button("Keep Simple") {
-                complexityMode = .simple
-            }
-        } message: {
-            Text("You can upgrade to the enhanced rule system with more powerful features like account filtering, amount ranges, and advanced logic.")
-        }
     }
 
-    // MARK: - Header Section
 
-    private var headerSection: some View {
-        VStack(spacing: DesignTokens.Spacing.m) {
-            // Statistics overview
-            HStack(spacing: DesignTokens.Spacing.xl) {
-                StatisticView(
-                    title: "Total Rules",
-                    value: "\(legacyRules.count + enhancedRules.count)",
-                    subtitle: "active rules",
-                    color: .blue
-                )
-
-                StatisticView(
-                    title: "Enhanced",
-                    value: "\(enhancedRules.count)",
-                    subtitle: "advanced rules",
-                    color: .green
-                )
-
-                StatisticView(
-                    title: "Legacy",
-                    value: "\(legacyRules.count)",
-                    subtitle: "basic rules",
-                    color: .orange
-                )
-            }
-
-            // Complexity Mode Selector
-            Picker("Rule System", selection: $complexityMode) {
-                Text("Simple Rules").tag(RuleComplexityMode.simple)
-                Text("Enhanced Rules").tag(RuleComplexityMode.enhanced)
-                Text("Advanced Logic").tag(RuleComplexityMode.advanced)
-            }
-            .pickerStyle(.segmented)
-            .animation(.spring(response: 0.3), value: complexityMode)
-        }
-        .padding(DesignTokens.Spacing.l)
-        .background(Color(nsColor: .controlBackgroundColor))
-    }
-
-    // MARK: - Content Section
-
-    private var contentSection: some View {
-        Group {
-            switch complexityMode {
-            case .simple:
-                LegacyRulesView()
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .leading).combined(with: .opacity),
-                        removal: .move(edge: .trailing).combined(with: .opacity)
-                    ))
-
-            case .enhanced:
-                if enhancedRules.isEmpty {
-                    EnhancedRulesEmptyState {
-                        showingSimpleRuleBuilder = true
-                    }
-                } else {
-                    RulesManagementView()
-                }
-
-            case .advanced:
-                AdvancedRulesView()
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .trailing).combined(with: .opacity),
-                        removal: .move(edge: .leading).combined(with: .opacity)
-                    ))
-            }
-        }
-    }
 
     // MARK: - Toolbar
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItemGroup(placement: .primaryAction) {
-            if complexityMode == .simple && !legacyRules.isEmpty {
-                Button("Upgrade to Enhanced") {
-                    withAnimation(.spring(response: 0.5)) {
-                        complexityMode = .enhanced
-                    }
-                }
-                .buttonStyle(.borderedProminent)
-            }
-
             Menu {
-                Button("Simple Rule") {
+                Button("Create Rule") {
                     showingSimpleRuleBuilder = true
-                }
-
-                if complexityMode != .simple {
-                    Button("Enhanced Rule") {
-                        showingSimpleRuleBuilder = true  // SimpleRuleBuilderView handles enhanced too
-                    }
-                }
-
-                if complexityMode == .advanced {
-                    Button("Advanced Logic Rule") {
-                        showingAdvancedRuleBuilder = true
-                    }
                 }
             } label: {
                 Image(systemName: "plus")
             }
 
-            // AI Insights button for advanced mode
-            if complexityMode == .advanced {
-                Button {
-                    showingAIInsights = true
-                } label: {
-                    Image(systemName: "brain.head.profile")
-                }
-                .help("AI Rule Intelligence")
-            }
         }
     }
 
-    // MARK: - Methods
-
-    private func checkForMigration() {
-        // If user has legacy rules but no enhanced rules, suggest migration
-        if !legacyRules.isEmpty && enhancedRules.isEmpty && complexityMode == .simple {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                showingMigrationAlert = true
-            }
-        }
-    }
 }
 
-// MARK: - Supporting Types
 
-enum RuleComplexityMode: String, CaseIterable {
-    case simple = "Simple"
-    case enhanced = "Enhanced"
-    case advanced = "Advanced"
 
-    var displayName: String { rawValue }
 
-    var description: String {
-        switch self {
-        case .simple:
-            return "Basic pattern matching with categories"
-        case .enhanced:
-            return "Account filtering, amount ranges, field targeting"
-        case .advanced:
-            return "Full Boolean logic with AND/OR/NOT operations"
-        }
-    }
-}
-
-// MARK: - Statistic View
-
-private struct StatisticView: View {
-    let title: String
-    let value: String
-    let subtitle: String
-    let color: Color
-
-    var body: some View {
-        VStack(spacing: 4) {
-            Text(value)
-                .font(.system(.title2, design: .rounded))
-                .fontWeight(.bold)
-                .foregroundStyle(color)
-
-            Text(title)
-                .font(.caption)
-                .fontWeight(.medium)
-                .foregroundStyle(.primary)
-
-            Text(subtitle)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, DesignTokens.Spacing.s)
-    }
-}
-
-// MARK: - Legacy Rules View
-
-private struct LegacyRulesView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query(sort: \CategorizationRule.priority) private var rules: [CategorizationRule]
-    @Query(sort: \Category.sortOrder) private var categories: [Category]
-
-    @State private var searchText = ""
-    @State private var showingAddSheet = false
-    @State private var editingRule: CategorizationRule?
-
-    private var filteredRules: [CategorizationRule] {
-        if searchText.isEmpty {
-            return rules
-        }
-        return rules.filter {
-            $0.pattern.localizedCaseInsensitiveContains(searchText) ||
-            $0.targetCategory.localizedCaseInsensitiveContains(searchText)
-        }
-    }
-
-    var body: some View {
-        VStack(spacing: DesignTokens.Spacing.m) {
-            // Search bar
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.secondary)
-                TextField("Search rules...", text: $searchText)
-                    .textFieldStyle(.plain)
-            }
-            .padding(DesignTokens.Spacing.m)
-            .background(Color(nsColor: .controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .padding(.horizontal, DesignTokens.Spacing.l)
-
-            // Rules list or empty state
-            if rules.isEmpty {
-                emptyStateView
-            } else {
-                rulesList
-            }
-        }
-    }
-
-    private var emptyStateView: some View {
-        VStack(spacing: DesignTokens.Spacing.l) {
-            Image(systemName: "slider.horizontal.3")
-                .font(.system(size: 64))
-                .foregroundStyle(.secondary)
-
-            VStack(spacing: DesignTokens.Spacing.s) {
-                Text("No Custom Rules")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-
-                Text("Create rules to automatically categorize your transactions based on patterns.")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-
-            Button("Create Your First Rule") {
-                showingAddSheet = true
-            }
-            .buttonStyle(.borderedProminent)
-        }
-        .padding(DesignTokens.Spacing.xl)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    private var rulesList: some View {
-        List {
-            ForEach(filteredRules) { rule in
-                SimplifiedRuleRow(rule: rule)
-                    .onTapGesture {
-                        editingRule = rule
-                    }
-            }
-            .onDelete(perform: deleteRules)
-        }
-        .listStyle(.inset)
-        .sheet(isPresented: $showingAddSheet) {
-            BasicRuleEditorSheet(rule: nil, categories: categories)
-        }
-        .sheet(item: $editingRule) { rule in
-            BasicRuleEditorSheet(rule: rule, categories: categories)
-        }
-    }
-
-    private func deleteRules(at offsets: IndexSet) {
-        for index in offsets {
-            modelContext.delete(filteredRules[index])
-        }
-        try? modelContext.save()
-    }
-}
-
-// MARK: - Simplified Rule Row
-
-private struct SimplifiedRuleRow: View {
-    let rule: CategorizationRule
-
-    var body: some View {
-        HStack(spacing: DesignTokens.Spacing.m) {
-            // Priority indicator
-            Circle()
-                .fill(rule.isActive ? Color.green : Color.gray)
-                .frame(width: 8, height: 8)
-
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text(rule.pattern)
-                        .font(.headline)
-                        .lineLimit(1)
-
-                    Spacer()
-
-                    Text("#\(rule.priority)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.blue.opacity(0.1))
-                        .clipShape(Capsule())
-                }
-
-                HStack {
-                    Text(rule.targetCategory)
-                        .font(.subheadline)
-                        .foregroundStyle(.blue)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(Color.blue.opacity(0.1))
-                        .clipShape(Capsule())
-
-                    Text(rule.matchType.displayName)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-
-                    Spacer()
-
-                    if rule.matchCount > 0 {
-                        Text("\(rule.matchCount) matches")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                    }
-                }
-            }
-        }
-        .padding(.vertical, 4)
-    }
-}
 
 // MARK: - Enhanced Rules Empty State
 
@@ -483,10 +156,11 @@ private struct FeatureRow: View {
 // MARK: - Advanced Rules View
 
 private struct AdvancedRulesView: View {
-    @Environment(\.modelContext) private var modelContext
-
     var body: some View {
-        AIRuleInsightsView(modelContext: modelContext)
+        Text("Advanced analytics coming soon...")
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(NSColor.controlBackgroundColor))
     }
 }
 

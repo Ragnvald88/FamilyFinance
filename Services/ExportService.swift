@@ -77,16 +77,20 @@ class ExportService: ObservableObject {
 
         let rules = try modelContext.fetch(descriptor)
 
-        var csvContent = "Pattern,Standardized Name,Category,Priority,Active,Match Type,Match Count\n"
+        var csvContent = "Name,Conditions,Category,Priority,Active,Match Count\n"
 
         for rule in rules {
+            // Create a summary of conditions for the new rule format
+            let conditionsSummary = rule.conditions.isEmpty
+                ? "No conditions"
+                : rule.conditions.map { $0.displayText }.joined(separator: "; ")
+
             let row = [
-                escapeCSV(rule.pattern),
-                escapeCSV(rule.standardizedName ?? ""),
+                escapeCSV(rule.name),
+                escapeCSV(conditionsSummary),
                 escapeCSV(rule.targetCategory),
                 String(rule.priority),
                 rule.isActive ? "Yes" : "No",
-                rule.matchType.rawValue,
                 String(rule.matchCount)
             ].joined(separator: ",")
 

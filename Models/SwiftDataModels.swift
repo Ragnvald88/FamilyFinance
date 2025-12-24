@@ -580,30 +580,36 @@ final class Category {
 
 // MARK: - Categorization Rule Model
 
-/// Pattern-based categorization rule with priority
+/// Modern unified categorization rule with flexible conditions
 @Model
 final class CategorizationRule {
+    // MARK: - Core Identity
 
-    /// Search pattern (lowercase, for matching)
-    var pattern: String
+    /// User-friendly rule name for management
+    var name: String
 
-    /// Match type (contains, startsWith, etc.)
-    var matchType: RuleMatchType
-
-    /// Standardized counter party name (output)
-    var standardizedName: String?
-
-    /// Target category
+    /// Target category to assign when rule matches
     var targetCategory: String
 
     /// Rule priority (lower = higher priority)
     var priority: Int
 
-    /// Is rule active?
+    /// Is rule currently active?
     var isActive: Bool
 
-    /// Rule description/notes
+    /// Optional description/notes for this rule
     var notes: String?
+
+    // MARK: - Rule Configuration
+
+    /// All conditions for this rule
+    @Relationship(deleteRule: .cascade) var conditions: [RuleCondition]
+
+    /// How multiple conditions are combined (AND/OR)
+    var logicalOperator: LogicalOperator
+
+    /// Standardized counter party name (for backward compatibility)
+    var standardizedName: String?
 
     // MARK: - Statistics
 
@@ -622,53 +628,49 @@ final class CategorizationRule {
     // MARK: - Initialization
 
     init(
-        pattern: String,
-        matchType: RuleMatchType = .contains,
-        standardizedName: String? = nil,
+        name: String,
         targetCategory: String,
+        conditions: [RuleCondition] = [],
+        logicalOperator: LogicalOperator = .and,
         priority: Int = 100,
         isActive: Bool = true,
-        notes: String? = nil
+        notes: String? = nil,
+        standardizedName: String? = nil
     ) {
-        self.pattern = pattern.lowercased()
-        self.matchType = matchType
-        self.standardizedName = standardizedName
+        self.name = name
         self.targetCategory = targetCategory
+        self.conditions = conditions
+        self.logicalOperator = logicalOperator
         self.priority = priority
         self.isActive = isActive
         self.notes = notes
+        self.standardizedName = standardizedName
         self.matchCount = 0
         self.createdAt = Date()
         self.modifiedAt = Date()
     }
 
-    // MARK: - Matching Logic
+    // MARK: - Rule Properties
 
-    /// Check if this rule matches given text
-    func matches(_ text: String) -> Bool {
-        guard isActive else { return false }
+    /// True if this is a simple rule (single condition)
+    var isSimple: Bool {
+        conditions.count <= 1
+    }
 
-        let searchText = text.lowercased()
+    /// True if this is an advanced rule (multiple conditions)
+    var isAdvanced: Bool {
+        conditions.count > 1
+    }
 
-        switch matchType {
-        case .contains:
-            return searchText.contains(pattern)
+    /// Human-readable summary of this rule
+    var displaySummary: String {
+        guard !conditions.isEmpty else { return "No conditions" }
 
-        case .startsWith:
-            return searchText.hasPrefix(pattern)
-
-        case .endsWith:
-            return searchText.hasSuffix(pattern)
-
-        case .exact:
-            return searchText == pattern
-
-        case .regex:
-            guard let regex = try? NSRegularExpression(pattern: pattern) else {
-                return false
-            }
-            let range = NSRange(searchText.startIndex..<searchText.endIndex, in: searchText)
-            return regex.firstMatch(in: searchText, range: range) != nil
+        if conditions.count == 1 {
+            return conditions[0].displayText
+        } else {
+            let connector = logicalOperator.displayName.uppercased()
+            return "\(conditions.count) conditions (\(connector))"
         }
     }
 
@@ -676,6 +678,144 @@ final class CategorizationRule {
     func recordMatch() {
         matchCount += 1
         lastMatchedAt = Date()
+        modifiedAt = Date()
+    }
+}
+
+// MARK: - Rule Condition Model
+
+/// Individual condition within a categorization rule
+@Model
+final class RuleCondition {
+    /// What field to check (description, amount, etc.)
+    var field: ConditionField
+
+    /// How to compare the field value
+    var operatorType: ConditionOperator
+
+    /// Value to compare against
+    var value: String
+
+    /// Order for display and evaluation
+    var sortOrder: Int
+
+    /// Parent rule relationship
+    var parentRule: CategorizationRule?
+
+    /// Creation timestamp
+    var createdAt: Date
+
+    init(
+        field: ConditionField,
+        operatorType: ConditionOperator,
+        value: String,
+        sortOrder: Int = 0
+    ) {
+        self.field = field
+        self.operatorType = operatorType
+        self.value = value
+        self.sortOrder = sortOrder
+        self.createdAt = Date()
+    }
+
+    /// Human-readable display of this condition
+    var displayText: String {
+        "\(field.displayName) \(operatorType.displayName) \(value)"
+    }
+}
+
+// MARK: - Rule System Enums
+
+/// Fields that can be checked in rule conditions
+enum ConditionField: String, CaseIterable, Codable, Sendable {
+    case description = "description"
+    case counterParty = "counterParty"
+    case counterIBAN = "counterIBAN"
+    case amount = "amount"
+    case account = "account"
+    case transactionType = "transactionType"
+    case date = "date"
+    case transactionCode = "transactionCode"
+
+    var displayName: String {
+        switch self {
+        case .description: return "Description"
+        case .counterParty: return "Counter Party"
+        case .counterIBAN: return "Counter IBAN"
+        case .amount: return "Amount"
+        case .account: return "Account"
+        case .transactionType: return "Transaction Type"
+        case .date: return "Date"
+        case .transactionCode: return "Transaction Code"
+        }
+    }
+
+    var isNumeric: Bool {
+        switch self {
+        case .amount: return true
+        default: return false
+        }
+    }
+}
+
+/// Operators for comparing field values
+enum ConditionOperator: String, CaseIterable, Codable, Sendable {
+    case contains = "contains"
+    case equals = "equals"
+    case startsWith = "startsWith"
+    case endsWith = "endsWith"
+    case greaterThan = "greaterThan"
+    case lessThan = "lessThan"
+    case between = "between"
+    case matches = "matches" // regex
+
+    var displayName: String {
+        switch self {
+        case .contains: return "contains"
+        case .equals: return "equals"
+        case .startsWith: return "starts with"
+        case .endsWith: return "ends with"
+        case .greaterThan: return "greater than"
+        case .lessThan: return "less than"
+        case .between: return "between"
+        case .matches: return "matches pattern"
+        }
+    }
+
+    /// Valid operators for the given field
+    static func validOperators(for field: ConditionField) -> [ConditionOperator] {
+        switch field {
+        case .amount:
+            return [.equals, .greaterThan, .lessThan, .between]
+        case .description, .counterParty, .counterIBAN, .transactionCode:
+            return [.contains, .equals, .startsWith, .endsWith, .matches]
+        case .account:
+            return [.equals, .contains]
+        case .transactionType:
+            return [.equals]
+        case .date:
+            return [.equals, .greaterThan, .lessThan, .between]
+        }
+    }
+}
+
+/// How multiple conditions are combined
+enum LogicalOperator: String, CaseIterable, Codable, Sendable {
+    case and = "AND"
+    case or = "OR"
+
+    var displayName: String {
+        switch self {
+        case .and: return "AND"
+        case .or: return "OR"
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .and: return "All conditions must match"
+        case .or: return "Any condition must match"
+        }
     }
 }
 

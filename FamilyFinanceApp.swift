@@ -469,7 +469,7 @@ struct ContentView: View {
         case .insights:
             InsightsViewWrapper()
         case .rules:
-            RulesListView()
+            EnhancedRulesWrapper()
         case .import:
             ImportViewWrapper()
         }
@@ -3749,3 +3749,471 @@ enum DatabaseError: Error, LocalizedError {
         }
     }
 }
+
+// MARK: - Enhanced Rules System Integration
+
+/// Progressive complexity rule system that bridges legacy and enhanced systems
+struct EnhancedRulesWrapper: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \CategorizationRule.priority) private var legacyRules: [CategorizationRule]
+
+    @State private var complexityMode: RuleComplexityMode = .simple
+    @State private var showingUpgradeAlert = false
+    @State private var showingAIInsights = false
+    @State private var showingMarketplace = false
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                // Header with stats and mode selector
+                headerSection
+
+                // Content based on complexity mode
+                contentSection
+            }
+            .navigationTitle("Categorization Rules")
+            .toolbar {
+                ToolbarItemGroup(placement: .primaryAction) {
+                    Button("Marketplace") {
+                        showingMarketplace = true
+                    }
+                    .buttonStyle(.bordered)
+                    .help("Browse and share rule templates")
+
+                    Button("AI Insights") {
+                        showingAIInsights = true
+                    }
+                    .buttonStyle(.bordered)
+                    .help("View intelligent rule suggestions and analytics")
+
+                    createRuleButton
+                }
+            }
+            .onAppear {
+                checkForUpgradeOpportunity()
+            }
+            .alert("Enhanced Rules Available", isPresented: $showingUpgradeAlert) {
+                Button("Try Enhanced Features") {
+                    withAnimation(.spring(response: 0.5)) {
+                        complexityMode = .enhanced
+                    }
+                }
+                Button("Stay with Simple") { }
+            } message: {
+                Text("Upgrade to enhanced rules with account filtering, amount ranges, and advanced logic.")
+            }
+            .sheet(isPresented: $showingAIInsights) {
+                VStack(spacing: 20) {
+                    Image(systemName: "brain.head.profile")
+                        .font(.system(size: 64))
+                        .foregroundStyle(.blue)
+
+                    Text("AI Rule Intelligence")
+                        .font(.title)
+                        .fontWeight(.bold)
+
+                    Text("Smart suggestions, conflict detection, and performance analytics")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+
+                    Text("🚀 Coming from separate AI insights view...")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
+                .padding(40)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .sheet(isPresented: $showingMarketplace) {
+                VStack(spacing: 20) {
+                    Image(systemName: "storefront")
+                        .font(.system(size: 64))
+                        .foregroundStyle(.green)
+
+                    Text("Rule Marketplace")
+                        .font(.title)
+                        .fontWeight(.bold)
+
+                    Text("Discover, share, and collaborate on categorization rules")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+
+                    VStack(spacing: 8) {
+                        Text("✨ Featured Templates for Dutch Banking")
+                        Text("🌍 Community Rule Sharing")
+                        Text("📦 Import/Export Rule Packs")
+                        Text("⭐ Rate & Review System")
+                        Text("🤝 Collaborative Curation")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+
+                    Text("🚀 Coming from separate marketplace view...")
+                        .font(.caption)
+                        .foregroundStyle(.quaternary)
+                }
+                .padding(40)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+    }
+
+    private var headerSection: some View {
+        VStack(spacing: 16) {
+            // Rule count and upgrade indicator
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("\(legacyRules.count) Active Rules")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+
+                    Text(complexityModeDescription)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                if complexityMode == .simple && !legacyRules.isEmpty {
+                    Button("Upgrade") {
+                        withAnimation(.spring(response: 0.5)) {
+                            complexityMode = .enhanced
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+                }
+            }
+
+            // Mode selector
+            Picker("Complexity", selection: $complexityMode) {
+                Text("Simple Rules").tag(RuleComplexityMode.simple)
+                Text("Enhanced Rules").tag(RuleComplexityMode.enhanced)
+                Text("Advanced Logic").tag(RuleComplexityMode.advanced)
+            }
+            .pickerStyle(.segmented)
+            .animation(.spring(response: 0.3), value: complexityMode)
+        }
+        .padding()
+        .background(Color(nsColor: .controlBackgroundColor))
+    }
+
+    private var contentSection: some View {
+        Group {
+            switch complexityMode {
+            case .simple:
+                SimplifiedRulesView(rules: legacyRules)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .leading).combined(with: .opacity),
+                        removal: .move(edge: .trailing).combined(with: .opacity)
+                    ))
+
+            case .enhanced:
+                EnhancedRulesPromptView {
+                    // Navigate to full enhanced system
+                    complexityMode = .advanced
+                }
+                .transition(.opacity.combined(with: .scale))
+
+            case .advanced:
+                VStack {
+                    Text("Advanced Boolean Logic Builder")
+                        .font(.title)
+                    Text("Coming from separate file...")
+                        .foregroundStyle(.secondary)
+                }
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal: .move(edge: .leading).combined(with: .opacity)
+                    ))
+            }
+        }
+    }
+
+    private var createRuleButton: some View {
+        Menu {
+            Button("Simple Pattern Rule") {
+                // Create basic rule - use existing sheet
+            }
+
+            if complexityMode != .simple {
+                Button("Enhanced Rule") {
+                    // Create enhanced rule
+                }
+            }
+
+            if complexityMode == .advanced {
+                Button("Advanced Logic Rule") {
+                    // Create complex rule
+                }
+            }
+        } label: {
+            Label("Add Rule", systemImage: "plus")
+        }
+    }
+
+    private var complexityModeDescription: String {
+        switch complexityMode {
+        case .simple:
+            return "Basic pattern matching with categories"
+        case .enhanced:
+            return "Enhanced rules with smart filtering"
+        case .advanced:
+            return "Advanced Boolean logic and complex conditions"
+        }
+    }
+
+    private func checkForUpgradeOpportunity() {
+        if !legacyRules.isEmpty && complexityMode == .simple {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                showingUpgradeAlert = true
+            }
+        }
+    }
+}
+
+enum RuleComplexityMode: String, CaseIterable {
+    case simple = "Simple"
+    case enhanced = "Enhanced"
+    case advanced = "Advanced"
+}
+
+/// Simplified view of legacy rules with modern UI
+struct SimplifiedRulesView: View {
+    let rules: [CategorizationRule]
+    @State private var searchText = ""
+
+    private var filteredRules: [CategorizationRule] {
+        if searchText.isEmpty {
+            return rules
+        }
+        return rules.filter {
+            $0.pattern.localizedCaseInsensitiveContains(searchText) ||
+            $0.targetCategory.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Search bar
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField("Search rules...", text: $searchText)
+                    .textFieldStyle(.plain)
+            }
+            .padding(12)
+            .background(Color(nsColor: .controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+
+            // Rules list
+            if rules.isEmpty {
+                EmptyRulesView()
+            } else {
+                List {
+                    ForEach(filteredRules) { rule in
+                        ModernRuleRow(rule: rule)
+                    }
+                }
+                .listStyle(.inset)
+            }
+        }
+    }
+}
+
+struct ModernRuleRow: View {
+    let rule: CategorizationRule
+
+    var body: some View {
+        HStack(spacing: 12) {
+            // Status indicator
+            Circle()
+                .fill(rule.isActive ? Color.green : Color.gray)
+                .frame(width: 8, height: 8)
+
+            // Rule content
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(rule.pattern)
+                        .font(.headline)
+                        .lineLimit(1)
+
+                    Spacer()
+
+                    Text("#\(rule.priority)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.blue.opacity(0.15))
+                        .clipShape(Capsule())
+                }
+
+                HStack {
+                    Text(rule.targetCategory)
+                        .font(.subheadline)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(Color.blue)
+                        .clipShape(Capsule())
+
+                    Text(rule.matchType.displayName)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    Spacer()
+
+                    if rule.matchCount > 0 {
+                        Text("\(rule.matchCount) matches")
+                            .font(.caption)
+                            .foregroundStyle(.green)
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 4)
+        .contentShape(Rectangle())
+        .contextMenu {
+            Button("Edit") { }
+            Button("Duplicate") { }
+            Divider()
+            Button("Delete", role: .destructive) { }
+        }
+    }
+}
+
+struct EmptyRulesView: View {
+    var body: some View {
+        VStack(spacing: 24) {
+            Image(systemName: "slider.horizontal.3")
+                .font(.system(size: 64))
+                .foregroundStyle(.blue.opacity(0.6))
+
+            VStack(spacing: 8) {
+                Text("No Rules Yet")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+
+                Text("Create your first rule to automatically categorize transactions")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            VStack(spacing: 12) {
+                Button("Create Simple Rule") {
+                    // Create rule action
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+
+                Button("See Examples") {
+                    // Show examples
+                }
+                .buttonStyle(.bordered)
+            }
+        }
+        .padding(40)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+struct EnhancedRulesPromptView: View {
+    let onAdvanced: () -> Void
+
+    var body: some View {
+        VStack(spacing: 32) {
+            Image(systemName: "wand.and.stars")
+                .font(.system(size: 64))
+                .foregroundStyle(.blue)
+
+            VStack(spacing: 16) {
+                Text("Enhanced Rules")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+
+                Text("Take your categorization to the next level with advanced features that make FamilyFinance more powerful than any other finance app.")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(3)
+
+                // Feature highlights
+                VStack(spacing: 12) {
+                    FeatureHighlight(
+                        icon: "building.columns",
+                        title: "Account Targeting",
+                        description: "Create rules specific to individual accounts"
+                    )
+
+                    FeatureHighlight(
+                        icon: "eurosign.circle",
+                        title: "Amount Ranges",
+                        description: "Filter by transaction amounts and ranges"
+                    )
+
+                    FeatureHighlight(
+                        icon: "target",
+                        title: "Smart Fields",
+                        description: "Match against descriptions, merchants, IBANs"
+                    )
+
+                    FeatureHighlight(
+                        icon: "gear.badge",
+                        title: "Advanced Logic",
+                        description: "Boolean AND/OR conditions for complex rules"
+                    )
+                }
+                .padding(16)
+                .background(Color.blue.opacity(0.05))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+
+            VStack(spacing: 12) {
+                Button("Unlock Enhanced Features") {
+                    onAdvanced()
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+
+                Text("Coming Soon - Advanced Boolean Logic Builder")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(40)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+struct FeatureHighlight: View {
+    let icon: String
+    let title: String
+    let description: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundStyle(.blue)
+                .frame(width: 24)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+
+                Text(description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+        }
+    }
+}
+

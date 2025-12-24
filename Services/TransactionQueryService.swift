@@ -614,7 +614,6 @@ class TransactionQueryService: ObservableObject {
 
     /// Get monthly spending data for insights charts
     func getMonthlySpending(from startDate: Date, to endDate: Date) async throws -> [MonthlySpendingData] {
-        let calendar = Calendar.current
         let filter = TransactionFilter(
             transactionType: .expense,
             dateRange: DateInterval(start: startDate, end: endDate)
@@ -844,43 +843,36 @@ class TransactionQueryService: ObservableObject {
         return filteredTransactions.count
     }
 
-    /// Stream transactions in chunks for very large datasets (50k+ records)
-    /// Returns async sequence for memory-efficient processing
-    func streamTransactions(
+    /// Get multiple pages of transactions efficiently for very large datasets
+    /// Returns array of transaction chunks for memory-efficient batch processing
+    func getTransactionsInBatches(
         filter: TransactionFilter,
-        chunkSize: Int = 500
-    ) -> AsyncStream<[Transaction]> {
-        AsyncStream<[Transaction]> { continuation in
-            Task { @MainActor in
-                var offset = 0
-                var hasMore = true
+        chunkSize: Int = 500,
+        maxBatches: Int = 10
+    ) async throws -> [[Transaction]] {
+        var batches: [[Transaction]] = []
+        var offset = 0
 
-                while hasMore {
-                    do {
-                        let chunk = try await getTransactionsPaginated(
-                            filter: filter,
-                            offset: offset,
-                            limit: chunkSize
-                        )
+        for _ in 0..<maxBatches {
+            let chunk = try await getTransactionsPaginated(
+                filter: filter,
+                offset: offset,
+                limit: chunkSize
+            )
 
-                        if chunk.isEmpty || chunk.count < chunkSize {
-                            hasMore = false
-                        }
+            if chunk.isEmpty {
+                break
+            }
 
-                        continuation.yield(chunk)
-                        offset += chunkSize
+            batches.append(chunk)
+            offset += chunkSize
 
-                        if !hasMore {
-                            continuation.finish()
-                        }
-
-                    } catch {
-                        continuation.finish(throwing: error)
-                        break
-                    }
-                }
+            if chunk.count < chunkSize {
+                break // Last batch
             }
         }
+
+        return batches
     }
 
     /// Get transactions with intelligent pre-loading for smooth scrolling

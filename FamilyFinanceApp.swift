@@ -300,7 +300,7 @@ struct ContentView: View {
         case .dashboard:
             DashboardViewWrapper()
         case .transactions:
-            OptimizedTransactionsListView()
+            OptimizedTransactionsViewWrapper()
         case .transfers:
             TransfersListView()
         case .categories:
@@ -379,6 +379,26 @@ struct InsightsViewWrapper: View {
                 InsightsView(queryService: service)
             } else {
                 ProgressView("Loading...")
+                    .onAppear {
+                        queryService = TransactionQueryService(modelContext: modelContext)
+                    }
+            }
+        }
+    }
+}
+
+/// High-performance wrapper for optimized transactions list (15k+ records)
+/// Uses pagination, virtualized scrolling, and database-level filtering
+struct OptimizedTransactionsViewWrapper: View {
+    @Environment(\.modelContext) private var modelContext
+    @State private var queryService: TransactionQueryService?
+
+    var body: some View {
+        Group {
+            if let service = queryService {
+                OptimizedTransactionsView(queryService: service)
+            } else {
+                ProgressView("Loading transactions...")
                     .onAppear {
                         queryService = TransactionQueryService(modelContext: modelContext)
                     }
@@ -2646,6 +2666,392 @@ enum TimeframeFilter: CaseIterable {
         case .year: return "Year"
         case .allTime: return "All Time"
         }
+    }
+}
+
+// MARK: - High-Performance Optimized Transactions View (15k+ Records)
+
+struct OptimizedTransactionsView: View {
+
+    // MARK: - Environment & State
+
+    @Environment(\.modelContext) private var modelContext
+    @StateObject private var viewModel: OptimizedTransactionsViewModel
+
+    @State private var searchText = ""
+    @State private var selectedType: TransactionType? = nil
+    @State private var selectedCategory: String? = nil
+    @State private var selectedTransaction: Transaction?
+    @State private var searchDebouncer = SearchDebouncer()
+
+    // MARK: - Data Queries (Light-weight)
+
+    @Query(sort: \Account.iban) private var accounts: [Account]
+    @Query(sort: \Category.sortOrder) private var categories: [Category]
+
+    // MARK: - Initialization
+
+    init(queryService: TransactionQueryService) {
+        _viewModel = StateObject(wrappedValue: OptimizedTransactionsViewModel(queryService: queryService))
+    }
+
+    // MARK: - Body
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Optimized header with filters
+            optimizedHeader
+
+            Divider()
+
+            // High-performance transaction list with virtualization
+            mainContent
+        }
+        .onAppear { Task { await viewModel.initialLoad() } }
+        .onChange(of: searchText) { _, newValue in
+            searchDebouncer.debounce(delay: 0.3) { Task { await applyFilters() } }
+        }
+        .onChange(of: selectedType) { _, _ in Task { await applyFilters() } }
+        .onChange(of: selectedCategory) { _, _ in Task { await applyFilters() } }
+        .sheet(item: $selectedTransaction) { transaction in
+            TransactionDetailView(transaction: transaction)
+        }
+    }
+
+    // MARK: - Optimized Header
+
+    private var optimizedHeader: some View {
+        VStack(spacing: 16) {
+            HStack {
+                Text("Transactions")
+                    .font(.system(size: 28, weight: .bold))
+
+                Spacer()
+
+                // Performance counter
+                if viewModel.hasMorePages {
+                    Text("\(viewModel.transactions.count)+ of \(viewModel.totalCount ?? 0)")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("\(viewModel.transactions.count) transactions")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            // Compact filter row
+            HStack(spacing: 12) {
+                // Search with clear button
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundStyle(.secondary)
+                    TextField("Search transactions...", text: $searchText)
+                        .textFieldStyle(.plain)
+                    if !searchText.isEmpty {
+                        Button(action: { searchText = "" }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(8)
+                .background(Color(nsColor: .controlBackgroundColor))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                // Type filter
+                Picker("Type", selection: $selectedType) {
+                    Text("All").tag(nil as TransactionType?)
+                    Text("Income").tag(TransactionType.income as TransactionType?)
+                    Text("Expenses").tag(TransactionType.expense as TransactionType?)
+                }
+                .pickerStyle(.menu)
+                .frame(width: 120)
+
+                // Category filter
+                Picker("Category", selection: $selectedCategory) {
+                    Text("All Categories").tag(nil as String?)
+                    ForEach(categories.filter { $0.type == .expense }, id: \.name) { category in
+                        Text(category.name).tag(category.name as String?)
+                    }
+                }
+                .pickerStyle(.menu)
+                .frame(width: 180)
+
+                // Clear filters
+                if hasActiveFilters {
+                    Button("Clear") { clearFilters() }
+                        .buttonStyle(.bordered)
+                }
+            }
+        }
+        .padding()
+    }
+
+    // MARK: - Main Content with Virtualization
+
+    private var mainContent: some View {
+        ZStack {
+            if viewModel.isLoading && viewModel.transactions.isEmpty {
+                ProgressView("Loading transactions...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if viewModel.transactions.isEmpty {
+                ContentUnavailableView(
+                    "No Transactions Found",
+                    systemImage: "list.bullet.rectangle",
+                    description: Text(hasActiveFilters ? "Try adjusting your filters" : "Import CSV files to get started")
+                )
+            } else {
+                virtualizedTransactionsList
+            }
+
+            // Pagination loading overlay
+            if viewModel.isLoading && !viewModel.transactions.isEmpty {
+                VStack {
+                    Spacer()
+                    HStack {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Text("Loading more...")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding()
+                    .background(Color(nsColor: .controlBackgroundColor).opacity(0.9))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+                .padding()
+            }
+        }
+    }
+
+    // MARK: - Virtualized List (Key Performance Feature)
+
+    private var virtualizedTransactionsList: some View {
+        ScrollView {
+            LazyVStack(spacing: 1) { // Minimal spacing for performance
+                ForEach(viewModel.transactions) { transaction in
+                    HighPerformanceTransactionRow(
+                        transaction: transaction,
+                        isSelected: selectedTransaction?.id == transaction.id
+                    )
+                    .contentShape(Rectangle())
+                    .onTapGesture { selectedTransaction = transaction }
+                    .onAppear {
+                        // Pagination trigger
+                        if transaction == viewModel.transactions.last {
+                            Task { await viewModel.loadNextPage() }
+                        }
+                    }
+                }
+
+                // Load more indicator
+                if viewModel.hasMorePages && !viewModel.isLoading {
+                    HStack {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Text("Loading more...")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding()
+                    .onAppear {
+                        Task { await viewModel.loadNextPage() }
+                    }
+                }
+            }
+            .animation(.easeOut(duration: 0.25), value: viewModel.transactions.count)
+        }
+        .refreshable {
+            await viewModel.refresh()
+        }
+    }
+
+    // MARK: - Helper Methods
+
+    private var hasActiveFilters: Bool {
+        !searchText.isEmpty || selectedType != nil || selectedCategory != nil
+    }
+
+    private func clearFilters() {
+        searchText = ""
+        selectedType = nil
+        selectedCategory = nil
+    }
+
+    @MainActor
+    private func applyFilters() async {
+        let filter = buildFilter()
+        await viewModel.applyFilter(filter)
+    }
+
+    private func buildFilter() -> TransactionFilter {
+        var filter = TransactionFilter()
+
+        if !searchText.trimmingCharacters(in: .whitespaces).isEmpty {
+            filter.searchText = searchText
+        }
+
+        if let type = selectedType {
+            filter.transactionType = type
+        }
+
+        if let category = selectedCategory {
+            filter.categories = [category]
+        }
+
+        return filter
+    }
+}
+
+// MARK: - High-Performance Transaction Row
+
+struct HighPerformanceTransactionRow: View {
+    let transaction: Transaction
+    let isSelected: Bool
+
+    var body: some View {
+        HStack(spacing: 12) {
+            // Optimized type indicator
+            Image(systemName: transaction.transactionType.icon)
+                .font(.title3)
+                .foregroundStyle(typeColor)
+                .frame(width: 24)
+
+            // Main content - optimized text rendering
+            VStack(alignment: .leading, spacing: 3) {
+                Text(transaction.standardizedName ?? transaction.counterName ?? "Unknown")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+
+                HStack(spacing: 6) {
+                    Text(transaction.effectiveCategory)
+                        .font(.caption2)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 1)
+                        .background(Color.accentColor.opacity(0.1))
+                        .clipShape(Capsule())
+
+                    Text(transaction.date.formatted(.dateTime.day().month(.abbreviated)))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Spacer()
+
+            // Optimized amount display
+            Text(transaction.amount.toCurrencyString())
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundStyle(transaction.amount >= 0 ? .green : .primary)
+                .monospacedDigit()
+        }
+        .padding(.vertical, 6)
+        .padding(.horizontal, 12)
+        .background(rowBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+    }
+
+    private var typeColor: Color {
+        switch transaction.transactionType {
+        case .income: return .green
+        case .expense: return .red.opacity(0.8)
+        case .transfer: return .blue
+        case .unknown: return .gray
+        }
+    }
+
+    private var rowBackground: Color {
+        isSelected ?
+            Color.accentColor.opacity(0.15) :
+            Color(nsColor: .controlBackgroundColor).opacity(0.3)
+    }
+}
+
+// MARK: - High-Performance View Model
+
+@MainActor
+class OptimizedTransactionsViewModel: ObservableObject {
+    @Published var transactions: [Transaction] = []
+    @Published var isLoading = false
+    @Published var hasMorePages = true
+    @Published var totalCount: Int?
+
+    private let pageSize = 100
+    private var currentPage = 0
+    private var currentFilter = TransactionFilter()
+    private let queryService: TransactionQueryService
+
+    init(queryService: TransactionQueryService) {
+        self.queryService = queryService
+    }
+
+    func initialLoad() async {
+        currentPage = 0
+        transactions = []
+        hasMorePages = true
+        totalCount = nil
+        await loadNextPage()
+    }
+
+    func loadNextPage() async {
+        guard !isLoading && hasMorePages else { return }
+
+        isLoading = true
+
+        do {
+            let skip = currentPage * pageSize
+            let newTransactions = try await queryService.getTransactionsPaginated(
+                filter: currentFilter,
+                offset: skip,
+                limit: pageSize
+            )
+
+            if newTransactions.isEmpty || newTransactions.count < pageSize {
+                hasMorePages = false
+            }
+
+            transactions.append(contentsOf: newTransactions)
+            currentPage += 1
+
+            if totalCount == nil {
+                totalCount = try await queryService.getTransactionsCount(filter: currentFilter)
+            }
+
+        } catch {
+            print("Failed to load transactions: \(error)")
+        }
+
+        isLoading = false
+    }
+
+    func applyFilter(_ filter: TransactionFilter) async {
+        currentFilter = filter
+        currentPage = 0
+        transactions = []
+        hasMorePages = true
+        totalCount = nil
+        await loadNextPage()
+    }
+
+    func refresh() async {
+        await initialLoad()
+    }
+}
+
+// MARK: - Search Debouncer for Performance
+
+class SearchDebouncer {
+    private var workItem: DispatchWorkItem?
+
+    func debounce(delay: TimeInterval, action: @escaping () -> Void) {
+        workItem?.cancel()
+        workItem = DispatchWorkItem(block: action)
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: workItem!)
     }
 }
 

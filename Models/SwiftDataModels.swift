@@ -680,6 +680,37 @@ final class CategorizationRule {
         lastMatchedAt = Date()
         modifiedAt = Date()
     }
+
+    // MARK: - Legacy Compatibility Properties
+
+    /// Computed pattern from first text-based condition for UI compatibility
+    /// Falls back to rule name if no suitable condition exists
+    var pattern: String {
+        // Find first text-based condition (description, counterParty, etc.)
+        guard let textCondition = conditions.first(where: { condition in
+            switch condition.field {
+            case .description, .counterParty, .counterIBAN, .account:
+                return true
+            case .amount, .date, .transactionType, .transactionCode:
+                return false
+            }
+        }) else {
+            // Fallback to rule name if no text conditions
+            return name
+        }
+
+        return textCondition.value
+    }
+
+    /// Computed match type from first condition's operator
+    /// Falls back to .contains if no conditions exist
+    var matchType: RuleMatchType {
+        guard let firstCondition = conditions.first else {
+            return .contains
+        }
+
+        return firstCondition.operatorType.toRuleMatchType()
+    }
 }
 
 // MARK: - Rule Condition Model
@@ -795,6 +826,29 @@ enum ConditionOperator: String, CaseIterable, Codable, Sendable {
             return [.equals]
         case .date:
             return [.equals, .greaterThan, .lessThan, .between]
+        }
+    }
+}
+
+// MARK: - ConditionOperator Extensions
+
+extension ConditionOperator {
+    /// Map ConditionOperator to RuleMatchType for legacy UI compatibility
+    func toRuleMatchType() -> RuleMatchType {
+        switch self {
+        case .contains:
+            return .contains
+        case .equals:
+            return .exact
+        case .startsWith:
+            return .startsWith
+        case .endsWith:
+            return .endsWith
+        case .matches:
+            return .regex
+        case .greaterThan, .lessThan, .between:
+            // Numeric operators fallback to contains for text-based UI
+            return .contains
         }
     }
 }
@@ -1361,6 +1415,26 @@ enum RuleMatchType: String, Codable, CaseIterable, Sendable {
         case .endsWith: return "Ends With"
         case .exact: return "Exact Match"
         case .regex: return "Regular Expression"
+        }
+    }
+}
+
+// MARK: - RuleMatchType Extensions
+
+extension RuleMatchType {
+    /// Map RuleMatchType back to ConditionOperator for creating conditions
+    func toConditionOperator() -> ConditionOperator {
+        switch self {
+        case .contains:
+            return .contains
+        case .exact:
+            return .equals
+        case .startsWith:
+            return .startsWith
+        case .endsWith:
+            return .endsWith
+        case .regex:
+            return .matches
         }
     }
 }

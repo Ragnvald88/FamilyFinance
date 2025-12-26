@@ -475,8 +475,14 @@ class CSVImportService: ObservableObject {
 
         // Extract and validate required fields
         let iban = fields[CSVColumn.iban].trimmingCharacters(in: .whitespaces)
-        guard !iban.isEmpty, iban.hasPrefix("NL") else {
-            return nil // Skip invalid rows
+        guard !iban.isEmpty else {
+            return nil // Skip rows without IBAN
+        }
+
+        // Validate IBAN format (supports international IBANs)
+        if let validationError = validateIBAN(iban) {
+            print("⚠️ Invalid IBAN '\(iban)': \(validationError)")
+            return nil // Skip invalid IBANs but don't crash
         }
 
         let sequenceStr = fields[CSVColumn.sequenceNumber].trimmingCharacters(in: .whitespaces)
@@ -490,10 +496,10 @@ class CSVImportService: ObservableObject {
         }
 
         let amountStr = fields[CSVColumn.amount].trimmingCharacters(in: .whitespaces)
-        let amount = parseDutchAmount(amountStr)
+        let amount = parseAmount(amountStr)
 
         let balanceStr = fields[CSVColumn.balance].trimmingCharacters(in: .whitespaces)
-        let balance = parseDutchAmount(balanceStr)
+        let balance = parseAmount(balanceStr)
 
         // Core optional fields
         let counterIBAN = fields[CSVColumn.counterIBAN].trimmingCharacters(in: .whitespaces)
@@ -595,38 +601,97 @@ class CSVImportService: ObservableObject {
 
     // MARK: - Parsing Helpers (nonisolated static)
 
-    /// Parse Dutch number format (+1.234,56 → 1234.56).
-    private nonisolated static func parseDutchAmount(_ amountStr: String) -> Decimal {
+    /// Parse international number formats (supports both US: 1,234.56 and European: 1.234,56).
+    private nonisolated static func parseAmount(_ amountStr: String) -> Decimal {
         guard !amountStr.isEmpty else { return 0 }
 
-        // Remove thousands separator (dot), replace decimal comma with dot, remove +
-        let cleaned = amountStr
-            .replacingOccurrences(of: ".", with: "")
-            .replacingOccurrences(of: ",", with: ".")
+        let trimmed = amountStr.trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: "+", with: "")
+
+        // Strategy: Detect format by looking at the last occurrence of comma vs period
+        let lastCommaIndex = trimmed.lastIndex(of: ",")
+        let lastPeriodIndex = trimmed.lastIndex(of: ".")
+
+        var cleaned: String
+
+        if let lastComma = lastCommaIndex, let lastPeriod = lastPeriodIndex {
+            // Both comma and period present - the rightmost one is decimal separator
+            if lastComma > lastPeriod {
+                // European format: 1.234,56 → thousands=period, decimal=comma
+                cleaned = trimmed
+                    .replacingOccurrences(of: ".", with: "")
+                    .replacingOccurrences(of: ",", with: ".")
+            } else {
+                // US format: 1,234.56 → thousands=comma, decimal=period
+                cleaned = trimmed.replacingOccurrences(of: ",", with: "")
+            }
+        } else if lastCommaIndex != nil {
+            // Only comma present - could be European decimal or US thousands
+            let components = trimmed.components(separatedBy: ",")
+            if components.count == 2 && components[1].count <= 3 {
+                // Likely European decimal: 1234,56
+                cleaned = trimmed.replacingOccurrences(of: ",", with: ".")
+            } else {
+                // Likely US thousands: 1,234
+                cleaned = trimmed.replacingOccurrences(of: ",", with: "")
+            }
+        } else if lastPeriodIndex != nil {
+            // Only period present - could be US decimal or European thousands
+            let components = trimmed.components(separatedBy: ".")
+            if components.count == 2 && components[1].count <= 3 {
+                // Likely US decimal: 1234.56
+                cleaned = trimmed
+            } else {
+                // Likely European thousands: 1.234
+                cleaned = trimmed.replacingOccurrences(of: ".", with: "")
+            }
+        } else {
+            // No separators - just a plain number
+            cleaned = trimmed
+        }
 
         return Decimal(string: cleaned) ?? 0
     }
 
-    /// Validate Dutch IBAN format (NL + 2 check digits + 4 bank code + 10 account number).
+    /// Validate international IBAN format for major countries.
     /// Returns nil if valid, or error message if invalid.
-    static func validateDutchIBAN(_ iban: String) -> String? {
+    static func validateIBAN(_ iban: String) -> String? {
         let cleanIBAN = iban.uppercased().replacingOccurrences(of: " ", with: "")
 
-        // Check length (Dutch IBANs are 18 characters)
-        guard cleanIBAN.count == 18 else {
-            return "Dutch IBAN must be 18 characters (got \(cleanIBAN.count))"
+        // Basic format check: minimum 15, maximum 34 characters
+        guard cleanIBAN.count >= 15 && cleanIBAN.count <= 34 else {
+            return "IBAN must be between 15-34 characters (got \(cleanIBAN.count))"
         }
 
-        // Check country code
-        guard cleanIBAN.hasPrefix("NL") else {
-            return "Dutch IBAN must start with 'NL'"
+        // Check country code (first 2 letters)
+        guard cleanIBAN.count >= 4,
+              cleanIBAN.prefix(2).allSatisfy(\.isLetter),
+              cleanIBAN.dropFirst(2).prefix(2).allSatisfy(\.isWholeNumber) else {
+            return "IBAN must start with 2-letter country code followed by 2 check digits"
         }
 
-        // Check format: NL + 2 digits + 4 letters + 10 digits
-        let pattern = "^NL[0-9]{2}[A-Z]{4}[0-9]{10}$"
-        guard cleanIBAN.range(of: pattern, options: .regularExpression) != nil else {
-            return "Invalid Dutch IBAN format"
+        let countryCode = String(cleanIBAN.prefix(2))
+
+        // Country-specific validation (major countries)
+        let expectedLength: Int
+        switch countryCode {
+        case "NL": expectedLength = 18  // Netherlands
+        case "DE": expectedLength = 22  // Germany
+        case "FR": expectedLength = 27  // France
+        case "GB": expectedLength = 22  // United Kingdom
+        case "BE": expectedLength = 16  // Belgium
+        case "IT": expectedLength = 27  // Italy
+        case "ES": expectedLength = 24  // Spain
+        case "AT": expectedLength = 20  // Austria
+        case "CH": expectedLength = 21  // Switzerland
+        case "US": expectedLength = 0   // No IBAN system
+        default:
+            // For unknown countries, accept if basic format is correct
+            expectedLength = 0
+        }
+
+        if expectedLength > 0 && cleanIBAN.count != expectedLength {
+            return "Invalid IBAN length for \(countryCode): expected \(expectedLength), got \(cleanIBAN.count)"
         }
 
         // Validate check digits (IBAN mod 97 algorithm)

@@ -361,22 +361,22 @@ struct FamilyFinanceApp: App {
         }
 
         let expenseCategories: [(String, Decimal, String, String)] = [
-            ("Boodschappen", 800, "cart.fill", "10B981"),
-            ("Uit Eten", 150, "fork.knife", "EF4444"),
-            ("Winkelen", 200, "bag.fill", "F59E0B"),
-            ("Vervoer", 250, "car.fill", "3B82F6"),
-            ("Nutsvoorzieningen", 300, "bolt.fill", "8B5CF6"),
-            ("Wonen", 1200, "house.fill", "EC4899"),
-            ("Verzekeringen", 200, "shield.fill", "14B8A6"),
-            ("Gezondheidszorg", 100, "cross.fill", "EF4444"),
-            ("Kinderopvang", 500, "figure.2.and.child.holdinghands", "F59E0B"),
-            ("Ontspanning", 100, "gamecontroller.fill", "8B5CF6"),
-            ("Huis & Tuin", 100, "tree.fill", "10B981"),
-            ("Belastingen", 200, "building.columns.fill", "64748B"),
-            ("Schuld Aflossing", 200, "creditcard.fill", "EF4444"),
-            ("Bankkosten", 20, "eurosign.circle.fill", "64748B"),
-            ("Abonnementen", 100, "repeat.circle.fill", "3B82F6"),
-            ("Niet Gecategoriseerd", 0, "questionmark.circle.fill", "9CA3AF"),
+            ("Groceries", 800, "cart.fill", "10B981"),
+            ("Dining", 150, "fork.knife", "EF4444"),
+            ("Shopping", 200, "bag.fill", "F59E0B"),
+            ("Transportation", 250, "car.fill", "3B82F6"),
+            ("Utilities", 300, "bolt.fill", "8B5CF6"),
+            ("Housing", 1200, "house.fill", "EC4899"),
+            ("Insurance", 200, "shield.fill", "14B8A6"),
+            ("Healthcare", 100, "cross.fill", "EF4444"),
+            ("Childcare", 500, "figure.2.and.child.holdinghands", "F59E0B"),
+            ("Entertainment", 100, "gamecontroller.fill", "8B5CF6"),
+            ("Home & Garden", 100, "tree.fill", "10B981"),
+            ("Taxes", 200, "building.columns.fill", "64748B"),
+            ("Debt Payments", 200, "creditcard.fill", "EF4444"),
+            ("Bank Fees", 20, "eurosign.circle.fill", "64748B"),
+            ("Subscriptions", 100, "repeat.circle.fill", "3B82F6"),
+            ("Uncategorized", 0, "questionmark.circle.fill", "9CA3AF"),
         ]
 
         for (index, (name, budget, icon, color)) in expenseCategories.enumerated() {
@@ -393,12 +393,12 @@ struct FamilyFinanceApp: App {
         }
 
         let incomeCategories: [(String, String, String)] = [
-            ("Salaris", "eurosign.circle.fill", "10B981"),
+            ("Salary", "eurosign.circle.fill", "10B981"),
             ("Freelance", "briefcase.fill", "3B82F6"),
-            ("Toeslagen", "building.columns.fill", "F59E0B"),
-            ("Inleg Partner 1", "person.fill", "8B5CF6"),
-            ("Inleg Partner 2", "person.fill", "EC4899"),
-            ("Overig Inkomen", "plus.circle.fill", "10B981"),
+            ("Benefits", "building.columns.fill", "F59E0B"),
+            ("Contribution Partner 1", "person.fill", "8B5CF6"),
+            ("Contribution Partner 2", "person.fill", "EC4899"),
+            ("Other Income", "plus.circle.fill", "10B981"),
         ]
 
         for (index, (name, icon, color)) in incomeCategories.enumerated() {
@@ -1063,7 +1063,7 @@ struct TransactionEditorSheet: View {
             amount: finalAmount,
             balance: account.currentBalance + finalAmount,
             counterName: counterName.isEmpty ? nil : counterName,
-            autoCategory: selectedCategory.isEmpty ? "Niet Gecategoriseerd" : selectedCategory,
+            autoCategory: selectedCategory.isEmpty ? "Uncategorized" : selectedCategory,
             transactionType: transactionType
         )
 
@@ -1601,7 +1601,7 @@ struct BudgetsListView: View {
     private func monthName(_ month: Int) -> String {
         guard month >= 1 && month <= 12 else { return "Unknown" }
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "nl_NL")
+        formatter.locale = Locale.current
         return formatter.monthSymbols[month - 1].capitalized
     }
 }
@@ -1862,7 +1862,7 @@ struct TransferRowView: View {
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
-        formatter.locale = Locale(identifier: "nl_NL")
+        formatter.locale = Locale.current
         return formatter
     }
 
@@ -2791,7 +2791,7 @@ struct CategoryInsight: Identifiable {
     let transactionCount: Int
 
     static let placeholder = CategoryInsight(
-        name: "Niet Gecategoriseerd",
+        name: "Uncategorized",
         amount: 0,
         icon: "questionmark.circle.fill",
         color: "9CA3AF",

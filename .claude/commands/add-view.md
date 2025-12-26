@@ -63,7 +63,7 @@ Create a new SwiftUI view following Family Finance UI patterns.
 - `Color(nsColor: .controlBackgroundColor)` for cards
 - `LazyVStack` for large lists
 - `ContentUnavailableView` for empty states
-- Dutch locale: `Locale(identifier: "nl_NL")`
+- System locale: `Locale.current` (adapts to user's locale)
 
 ## Color Helpers
 

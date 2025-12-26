@@ -100,7 +100,7 @@ struct MonthlyTrend: Identifiable {
     var monthName: String {
         guard month >= 1 && month <= 12 else { return "Unknown" }
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "nl_NL")
+        formatter.locale = Locale.current
         return formatter.monthSymbols[month - 1]
     }
 
@@ -625,7 +625,7 @@ class TransactionQueryService: ObservableObject {
         var monthlyData: [String: (amount: Decimal, count: Int)] = [:]
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM yyyy"
-        formatter.locale = Locale(identifier: "nl_NL")
+        formatter.locale = Locale.current
 
         for transaction in transactions {
             let monthKey = formatter.string(from: transaction.date)
@@ -992,7 +992,7 @@ struct CashFlowForecast: Identifiable {
     var monthName: String {
         guard month >= 1 && month <= 12 else { return "Unknown" }
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "nl_NL")
+        formatter.locale = Locale.current
         return formatter.monthSymbols[month - 1]
     }
 
@@ -1008,7 +1008,7 @@ private enum FormatterCache {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.currencyCode = "EUR"
-        formatter.locale = Locale(identifier: "nl_NL")
+        formatter.locale = Locale.current
         return formatter
     }()
 
@@ -1017,13 +1017,13 @@ private enum FormatterCache {
         formatter.numberStyle = .percent
         formatter.minimumFractionDigits = 1
         formatter.maximumFractionDigits = 1
-        formatter.locale = Locale(identifier: "nl_NL")
+        formatter.locale = Locale.current
         return formatter
     }()
 
     static let dutchMonthFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "nl_NL")
+        formatter.locale = Locale.current
         return formatter
     }()
 }
@@ -1046,7 +1046,7 @@ extension Decimal {
         formatter.numberStyle = .percent
         formatter.minimumFractionDigits = decimals
         formatter.maximumFractionDigits = decimals
-        formatter.locale = Locale(identifier: "nl_NL")
+        formatter.locale = Locale.current
         return formatter.string(from: (self / 100) as NSNumber) ?? "0%"
     }
 }

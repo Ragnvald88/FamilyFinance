@@ -2,7 +2,7 @@
 
 > **App Store-Quality macOS Finance Application**
 >
-> 🎯 **95% App Store Quality** | Enterprise Performance | Premium UX | Zero Dependencies
+> 🎯 **80% App Store Quality** | Enterprise Performance | Premium UX | Rules Foundation Rebuilt
 
 ![macOS](https://img.shields.io/badge/macOS-13.0+-blue.svg)
 ![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)
@@ -43,10 +43,10 @@
 - **Automatic encoding detection** (latin-1, cp1252, utf-8)
 - **Dutch number format parsing** (`+1.234,56` → `1234.56`)
 - **Transaction code mapping** (bg, bc, id, ei, tb)
-- **100+ categorization rules** with smart pattern matching
+- **Advanced rule engine foundation** (Firefly III-inspired trigger-action system)
 
 ### **💼 Financial Intelligence**
-- **Automatic transaction categorization** with 100+ predefined rules
+- **Rule-based categorization system** (foundation rebuilt, engine in development)
 - **Transaction splitting** for complex purchases
 - **Recurring transaction detection** (subscriptions, salary)
 - **Account balance tracking** with historical data
@@ -76,7 +76,7 @@ DesignTokens.Typography.currencyLarge // Monospaced financial display
 // Thread-safe background processing
 @ModelActor BackgroundDataHandler   // Heavy imports without UI blocking
 TransactionQueryService             // Optimized pagination + analytics
-CategorizationEngine               // ML-ready rule system
+RulesModels                       // Firefly III-inspired foundation
 ```
 
 ---
@@ -165,7 +165,7 @@ open FamilyFinance.xcodeproj
 ### **Import Bank Data**
 1. **Export CSV** from your Dutch bank (ING, Rabobank, etc.)
 2. **Drag & drop** CSV file into the Import tab
-3. **Automatic categorization** applies 100+ rules
+3. **Rule-based categorization** (engine foundation in place)
 4. **Review** imported transactions in optimized list view
 
 ### **Explore Analytics**
@@ -198,7 +198,7 @@ open FamilyFinance.xcodeproj
 ### **✅ Core Functionality**
 - [x] **Transaction Management** (15k+ records with smooth performance)
 - [x] **Dutch Banking Import** (5 major banks with encoding detection)
-- [x] **Automatic Categorization** (100+ rules with pattern matching)
+- [x] **Categorization Engine Foundation** (Firefly III-inspired architecture)
 - [x] **Analytics Dashboard** (trends, breakdowns, comparisons)
 - [x] **Data Export** (Excel, CSV with formatting)
 - [x] **Account Management** (multiple accounts with balance tracking)
@@ -259,7 +259,7 @@ open FamilyFinance.xcodeproj
 Most finance apps struggle with large datasets. FamilyFinance **handles 50k+ transactions** smoothly with **99% memory reduction** and **sub-100ms response times**.
 
 ### **Dutch Banking Expertise**
-Purpose-built for Dutch financial institutions with **automatic encoding detection**, **format parsing**, and **100+ categorization rules** specifically for Dutch transaction patterns.
+Purpose-built for Dutch financial institutions with **automatic encoding detection**, **format parsing**, and **advanced rule engine foundation** designed for Dutch transaction patterns.
 
 ### **App Store-Quality Polish**
 Every interaction is **animated at 60fps** with **professional easing curves**. Desktop **micro-interactions** make it feel native to macOS with **hover effects** and **press feedback**.

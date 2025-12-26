@@ -67,15 +67,19 @@ enum FamilyAccountsConfig {
 
     /// Description patterns for Partner 1 contributions (handles typos)
     static let partner1InlegPatterns: [String] = [
-        "inleg partner1",
-        "contribution",
-        "huishoudgeld",
+        "inleg partner1",           // Dutch: contribution partner1
+        "contribution partner 1",  // English
+        "contribution",            // Generic contribution
+        "huishoudgeld",           // Dutch: household allowance
+        "household allowance",     // English
     ]
 
     /// Description patterns for Partner 2 contributions
     static let partner2InlegPatterns: [String] = [
-        "inleg partner2",
-        "bijdrage",
+        "inleg partner2",           // Dutch: contribution partner2
+        "contribution partner 2",  // English
+        "bijdrage",                // Dutch: contribution
+        "contribution",            // Generic contribution
     ]
 
     // MARK: - Default Account Definitions

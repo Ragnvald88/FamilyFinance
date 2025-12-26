@@ -186,8 +186,8 @@ class ExportService: ObservableObject {
             dateFormatter.string(from: transaction.date),
             String(transaction.year),
             String(transaction.month),
-            formatDutchAmount(transaction.amount),
-            formatDutchAmount(transaction.balance),
+            formatAmount(transaction.amount),
+            formatAmount(transaction.balance),
             escapeCSV(transaction.counterIBAN ?? ""),
             escapeCSV(transaction.counterName ?? ""),
             escapeCSV(transaction.fullDescription),
@@ -208,10 +208,10 @@ class ExportService: ObservableObject {
         return value
     }
 
-    private func formatDutchAmount(_ amount: Decimal) -> String {
+    private func formatAmount(_ amount: Decimal) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
-        formatter.locale = Locale(identifier: "nl_NL")
+        formatter.locale = Locale.current
         formatter.minimumFractionDigits = 2
         formatter.maximumFractionDigits = 2
 

@@ -24,8 +24,13 @@ import Foundation
 @Model
 final class RuleGroup {
     var name: String
-    var executionOrder: Int
-    var isActive: Bool
+
+    /// Execution order for rule groups - indexed for sorting performance
+    @Attribute(.spotlight) var executionOrder: Int
+
+    /// Active status - indexed for filtering active groups
+    @Attribute(.spotlight) var isActive: Bool
+
     var notes: String?
 
     // Relationships
@@ -61,10 +66,17 @@ final class RuleGroup {
 @Model
 final class Rule {
     var name: String
-    var isActive: Bool
+
+    /// Active status - indexed for filtering in rule evaluation (queried every time)
+    @Attribute(.spotlight) var isActive: Bool
+
     var stopProcessing: Bool
     var triggerLogic: TriggerLogic
     var notes: String?
+
+    /// Denormalized group execution order for efficient sorting without joins
+    /// Updated automatically when group changes - see syncGroupOrder()
+    var groupExecutionOrder: Int
 
     // Relationships
     @Relationship(deleteRule: .cascade) var triggers: [RuleTrigger]
@@ -86,6 +98,7 @@ final class Rule {
         self.triggerLogic = .all
         self.notes = nil
         self.group = group
+        self.groupExecutionOrder = group?.executionOrder ?? Int.max // Ungrouped rules last
         self.triggers = []
         self.actions = []
         self.matchCount = 0
@@ -97,6 +110,13 @@ final class Rule {
     /// Update modification timestamp
     func touch() {
         modifiedAt = Date()
+    }
+
+    /// Synchronize denormalized groupExecutionOrder with actual group order
+    /// Call this when rule's group changes for optimal query performance
+    func syncGroupOrder() {
+        groupExecutionOrder = group?.executionOrder ?? Int.max
+        touch()
     }
 
     /// Record a successful rule match

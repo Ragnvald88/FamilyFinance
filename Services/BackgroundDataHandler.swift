@@ -337,22 +337,22 @@ actor BackgroundDataHandler {
 
         // Expense categories with budgets
         let expenseCategories: [(String, Decimal)] = [
-            ("Boodschappen", 800),
-            ("Uit Eten", 150),
-            ("Winkelen", 200),
-            ("Vervoer", 250),
-            ("Nutsvoorzieningen", 300),
-            ("Wonen", 1200),
-            ("Verzekeringen", 200),
-            ("Gezondheidszorg", 100),
-            ("Kinderopvang", 500),
-            ("Ontspanning", 100),
-            ("Huis & Tuin", 100),
-            ("Belastingen", 200),
-            ("Schuld Aflossing", 200),
-            ("Bankkosten", 20),
-            ("Abonnementen", 100),
-            ("Niet Gecategoriseerd", 0)
+            ("Groceries", 800),
+            ("Dining", 150),
+            ("Shopping", 200),
+            ("Transportation", 250),
+            ("Utilities", 300),
+            ("Housing", 1200),
+            ("Insurance", 200),
+            ("Healthcare", 100),
+            ("Childcare", 500),
+            ("Entertainment", 100),
+            ("Home & Garden", 100),
+            ("Taxes", 200),
+            ("Debt Payments", 200),
+            ("Bank Fees", 20),
+            ("Subscriptions", 100),
+            ("Uncategorized", 0)
         ]
 
         for (name, budget) in expenseCategories {
@@ -366,12 +366,12 @@ actor BackgroundDataHandler {
 
         // Income categories
         let incomeCategories = [
-            "Salaris",
+            "Salary",
             "Freelance",
-            "Toeslagen",
-            "Inleg Partner 1",
-            "Inleg Partner 2",
-            "Overig Inkomen"
+            "Benefits",
+            "Contribution Partner 1",
+            "Contribution Partner 2",
+            "Other Income"
         ]
 
         for name in incomeCategories {
@@ -385,7 +385,7 @@ actor BackgroundDataHandler {
 
         // Transfer category
         let transfer = Category(
-            name: "Interne Overboeking",
+            name: "Internal Transfer",
             type: .transfer,
             monthlyBudget: 0
         )

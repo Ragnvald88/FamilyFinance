@@ -132,7 +132,7 @@ final class Transaction {
         if let override = categoryOverride, !override.isEmpty {
             return override
         }
-        return autoCategory ?? "Niet Gecategoriseerd"
+        return autoCategory ?? "Uncategorized"
     }
 
     /// Stored category for queries (updated when autoCategory or categoryOverride changes)
@@ -284,7 +284,7 @@ final class Transaction {
         self.month = calendar.component(.month, from: date)
 
         // Indexed category for fast queries
-        self.indexedCategory = categoryOverride ?? autoCategory ?? "Niet Gecategoriseerd"
+        self.indexedCategory = categoryOverride ?? autoCategory ?? "Uncategorized"
     }
 
     // MARK: - Update Helpers
@@ -1360,7 +1360,14 @@ enum TransactionType: String, Codable, CaseIterable, Sendable {
     case transfer = "Overboeking"
     case unknown = "Onbekend"
 
-    var displayName: String { rawValue }
+    var displayName: String {
+        switch self {
+        case .income: return "Income"
+        case .expense: return "Expense"
+        case .transfer: return "Transfer"
+        case .unknown: return "Unknown"
+        }
+    }
 
     var icon: String {
         switch self {
@@ -1379,7 +1386,14 @@ enum AccountType: String, Codable, CaseIterable, Sendable {
     case creditCard = "Creditcard"
     case investment = "Beleggingsrekening"
 
-    var displayName: String { rawValue }
+    var displayName: String {
+        switch self {
+        case .checking: return "Checking Account"
+        case .savings: return "Savings Account"
+        case .creditCard: return "Credit Card"
+        case .investment: return "Investment Account"
+        }
+    }
 
     var icon: String {
         switch self {

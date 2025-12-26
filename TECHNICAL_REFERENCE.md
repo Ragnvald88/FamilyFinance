@@ -3,7 +3,7 @@
 > **App Store-Quality Architecture Documentation**
 >
 > Complete technical reference for the production-ready FamilyFinance codebase.
-> 🎯 **Status: 95% App Store Quality** with enterprise performance and premium UX.
+> 🎯 **Status: 80% App Store Quality** with enterprise performance and premium UX.
 
 ---
 
@@ -28,7 +28,7 @@
 ┌─────────────────────────────────────────────────────────────────────┐
 │              High-Performance Service Layer (@MainActor)           │
 │ • TransactionQueryService (pagination + analytics + 100ms queries) │
-│ • CategorizationEngine (100+ rules + machine learning ready)       │
+│ • RuleEngine (Firefly III-inspired trigger-action system)          │
 │ • CSVImportService (Dutch banking + encoding detection)            │
 │ • ExportService (Excel + CSV with formatting)                      │
 └─────────────────────────────────────────────────────────────────────┘
@@ -45,7 +45,7 @@
 │ • Transaction (with audit trail + splits + relationships)          │
 │ • Account (real-time balances + historical tracking)               │
 │ • Category (hierarchical + budget planning + analytics)            │
-│ • CategorizationRule (machine learning ready + priority system)    │
+│ • RuleGroup/Rule/RuleTrigger/RuleAction (Firefly III-inspired)     │
 │ • RecurringTransaction (subscription tracking + forecasting)       │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -480,23 +480,34 @@ Services/
 │   ├── getCategoryBreakdown()          — Analytics with metadata
 │   └── getMerchantStats()              — Top merchants analysis
 ├── BackgroundDataHandler.swift         — @ModelActor for thread safety
-├── CategorizationEngine.swift          — 100+ rules + ML-ready architecture
+├── [Rules Engine Services]              — 🚧 Phase 2: Rule evaluation system
+│   ├── RuleEngine.swift                 — Main rule evaluation engine
+│   ├── TriggerEvaluator.swift          — Trigger logic processor
+│   ├── ActionExecutor.swift            — Action implementation engine
+│   └── ExpressionEngine.swift          — Advanced string processing
 ├── CSVImportService.swift              — Dutch banking + encoding detection
 └── ExportService.swift                 — Excel/CSV export with formatting
 ```
 
 ### **Models (Enterprise-Scale)**
 ```
-Models/SwiftDataModels.swift (1,300+ lines) — Complete domain model
-├── Transaction                          — Core financial data + audit trail
-│   ├── updateDate()                     — Keeps year/month indexes synced
-│   ├── effectiveCategory                — Computed category with fallback
-│   └── generateUniqueKey()             — Prevents duplicates
-├── Account                              — Real-time balance tracking
-├── Category                             — Hierarchical + budget support
-├── CategorizationRule                   — ML-ready rule engine
-├── TransactionSplit                     — Multi-category transactions
-└── RecurringTransaction                 — Subscription tracking + forecasting
+Models/
+├── SwiftDataModels.swift (1,300+ lines) — Complete core domain model
+│   ├── Transaction                      — Core financial data + audit trail
+│   │   ├── updateDate()                 — Keeps year/month indexes synced
+│   │   ├── effectiveCategory            — Computed category with fallback
+│   │   └── generateUniqueKey()         — Prevents duplicates
+│   ├── Account                          — Real-time balance tracking
+│   ├── Category                         — Hierarchical + budget support
+│   ├── CategorizationRule               — Legacy rule system (backward compatible)
+│   ├── TransactionSplit                 — Multi-category transactions
+│   └── RecurringTransaction             — Subscription tracking + forecasting
+└── RulesModels.swift (500+ lines)       — ✅ NEW: Firefly III-inspired rules system
+    ├── RuleGroup                        — Rule organization with execution order
+    ├── Rule                             — Trigger-action rule architecture
+    ├── RuleTrigger                      — Advanced triggers (NOT logic, regex, dates)
+    ├── RuleAction                       — Comprehensive actions (15+ types)
+    └── Supporting Enums                 — TriggerField, TriggerOperator, ActionType
 ```
 
 ---

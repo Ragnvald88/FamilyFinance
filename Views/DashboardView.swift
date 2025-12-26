@@ -440,7 +440,7 @@ struct DashboardView: View {
     private func monthName(_ month: Int) -> String {
         guard month >= 1 && month <= 12 else { return "Unknown" }
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "nl_NL")
+        formatter.locale = Locale.current
         return formatter.monthSymbols[month - 1].capitalized
     }
 

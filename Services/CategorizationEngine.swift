@@ -390,7 +390,7 @@ class CategorizationEngine {
         switch contributor {
         case .partner1:
             return CategorizationResult(
-                category: "Inleg Partner 1",
+                category: "Contribution Partner 1",
                 standardizedName: "Partner 1",
                 matchedRuleName: "Contribution Rule - Partner 1",
                 ruleType: "system",
@@ -399,7 +399,7 @@ class CategorizationEngine {
             )
         case .partner2:
             return CategorizationResult(
-                category: "Inleg Partner 2",
+                category: "Contribution Partner 2",
                 standardizedName: "Partner 2",
                 matchedRuleName: "Contribution Rule - Partner 2",
                 ruleType: "system",

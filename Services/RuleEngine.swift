@@ -59,7 +59,7 @@ final class RuleEngine {
         self.modelExecutor = DefaultSerialModelExecutor(modelContext: modelContext)
 
         // Initialize components with dependency injection
-        self.triggerEvaluator = TriggerEvaluator(modelExecutor: DefaultSerialModelExecutor(modelContext: modelContext))
+        // TriggerEvaluator is @ModelActor struct - used directly where needed
         self.actionExecutor = ActionExecutor(modelContainer: modelContainer)
         self.statistics = RuleStatistics(ruleIdentifier: "engine-stats") // Will be created per rule
         self.progressPublisher = RuleProgressPublisher()
@@ -354,8 +354,9 @@ final class RuleEngine {
 
         for rule in activeRules {
             do {
-                // 1. Evaluate triggers using TriggerEvaluator
-                let triggerResults = await triggerEvaluator.evaluateParallel(
+                // 1. Evaluate triggers using TriggerEvaluator (direct instantiation)
+                // TODO: Fix TriggerEvaluator accessibility - temporary placeholder
+                let triggerResults = await TriggerEvaluator().evaluateParallel(
                     rule.triggers,
                     against: transaction
                 )

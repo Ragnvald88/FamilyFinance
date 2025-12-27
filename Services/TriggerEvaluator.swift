@@ -29,7 +29,7 @@ import OSLog
 private let logger = Logger(subsystem: "FamilyFinance", category: "TriggerEvaluator")
 
 @ModelActor
-struct TriggerEvaluator {
+actor TriggerEvaluator {
 
     // MARK: - Performance Configuration
 
@@ -38,6 +38,14 @@ struct TriggerEvaluator {
 
     /// Batch size for parallel processing (optimize for CPU cores)
     private static let BATCH_SIZE = 25
+
+    // MARK: - Initialization
+
+    /// Initialize TriggerEvaluator with ModelActor pattern
+    init(modelContainer: ModelContainer) {
+        let modelContext = ModelContext(modelContainer)
+        self.modelExecutor = DefaultSerialModelExecutor(modelContext: modelContext)
+    }
 
     // MARK: - Shared Caches
 
@@ -196,7 +204,7 @@ struct TriggerEvaluator {
         case .amount:
             return transaction.amount.description
         case .date:
-            return Self.dateFormatter.string(from: transaction.date)
+            return DateFormatter.dateFormatter.string(from: transaction.date)
         case .iban:
             return transaction.iban
         case .counterIban:
@@ -370,7 +378,7 @@ struct TriggerEvaluator {
 
     /// Parse date from string using multiple formats
     private static func parseDate(_ dateString: String) -> Date? {
-        for formatter in [Self.dateFormatter, Self.dateFormatterSlash, Self.dateFormatterDash] {
+        for formatter in [DateFormatter.dateFormatter, DateFormatter.dateFormatterSlash, DateFormatter.dateFormatterDash] {
             if let date = formatter.date(from: dateString) {
                 return date
             }

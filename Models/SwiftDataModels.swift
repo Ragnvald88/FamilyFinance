@@ -1548,3 +1548,35 @@ enum AuditAction: String, Codable, CaseIterable, Sendable {
         }
     }
 }
+
+// MARK: - Transaction Extensions for Rules System
+
+// Required for objc_getAssociatedObject
+import ObjectiveC
+
+extension Transaction {
+    /// Cached full description combining all description fields
+    var cachedFullDescription: String {
+        // Use objc associated objects for caching
+        let cacheKey = "cachedFullDescription"
+        if let cached = objc_getAssociatedObject(self, cacheKey) as? String {
+            return cached
+        }
+
+        // Compute full description
+        let components = [
+            description1,
+            description2,
+            description3,
+            notes
+        ].compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+         .filter { !$0.isEmpty }
+
+        let fullDescription = components.joined(separator: " ")
+
+        // Cache the result
+        objc_setAssociatedObject(self, cacheKey, fullDescription, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+
+        return fullDescription
+    }
+}

@@ -192,7 +192,12 @@ struct FamilyFinanceApp: App {
             BudgetPeriod.self,
             TransactionSplit.self,
             RecurringTransaction.self,
-            TransactionAuditLog.self
+            TransactionAuditLog.self,
+            // New Rules System Models
+            RuleGroup.self,
+            Rule.self,
+            RuleTrigger.self,
+            RuleAction.self
         ])
 
         // Use in-memory database for tests to avoid file system issues
@@ -469,7 +474,7 @@ struct ContentView: View {
         case .insights:
             InsightsViewWrapper()
         case .rules:
-            RulesPlaceholder()
+            RulesView()
         case .import:
             ImportViewWrapper()
         }

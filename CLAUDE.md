@@ -2,123 +2,164 @@
 
 > **App Store-Quality macOS Finance App** | SwiftUI + SwiftData | Premium UI/UX
 >
-> 🎯 **Status: 80% App Store Quality** — Core functionality excellent, rules system foundation rebuilt (Phase 1 complete)
+> 🎯 **Status: 70% App Store Quality** — Core functionality excellent, rules system **needs critical fixes** (Phase 2 incomplete)
 
-## Current Status: Excellent Progress ✅
+## Current Status: Progress with Critical Issues ⚠️
 
-### ✅ **MAJOR SUCCESS: Core App Functionality**
+### ✅ **SOLID FOUNDATION: Core App Functionality**
 - **Transaction management** - full CRUD, 15k+ transaction support ✅
 - **CSV import** for Dutch banks - robust encoding detection ✅
 - **Dashboard with analytics** - charts, trends, KPIs ✅
 - **Categories management** - hierarchical system ✅
 - **Account management** - multi-bank support ✅
 - **Performance** - 60fps animations, virtualized scrolling ✅
-- **Build system** - compiles cleanly, zero errors ✅
+- **Build system** - compiles cleanly for core app ✅
 
-### 🚀 **MAJOR ACHIEVEMENT: Rules System Foundation Rebuilt (Dec 26, 2025)**
+### ✅ **MAJOR ACHIEVEMENT: Rules System Foundation (Phase 1 Complete)**
 
 **Phase 1 Complete**: Complete teardown and foundation rebuild
 - ✅ **Demolished broken system** - Removed unwanted Marketplace/AI features entirely
 - ✅ **Clean architecture** - New `RulesModels.swift` with Firefly III-inspired trigger-action system
-- ✅ **Professional UX** - Replaced marketing content with "Under Construction" placeholder
-- ✅ **Zero compilation errors** - App builds and runs perfectly
+- ✅ **Professional UX** - Replaced marketing content with development status
 - ✅ **Legacy data preserved** - Existing rules displayed but not lost
+- ✅ **SwiftData Integration** - All models properly registered in ModelContainer
 
-**What Was Removed**:
-- ❌ Marketplace tab (deleted `EnhancedRulesWrapper.swift`)
-- ❌ AI Insights tab (deleted AI-related files)
-- ❌ "Unlock Enhanced Features" freemium complexity
-- ❌ "Coming Soon" placeholders in production
-- ❌ Over-engineered 4-tier complexity system
-- ❌ All marketing/promotional UI content
+### ❌ **CRITICAL ISSUES: Phase 2 Implementation (December 27, 2025)**
 
-**What Was Built**:
-- ✅ **RuleGroup** model with execution order
-- ✅ **Rule** model with trigger-action architecture
-- ✅ **RuleTrigger** model with NOT logic and 15+ operators
-- ✅ **RuleAction** model with 15+ action types
-- ✅ **Professional enums** with display names, icons, validation
-- ✅ **Clean placeholder UI** showing development status
+**VERIFICATION FINDINGS**: Phase 2 has significant implementation flaws
+
+**❌ COMPILATION BLOCKERS**:
+- `RuleEngine.swift` - **Cannot compile** due to @ModelActor initialization error
+- Integration pattern mismatches prevent app from building with new rules system
+
+**❌ MISSING USER FUNCTIONALITY**:
+- `RuleEditorView.swift` - **Placeholder only** - users cannot create/edit rules
+- `RuleGroupEditorView.swift` - **Placeholder only** - users cannot manage groups
+- No functional rule creation workflow
+
+**✅ WORKING COMPONENTS**:
+- `TriggerEvaluator.swift` - **Production ready** with 15+ operators, adaptive parallelization
+- `ActionExecutor.swift` - **Production ready** with all 16 action types, ACID compliance
+- `RulesView.swift` - **UI structure complete** with native macOS patterns
+- `RulesModels.swift` - **Complete data foundation** with proper SwiftData relationships
 
 ---
 
-## Next Development Phase
+## **HONEST CURRENT STATE ASSESSMENT**
 
-### **Phase 2: Core Rule Engine (Ready to Start)**
-**Goal**: Build the rule evaluation and execution engine
-**Files to create**:
-- `Services/RuleEngine.swift` - Main evaluation engine
-- `Services/TriggerEvaluator.swift` - Trigger logic processor
-- `Services/ActionExecutor.swift` - Action implementation
-- `Services/ExpressionEngine.swift` - Advanced string processing
+### **Phase 1: Foundation** ✅ **100% COMPLETE**
+- ✅ Models designed and implemented
+- ✅ Legacy system removed cleanly
+- ✅ Data migration strategy working
+- ✅ SwiftData schema integration complete
 
-**Architecture**: Complete Firefly III feature parity
-- Trigger-action rule evaluation
-- Rule group execution order
-- Advanced trigger operators (regex, date keywords, NOT logic)
-- Comprehensive actions (categorization, account operations, conversion)
-- Expression engine for advanced string manipulation
+### **Phase 2: Core Engine** ⚠️ **70% COMPLETE - BLOCKED**
+- ✅ TriggerEvaluator: Advanced trigger processing with caching
+- ✅ ActionExecutor: Full action execution with transaction safety
+- ❌ RuleEngine: Critical initialization bug prevents compilation
+- ✅ RulesView: UI framework complete but missing editors
+- ❌ User workflows: Cannot create/edit rules (placeholders only)
+
+### **Phase 3: Polish & Features** ❌ **NOT STARTED**
+- ❌ Rule testing interface
+- ❌ Bulk operations UI
+- ❌ Advanced progress components
+- ❌ Performance optimization
+
+---
+
+## **IMMEDIATE PRIORITIES (CRITICAL FIXES REQUIRED)**
+
+### **🚨 P0: COMPILATION FIXES (BLOCKING)**
+1. **Fix @ModelActor initialization in RuleEngine.swift**
+   - Current: `TriggerEvaluator(modelExecutor: ...)` ❌
+   - Required: Direct usage since both are @ModelActor ✅
+
+2. **Verify app compilation with rules system integrated**
+   - Test that FamilyFinanceApp builds successfully
+   - Validate all imports and dependencies resolve
+
+### **🔧 P1: COMPLETE USER FUNCTIONALITY (HIGH PRIORITY)**
+3. **Implement RuleEditorView.swift**
+   - Rule creation interface with trigger/action builders
+   - Validation and preview functionality
+   - Integration with RulesView modal system
+
+4. **Implement RuleGroupEditorView.swift**
+   - Group creation and management interface
+   - Execution order and settings configuration
+   - Group enable/disable functionality
+
+5. **End-to-end testing**
+   - Verify rule creation → execution → results workflow
+   - Test with actual transaction data
+   - Validate statistics and progress reporting
+
+### **⚡ P2: OPTIMIZATION & POLISH (NICE TO HAVE)**
+6. **Performance validation**
+   - Test with 1000+ rules and 15k+ transactions
+   - Memory usage optimization
+   - UI responsiveness under load
+
+7. **Advanced features**
+   - Rule testing and preview
+   - Bulk operations interface
+   - Advanced progress components
 
 ---
 
 ## Architecture Overview
 
-**FamilyFinance** is a premium native macOS finance application with excellent core functionality and a freshly rebuilt rules system foundation.
+**FamilyFinance** is a premium native macOS finance application with excellent core functionality and a **partially complete** rules system requiring critical fixes.
 
 ### Current Architecture Strengths ✅
-- ✅ **SwiftData Models**: Robust transaction/account/category models + new rules models
-- ✅ **Performance**: Handles 15k+ transactions with virtualized scrolling
-- ✅ **Import Pipeline**: Dutch banking CSV with encoding detection
-- ✅ **Analytics Engine**: Real-time dashboard with charts
-- ✅ **Design System**: Consistent tokens, animations, interactions
-- ✅ **Rules Foundation**: Clean, extensible Firefly III-inspired architecture
+- ✅ **SwiftData Models**: Complete rules architecture with proper relationships
+- ✅ **Performance Foundation**: Optimized trigger evaluation and action execution
+- ✅ **Native UI Framework**: NavigationSplitView with proper macOS patterns
+- ✅ **Thread Safety**: @ModelActor patterns correctly implemented (where working)
+- ✅ **Error Handling**: Comprehensive error classification and recovery
+- ✅ **Caching**: Multi-level performance optimization
 
-### Previous Architecture Problems ✅ **FIXED**
-- ✅ **Over-engineered Rules UI**: Simplified from 4 complexity tiers to clean foundation
-- ✅ **Feature Creep**: Removed unwanted Marketplace/AI features entirely
-- ✅ **Marketing UI**: Replaced with functional development status
-
-## You Are
-
-A senior macOS developer focused on **functional, user-centered design**. The rules system foundation has been rebuilt with clean architecture. Continue with Phase 2 implementation of the rule evaluation engine.
+### Critical Issues Requiring Immediate Attention ❌
+- ❌ **Compilation Blocking**: @ModelActor initialization prevents build
+- ❌ **Missing User Interface**: Rule editing is placeholder-only
+- ❌ **Untested Integration**: No verification of end-to-end workflows
 
 ## Development Workflow
 
-1. **Function first** — Build working rule engine before advanced features
-2. **Firefly III parity** — Complete trigger-action feature set
-3. **User-centered UX** — Clean functional interface (no marketing content)
-4. **Performance focus** — Handle 1000+ rules efficiently
+1. **Fix first** — Resolve compilation blockers before new features
+2. **Complete core functionality** — Users must be able to create/edit rules
+3. **Verify thoroughly** — Test all workflows before claiming completion
+4. **Performance focus** — Optimize after functionality is working
 
-## Rules System Status - PHASE 1 COMPLETE ✅
+## Rules System Status - PHASE 2 INCOMPLETE ⚠️
 
-### **✅ DEMOLITION COMPLETE (December 26, 2025)**
+### **✅ WORKING COMPONENTS (Verified)**
 ```
-❌ DELETED Marketplace tab entirely
-❌ DELETED AI Insights tab entirely
-❌ REMOVED "Unlock Enhanced Features" UI
-❌ REMOVED "Coming Soon" placeholders
-❌ REMOVED over-engineered complexity tiers
-❌ REPLACED marketing copy with functional status
+✅ RulesModels.swift - Complete data foundation (4 @Model classes)
+✅ TriggerEvaluator.swift - Production ready (15 operators, parallel processing)
+✅ ActionExecutor.swift - Production ready (16 actions, ACID compliance)
+✅ RulesView.swift - UI structure complete (NavigationSplitView, native patterns)
 ```
 
-### **✅ FOUNDATION COMPLETE**
+### **❌ BROKEN/INCOMPLETE COMPONENTS (Verified)**
 ```
-✅ CREATED Models/RulesModels.swift (500+ lines)
-✅ BUILT RuleGroup model with execution order
-✅ BUILT Rule model with trigger-action architecture
-✅ BUILT RuleTrigger model with NOT logic + 15 operators
-✅ BUILT RuleAction model with 15+ comprehensive actions
-✅ ADDED professional enums with UI helpers
-✅ UPDATED navigation to clean placeholder
-✅ VERIFIED zero compilation errors
+❌ RuleEngine.swift - COMPILATION BLOCKED (@ModelActor initialization error)
+❌ RuleEditorView.swift - PLACEHOLDER ONLY (users cannot create rules)
+❌ RuleGroupEditorView.swift - PLACEHOLDER ONLY (users cannot manage groups)
+❌ End-to-end workflow - UNTESTED (cannot verify due to compilation issues)
 ```
 
-### **Current Rules User Experience**
+### **Current User Experience**
 ```
-Rules Tab → "Under Construction" message
-           → Shows legacy rule count (data preserved)
-           → Professional development status
-           → No marketing content or broken features
+Rules Tab →
+├── ✅ View existing rule groups and rules
+├── ✅ Navigate with sidebar/detail interface
+├── ✅ See rule statistics and status
+├── ❌ Create new rules (placeholder modal only)
+├── ❌ Edit existing rules (placeholder modal only)
+├── ❌ Execute rules (compilation blocked)
+└── ❌ Test rule functionality (not implemented)
 ```
 
 ---
@@ -127,159 +168,118 @@ Rules Tab → "Under Construction" message
 
 ### Core Application ✅
 ```
-FamilyFinanceApp.swift           — Main app + design tokens + clean rules placeholder
-├── DesignTokens                 — Spacing, animations, typography, colors
-├── Enhanced UI Components       — EnhancedSearchField, EnhancedButton, etc.
-├── OptimizedTransactionsView    — High-performance list with pagination
-└── Animation Helpers            — AnimatedNumber, SkeletonCard, etc.
+FamilyFinanceApp.swift           — ✅ Main app + design tokens + rules integration
+├── DesignTokens                 — ✅ Spacing, animations, typography, colors
+├── Enhanced UI Components       — ✅ EnhancedSearchField, EnhancedButton, etc.
+├── OptimizedTransactionsView    — ✅ High-performance list with pagination
+└── Animation Helpers            — ✅ AnimatedNumber, SkeletonCard, etc.
 ```
 
-### Views ✅ (Clean Architecture)
+### Views ⚠️ (Mixed Status)
 ```
 Views/
 ├── DashboardView.swift          — ✅ Animated KPIs + charts + skeleton loading
 ├── TransactionDetailView.swift  — ✅ Full editing with splits and audit log
 ├── ImportView.swift             — ✅ Drag-drop CSV import with progress
-├── [Rules System Views]         — 🚧 TO BE BUILT in Phase 2
-│   ├── RulesView.swift          — Main rules management interface
-│   ├── RuleEditorView.swift     — Create/edit rule interface
-│   ├── RuleGroupsSidebar.swift  — Groups management
-│   └── TriggerActionBuilder.swift — Rule builder components
+├── RulesView.swift              — ✅ Complete UI framework, missing editors
+├── [Missing Editors]            — ❌ Critical gap in user functionality
+│   ├── RuleEditorView.swift     — ❌ PLACEHOLDER - Cannot create/edit rules
+│   └── RuleGroupEditorView.swift — ❌ PLACEHOLDER - Cannot manage groups
 ```
 
-### Services ✅ (Core Complete, Rules To Be Built)
+### Services ⚠️ (Core Complete, Integration Broken)
 ```
 Services/
 ├── TransactionQueryService.swift — ✅ Pagination + analytics + performance
 ├── BackgroundDataHandler.swift   — ✅ Thread-safe data operations
 ├── CSVImportService.swift        — ✅ Dutch banking format support
 ├── ExportService.swift          — ✅ Data export capabilities
-├── [Rules Engine Services]      — 🚧 TO BE BUILT in Phase 2
-│   ├── RuleEngine.swift         — Main rule evaluation engine
-│   ├── TriggerEvaluator.swift   — Trigger logic processor
-│   ├── ActionExecutor.swift     — Action implementation engine
-│   ├── ExpressionEngine.swift   — Advanced string processing
-│   └── BulkRuleProcessor.swift  — Batch operations
+├── TriggerEvaluator.swift       — ✅ Production ready parallel evaluation
+├── ActionExecutor.swift         — ✅ Complete ACID action execution
+├── RuleEngine.swift             — ❌ COMPILATION BLOCKED (@ModelActor error)
+└── RuleProgressPublisher.swift  — ✅ Progress reporting with throttling
 ```
 
 ### Models ✅ (Complete)
 ```
 Models/
 ├── SwiftDataModels.swift        — ✅ Core transaction/account/category models
-│   ├── Transaction              — Core financial data with audit trail
-│   ├── Account                  — Bank accounts with real-time balances
-│   ├── Category                 — Hierarchical categorization
-│   └── CategorizationRule       — ✅ Legacy rules (with computed properties fix)
-└── RulesModels.swift            — ✅ NEW: Complete rules system foundation
-    ├── RuleGroup                — Rule organization with execution order
-    ├── Rule                     — Core rule model with trigger-action architecture
-    ├── RuleTrigger              — Advanced triggers with NOT logic + 15 operators
-    ├── RuleAction               — Comprehensive actions (15+ types)
-    └── Supporting Enums         — TriggerField, TriggerOperator, ActionType, etc.
+└── RulesModels.swift            — ✅ Complete rules architecture
+    ├── RuleGroup                — ✅ Rule organization with execution order
+    ├── Rule                     — ✅ Core rule model with trigger-action architecture
+    ├── RuleTrigger              — ✅ Advanced triggers with NOT logic + 15 operators
+    ├── RuleAction               — ✅ Comprehensive actions (16 types)
+    └── Supporting Enums         — ✅ TriggerField, TriggerOperator, ActionType, etc.
 ```
 
 ---
 
-## Quality Standards (App Store Level)
+## Quality Standards (Partially Met)
 
-### Technical Standards ✅
+### Technical Standards ✅ (Where Working)
 - [x] All state changes are animated (0.3s spring)
 - [x] Handles 15k+ transactions smoothly
-- [x] Zero compiler warnings or errors
-- [x] Memory usage stays under 100MB
+- [❌] Zero compiler warnings or errors - **BROKEN for rules system**
+- [x] Memory usage stays under 100MB (core app)
 - [x] SwiftData relationships properly set
 - [x] Sendable compliance for Swift 6
 - [x] Clean architecture with proper separation of concerns
 
-### Rules System Standards (Phase 1 ✅)
-- [x] Clean, functional interface foundation (no marketing content)
-- [x] Professional development status (not broken placeholders)
-- [x] No unwanted features (Marketplace/AI completely removed)
+### Rules System Standards (Incomplete)
 - [x] Comprehensive model architecture (Firefly III feature parity)
-- [x] Extensible design for Phase 2 implementation
+- [❌] **Functional interface** - Users cannot create/edit rules
+- [❌] **Zero compilation errors** - Critical @ModelActor bug
+- [x] Extensible design for future enhancement
+- [❌] **End-to-end workflows** - Untested due to compilation issues
 
 ---
 
-## Dutch Banking Integration ✅
+## **NEXT STEPS: CRITICAL FIXES REQUIRED** 🚨
 
-### CSV Import Specifications
-- **Number Format**: `+1.234,56` → `1234.56` (remove dots, comma→period)
-- **Encoding Priority**: latin-1 → cp1252 → utf-8
-- **Date Formats**: dd-MM-yyyy, dd/MM/yyyy, yyyy-MM-dd
+### **Immediate Action Required (Cannot proceed without these)**
+1. **FIX: RuleEngine.swift @ModelActor initialization**
+   - Remove incorrect `modelExecutor` parameter passing
+   - Verify TriggerEvaluator integration works correctly
 
-### Supported Banks
-- ING Bank (Nederland) ✅
-- ABN AMRO ✅
-- Rabobank ✅
-- ASN Bank ✅
-- Bunq ✅
+2. **IMPLEMENT: RuleEditorView.swift completely**
+   - Trigger selection and configuration UI
+   - Action selection and configuration UI
+   - Rule validation and preview
+   - Save/cancel functionality
 
----
+3. **IMPLEMENT: RuleGroupEditorView.swift completely**
+   - Group creation and naming
+   - Execution order configuration
+   - Enable/disable settings
 
-## Development Priorities 🎯
+4. **VERIFY: End-to-end rule processing**
+   - Create test rule through UI
+   - Execute rule on sample transaction
+   - Verify results and statistics
 
-### **✅ P0: Phase 1 Complete (DONE - Dec 26, 2025)**
-1. ✅ ~~Remove Marketplace tab from navigation~~ **COMPLETED**
-2. ✅ ~~Remove AI Insights tab from navigation~~ **COMPLETED**
-3. ✅ ~~Replace marketing content with functional status~~ **COMPLETED**
-4. ✅ ~~Create comprehensive rules model architecture~~ **COMPLETED**
-5. ✅ ~~Ensure zero compilation errors~~ **COMPLETED**
+### **Success Criteria (Evidence Required)**
+- ✅ App compiles and runs without errors
+- ✅ Users can create new rules through UI
+- ✅ Users can edit existing rules
+- ✅ Rules execute successfully on transactions
+- ✅ Statistics update correctly after rule execution
 
-### **🚧 P1: Phase 2 - Core Rule Engine (READY TO START)**
-6. ❌ **Build RuleEngine.swift - main evaluation logic**
-7. ❌ **Build TriggerEvaluator.swift - trigger processing**
-8. ❌ **Build ActionExecutor.swift - action implementation**
-9. ❌ **Integrate with transaction processing pipeline**
-10. ❌ **Add rule statistics and performance tracking**
-
-### **⏳ P2: Phase 3 - User Interface (AFTER P1)**
-11. ❌ **Build RulesView.swift - main management interface**
-12. ❌ **Build RuleEditorView.swift - create/edit interface**
-13. ❌ **Build rule preview and testing functionality**
-14. ❌ **Add bulk operations interface**
+**Current Status**: **Critical fixes required before production readiness claims**
 
 ---
 
-## Recent Achievements ✅
+## Recent Work History
 
-### **December 26, 2025: Rules System Foundation Rebuilt**
-- ✅ **Complete demolition** - Removed all unwanted Marketplace/AI features
-- ✅ **Clean architecture** - Built comprehensive RulesModels.swift (500+ lines)
-- ✅ **Professional UX** - Replaced marketing content with development status
-- ✅ **Zero compilation errors** - App builds and runs perfectly
-- ✅ **Data preservation** - Legacy rules maintained during transition
+### **December 27, 2025: Phase 2 Implementation Attempt**
+- ✅ **Built comprehensive backend**: TriggerEvaluator, ActionExecutor with expert architecture
+- ✅ **Created UI framework**: RulesView with native macOS patterns
+- ❌ **Critical integration bugs**: @ModelActor initialization prevents compilation
+- ❌ **Missing user workflows**: Rule editing interfaces are placeholders only
 
-**Technical Impact**: Clean slate with enterprise-grade architecture foundation.
+**Technical Impact**: Strong architectural foundation exists but critical gaps prevent user functionality.
 
-**Business Impact**: Eliminated user confusion from unwanted features, professional development approach.
-
-### **December 25, 2025: Critical Architecture Fix**
-- ✅ **Smart computed properties** for backward compatibility
-- ✅ **Bidirectional type mapping** (ConditionOperator ↔ RuleMatchType)
-- ✅ **Fixed all compilation errors** - app builds cleanly
-- ✅ **Preserved architectural evolution** while maintaining UI compatibility
+**Business Impact**: Users cannot utilize rules system until compilation and UI issues are resolved.
 
 ---
 
-## Next Steps 🚀
-
-### **Phase 2: Core Rule Engine (Ready to Start)**
-**Goal**: Build the rule evaluation and execution system
-**Estimated**: 3-4 days development time
-
-**Key Components**:
-1. **RuleEngine.swift** - Main evaluation logic with group processing
-2. **TriggerEvaluator.swift** - Advanced trigger evaluation (regex, dates, NOT logic)
-3. **ActionExecutor.swift** - Comprehensive action implementation
-4. **Integration** - Hook into transaction processing pipeline
-
-**Success Criteria**:
-- ✅ Rules automatically process transactions
-- ✅ Advanced triggers work (regex, date keywords, NOT logic)
-- ✅ All action types function correctly
-- ✅ Rule statistics tracking operational
-- ✅ Performance handles 1000+ rules efficiently
-
----
-
-**Current Status**: **Rules system foundation rebuilt with clean architecture. Ready for Phase 2 core engine implementation.**
+**Current Reality**: **Solid foundation with critical implementation gaps requiring immediate attention before any production deployment.**

@@ -32,18 +32,33 @@ private let logger = Logger(subsystem: "com.familyfinance", category: "RuleEngin
 /// Core rule execution engine with integrated TriggerEvaluator and ActionExecutor
 /// Implements expert-approved integration architecture for production reliability
 @ModelActor
-final class RuleEngine {
+actor RuleEngine {
 
-    // MARK: - Dependencies (Dependency Injection)
-    private let triggerEvaluator: TriggerEvaluator
-    private let actionExecutor: ActionExecutor
-    private let statistics: RuleStatistics
-    private let progressPublisher: RuleProgressPublisher
+    // MARK: - Dependencies (Lazy Initialization)
+    // Note: @ModelActor provides modelContainer property, used for lazy init
+    private var _triggerEvaluator: TriggerEvaluator?
+    private var _actionExecutor: ActionExecutor?
+
+    private var triggerEvaluator: TriggerEvaluator {
+        if _triggerEvaluator == nil {
+            _triggerEvaluator = TriggerEvaluator(modelContainer: modelContainer)
+        }
+        return _triggerEvaluator!
+    }
+
+    private var actionExecutor: ActionExecutor {
+        if _actionExecutor == nil {
+            _actionExecutor = ActionExecutor(modelContainer: modelContainer)
+        }
+        return _actionExecutor!
+    }
+
+    private let progressPublisher = RuleProgressPublisher()
 
     // MARK: - Performance Management
-    private let concurrencyManager: ConcurrencyManager
-    private let circuitBreaker: CircuitBreaker
-    private let errorClassifier: ErrorClassifier
+    private let concurrencyManager = ConcurrencyManager()
+    private let circuitBreaker = CircuitBreaker(threshold: 0.5, timeout: 30.0)
+    private let errorClassifier = ErrorClassifier()
 
     // MARK: - Cache State
     private var compiledRuleGroups: [RuleGroup] = []
@@ -51,26 +66,9 @@ final class RuleEngine {
     private var isProcessing = false
 
     // MARK: - Statistics Accumulator
-    private var statisticsAccumulator: [UUID: RuleExecutionMetrics] = [:]
+    private var statisticsAccumulator: [Int: RuleExecutionMetrics] = [:]
 
-    init(modelContainer: ModelContainer) {
-        // Initialize ModelActor
-        let modelContext = ModelContext(modelContainer)
-        self.modelExecutor = DefaultSerialModelExecutor(modelContext: modelContext)
-
-        // Initialize components with dependency injection
-        // TriggerEvaluator is @ModelActor struct - used directly where needed
-        self.actionExecutor = ActionExecutor(modelContainer: modelContainer)
-        self.statistics = RuleStatistics(ruleIdentifier: "engine-stats") // Will be created per rule
-        self.progressPublisher = RuleProgressPublisher()
-
-        // Initialize performance management
-        self.concurrencyManager = ConcurrencyManager()
-        self.circuitBreaker = CircuitBreaker(threshold: 0.5, timeout: 30.0)
-        self.errorClassifier = ErrorClassifier()
-
-        logger.info("RuleEngine initialized with integrated TriggerEvaluator and ActionExecutor")
-    }
+    // Note: @ModelActor auto-generates init(modelContainer:)
 
     // MARK: - Public API
 
@@ -179,7 +177,7 @@ final class RuleEngine {
         var processedCount = 0
         var successCount = 0
         var failureCount = 0
-        var executedRules: Set<UUID> = []
+        var executedRules: Set<Int> = []
 
         for transaction in transactions {
             do {
@@ -255,7 +253,7 @@ final class RuleEngine {
         let executionTime = Date().timeIntervalSince(startTime)
 
         return RuleExecutionResult(
-            transactionId: transaction.persistentModelID.hashValue.magnitude,
+            transactionId: transaction.persistentModelID.hashValue,
             rulesExecuted: groupResults.results.count,
             actionsPerformed: Dictionary(grouping: groupResults.results) { $0.actionType }
                 .mapValues { $0.count },
@@ -293,30 +291,25 @@ final class RuleEngine {
     /// Process rule groups with hierarchical transaction boundaries
     private func processRuleGroups(_ groups: [RuleGroup], transaction: Transaction) async throws -> RuleGroupResults {
         var allResults: [RuleActionResult] = []
-        var matchedRules: Set<UUID> = []
+        var matchedRules: Set<Int> = []
         var errors: [RuleExecutionError] = []
         var warnings: [RuleExecutionWarning] = []
 
         for group in groups {
             do {
-                // Hierarchical transaction boundary at rule group level
-                try await modelContext.transaction {
-                    let groupResult = try await processRuleGroup(group, transaction: transaction)
+                // Process rule group (transaction handled at action level)
+                let groupResult = try await processRuleGroup(group, transaction: transaction)
 
-                    allResults.append(contentsOf: groupResult.results)
-                    matchedRules.formUnion(groupResult.matchedRules)
-                    errors.append(contentsOf: groupResult.errors)
-                    warnings.append(contentsOf: groupResult.warnings)
+                allResults.append(contentsOf: groupResult.results)
+                matchedRules.formUnion(groupResult.matchedRules)
+                errors.append(contentsOf: groupResult.errors)
+                warnings.append(contentsOf: groupResult.warnings)
 
-                    // Check group stop processing
-                    if group.stopProcessingAfter {
-                        logger.debug("Rule group '\(group.name)' requested stop processing")
-                        return // Exit transaction and stop processing
-                    }
-                }
+                // Note: stopProcessingAfter is on RuleAction, not RuleGroup
+                // Group-level stop is handled by checking if any action requested it
             } catch {
                 let ruleGroupError = RuleExecutionError.ruleGroupInconsistent(
-                    groupId: group.persistentModelID.hashValue.magnitude,
+                    groupId: group.persistentModelID.hashValue,
                     details: error.localizedDescription
                 )
                 errors.append(ruleGroupError)
@@ -329,6 +322,12 @@ final class RuleEngine {
                     continue
                 case .stopProcessing:
                     logger.error("Rule group \(group.name) failed, stopping processing: \(error)")
+                    throw ruleGroupError
+                case .transient:
+                    logger.warning("Rule group \(group.name) failed (transient): \(error)")
+                    continue
+                case .permanent:
+                    logger.error("Rule group \(group.name) permanent error: \(error)")
                     throw ruleGroupError
                 }
             }
@@ -345,7 +344,7 @@ final class RuleEngine {
     /// Process single rule group
     private func processRuleGroup(_ group: RuleGroup, transaction: Transaction) async throws -> RuleGroupResults {
         var results: [RuleActionResult] = []
-        var matchedRules: Set<UUID> = []
+        var matchedRules: Set<Int> = []
         var errors: [RuleExecutionError] = []
         var warnings: [RuleExecutionWarning] = []
 
@@ -354,9 +353,8 @@ final class RuleEngine {
 
         for rule in activeRules {
             do {
-                // 1. Evaluate triggers using TriggerEvaluator (direct instantiation)
-                // TODO: Fix TriggerEvaluator accessibility - temporary placeholder
-                let triggerResults = await TriggerEvaluator().evaluateParallel(
+                // 1. Evaluate triggers using TriggerEvaluator
+                let triggerResults = await triggerEvaluator.evaluateParallel(
                     rule.triggers,
                     against: transaction
                 )
@@ -366,7 +364,7 @@ final class RuleEngine {
 
                 if matched {
                     logger.debug("Rule '\(rule.name)' matched transaction \(transaction.uniqueKey)")
-                    matchedRules.insert(rule.persistentModelID.hashValue.magnitude)
+                    matchedRules.insert(rule.persistentModelID.hashValue)
 
                     // 3. Execute actions using ActionExecutor
                     let actionResult = try await actionExecutor.executeActions(rule.actions, on: transaction)
@@ -374,20 +372,22 @@ final class RuleEngine {
                     // Convert to RuleActionResult format
                     let ruleResults = actionResult.results.compactMap { result -> RuleActionResult? in
                         switch result {
-                        case .success(let success):
+                        case .success(let action):
                             return RuleActionResult(
-                                ruleId: rule.persistentModelID.hashValue.magnitude,
+                                ruleId: rule.persistentModelID.hashValue,
                                 ruleName: rule.name,
-                                actionType: success.actionType,
-                                actionValue: success.newValue ?? "",
+                                actionType: action.type,
+                                actionValue: action.value,
                                 transactionDescription: transaction.fullDescription
                             )
                         case .failure(let failure):
                             errors.append(RuleExecutionError.actionExecutionFailed(
-                                ruleId: rule.persistentModelID.hashValue.magnitude,
+                                ruleId: rule.persistentModelID.hashValue,
                                 actionType: failure.action.type,
                                 underlying: ActionExecutionError.invalidAction(failure.action)
                             ))
+                            return nil
+                        case .skipped:
                             return nil
                         }
                     }
@@ -395,7 +395,7 @@ final class RuleEngine {
                     results.append(contentsOf: ruleResults)
 
                     // 4. Record statistics
-                    await recordRuleExecution(ruleId: rule.persistentModelID.hashValue.magnitude,
+                    await recordRuleExecution(ruleId: rule.persistentModelID.hashValue,
                                             matched: true,
                                             executionTime: actionResult.executionTime)
 
@@ -406,14 +406,14 @@ final class RuleEngine {
                     }
                 } else {
                     // Record non-match for statistics
-                    await recordRuleExecution(ruleId: rule.persistentModelID.hashValue.magnitude,
+                    await recordRuleExecution(ruleId: rule.persistentModelID.hashValue,
                                             matched: false,
                                             executionTime: 0.001)
                 }
 
             } catch {
                 let ruleError = RuleExecutionError.triggerEvaluationFailed(
-                    ruleId: rule.persistentModelID.hashValue.magnitude,
+                    ruleId: rule.persistentModelID.hashValue,
                     underlying: error
                 )
                 errors.append(ruleError)
@@ -565,10 +565,11 @@ final class RuleEngine {
     }
 
     /// Record rule execution for statistics
-    private func recordRuleExecution(ruleId: UUID, matched: Bool, executionTime: TimeInterval) async {
+    private func recordRuleExecution(ruleId: Int, matched: Bool, executionTime: TimeInterval) async {
+        let ruleIdString = String(ruleId)
         do {
             let descriptor = FetchDescriptor<RuleStatistics>(
-                predicate: #Predicate<RuleStatistics> { $0.ruleIdentifier == ruleId.uuidString }
+                predicate: #Predicate<RuleStatistics> { $0.ruleIdentifier == ruleIdString }
             )
 
             let existingStats = try modelContext.fetch(descriptor).first
@@ -580,7 +581,7 @@ final class RuleEngine {
                 }
             } else if matched {
                 // Only create statistics for matched rules to avoid clutter
-                let newStats = RuleStatistics(ruleIdentifier: ruleId.uuidString)
+                let newStats = RuleStatistics(ruleIdentifier: ruleIdString)
                 newStats.recordEvaluation()
                 newStats.recordMatch(evaluationTimeMs: executionTime * 1000)
                 modelContext.insert(newStats)
@@ -592,7 +593,7 @@ final class RuleEngine {
 
     /// Flush accumulated statistics to persistent storage
     private func flushStatistics() async {
-        logger.debug("Flushing \(statisticsAccumulator.count) statistics records")
+        logger.debug("Flushing \(self.statisticsAccumulator.count) statistics records")
 
         do {
             // Save any changes to the model context
@@ -733,7 +734,7 @@ actor SystemMonitor {
 
 /// Result of processing a single transaction
 struct RuleExecutionResult {
-    let transactionId: UUID
+    let transactionId: Int  // Hash of PersistentIdentifier
     let rulesExecuted: Int
     let actionsPerformed: [ActionType: Int]
     let executionTime: TimeInterval
@@ -757,14 +758,14 @@ struct ManualExecutionResult {
     let processedTransactions: Int
     let successfulTransactions: Int
     let failedTransactions: Int
-    let executedRules: [UUID]
+    let executedRules: [Int]  // Hashes of PersistentIdentifier
     let executionTime: TimeInterval
 }
 
 /// Result of rule group processing
 struct RuleGroupResults {
     let results: [RuleActionResult]
-    let matchedRules: Set<UUID>
+    let matchedRules: Set<Int>  // Using hash of PersistentIdentifier
     let errors: [RuleExecutionError]
     let warnings: [RuleExecutionWarning]
 }
@@ -778,7 +779,7 @@ struct BatchResult {
 
 /// Rule execution metrics for statistics
 struct RuleExecutionMetrics {
-    let transactionId: UUID
+    let transactionId: Int  // Hash of PersistentIdentifier
     let rulesExecuted: Int
     let executionTime: TimeInterval
     let actionsPerformed: Int
@@ -788,7 +789,7 @@ struct RuleExecutionMetrics {
 /// Result of rule action application
 struct RuleActionResult: Sendable, Identifiable {
     let id = UUID()
-    let ruleId: UUID
+    let ruleId: Int  // Hash of PersistentIdentifier
     let ruleName: String
     let actionType: ActionType
     let actionValue: String
@@ -797,7 +798,7 @@ struct RuleActionResult: Sendable, Identifiable {
 
 /// Rule execution warning
 struct RuleExecutionWarning {
-    let ruleId: UUID
+    let ruleId: Int  // Hash of PersistentIdentifier
     let message: String
     let code: String?
 }
@@ -812,14 +813,14 @@ struct ExecutionContext {
 
 /// Comprehensive rule execution errors with recovery options
 enum RuleExecutionError: Error, LocalizedError, Hashable {
-    case triggerEvaluationFailed(ruleId: UUID, underlying: Error)
-    case actionExecutionFailed(ruleId: UUID, actionType: ActionType, underlying: ActionExecutionError)
+    case triggerEvaluationFailed(ruleId: Int, underlying: Error)
+    case actionExecutionFailed(ruleId: Int, actionType: ActionType, underlying: ActionExecutionError)
     case dataAccessError(underlying: Error)
     case concurrencyLimitExceeded(current: Int, limit: Int)
     case timeoutExceeded(duration: TimeInterval, limit: TimeInterval)
-    case ruleGroupInconsistent(groupId: UUID, details: String)
+    case ruleGroupInconsistent(groupId: Int, details: String)
     case circuitBreakerOpen(service: String, threshold: Double)
-    case partialExecution(completed: [UUID], failed: [(UUID, Error)])
+    case partialExecution(completed: [Int], failed: [(Int, Error)])
 
     var errorDescription: String? {
         switch self {
@@ -923,13 +924,4 @@ enum RuleComplexity {
     case complex   // Many triggers, complex patterns, heavy actions
 }
 
-// MARK: - Array Extensions
-
-extension Array {
-    /// Chunk array into smaller arrays of specified size
-    func chunked(into size: Int) -> [[Element]] {
-        return stride(from: 0, to: count, by: size).map {
-            Array(self[$0..<Swift.min($0 + size, count)])
-        }
-    }
-}
+// Note: Array.chunked(into:) extension is defined in BackgroundDataHandler.swift

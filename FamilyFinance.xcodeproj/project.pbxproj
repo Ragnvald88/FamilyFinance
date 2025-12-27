@@ -24,6 +24,13 @@
 		A1000001232312340051 /* FamilyFinanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340151 /* FamilyFinanceTests.swift */; };
 		A1000001232312340052 /* TransactionModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340152 /* TransactionModelTests.swift */; };
 		A1000001232312340053 /* TransactionDetailViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340153 /* TransactionDetailViewTests.swift */; };
+		A1000001232312340015 /* RulesModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340115 /* RulesModels.swift */; };
+		A1000001232312340016 /* RuleStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340116 /* RuleStatistics.swift */; };
+		A1000001232312340017 /* ActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340117 /* ActionExecutor.swift */; };
+		A1000001232312340018 /* RuleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340118 /* RuleEngine.swift */; };
+		A1000001232312340019 /* RuleProgressPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340119 /* RuleProgressPublisher.swift */; };
+		A1000001232312340020 /* TriggerEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340120 /* TriggerEvaluator.swift */; };
+		A1000001232312340021 /* RulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340121 /* RulesView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +61,13 @@
 		A1000001232312340151 /* FamilyFinanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyFinanceTests.swift; sourceTree = "<group>"; };
 		A1000001232312340152 /* TransactionModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionModelTests.swift; sourceTree = "<group>"; };
 		A1000001232312340153 /* TransactionDetailViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailViewTests.swift; sourceTree = "<group>"; };
+		A1000001232312340115 /* RulesModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesModels.swift; sourceTree = "<group>"; };
+		A1000001232312340116 /* RuleStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleStatistics.swift; sourceTree = "<group>"; };
+		A1000001232312340117 /* ActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionExecutor.swift; sourceTree = "<group>"; };
+		A1000001232312340118 /* RuleEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleEngine.swift; sourceTree = "<group>"; };
+		A1000001232312340119 /* RuleProgressPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleProgressPublisher.swift; sourceTree = "<group>"; };
+		A1000001232312340120 /* TriggerEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriggerEvaluator.swift; sourceTree = "<group>"; };
+		A1000001232312340121 /* RulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesView.swift; sourceTree = "<group>"; };
 		A1000001232312340401 /* FamilyFinance.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FamilyFinance.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000001232312340402 /* FamilyFinanceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FamilyFinanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -93,6 +107,8 @@
 			isa = PBXGroup;
 			children = (
 				A1000001232312340102 /* SwiftDataModels.swift */,
+				A1000001232312340115 /* RulesModels.swift */,
+				A1000001232312340116 /* RuleStatistics.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -103,6 +119,7 @@
 				A1000001232312340112 /* DashboardView.swift */,
 				A1000001232312340113 /* ImportView.swift */,
 				A1000001232312340114 /* TransactionDetailView.swift */,
+				A1000001232312340121 /* RulesView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -118,6 +135,10 @@
 				A1000001232312340109 /* ExportService.swift */,
 				A1000001232312340110 /* ThreadSafeCategorization.swift */,
 				A1000001232312340111 /* AccountRepository.swift */,
+				A1000001232312340117 /* ActionExecutor.swift */,
+				A1000001232312340118 /* RuleEngine.swift */,
+				A1000001232312340119 /* RuleProgressPublisher.swift */,
+				A1000001232312340120 /* TriggerEvaluator.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -262,6 +283,13 @@
 				A1000001232312340012 /* DashboardView.swift in Sources */,
 				A1000001232312340013 /* ImportView.swift in Sources */,
 				A1000001232312340014 /* TransactionDetailView.swift in Sources */,
+				A1000001232312340015 /* RulesModels.swift in Sources */,
+				A1000001232312340016 /* RuleStatistics.swift in Sources */,
+				A1000001232312340017 /* ActionExecutor.swift in Sources */,
+				A1000001232312340018 /* RuleEngine.swift in Sources */,
+				A1000001232312340019 /* RuleProgressPublisher.swift in Sources */,
+				A1000001232312340020 /* TriggerEvaluator.swift in Sources */,
+				A1000001232312340021 /* RulesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

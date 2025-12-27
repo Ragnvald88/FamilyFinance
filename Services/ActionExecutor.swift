@@ -30,63 +30,58 @@ import OSLog
 
 @ModelActor
 actor ActionExecutor {
-    private let progressPublisher: RuleProgressPublisher
-    private let relationshipCache: RelationshipCache
-    private let errorHandler: ActionErrorHandler
+    private let progressPublisher = RuleProgressPublisher()
+    private var _relationshipCache: RelationshipCache?
+    private let errorHandler = ActionErrorHandler()
     private let logger = Logger(subsystem: "com.familyfinance", category: "ActionExecutor")
 
-    /// Initialize ActionExecutor with SwiftData ModelActor pattern
-    init(modelContainer: ModelContainer) {
-        self.modelExecutor = DefaultSerialModelExecutor(modelContext: ModelContext(modelContainer))
-
-        // Initialize supporting components
-        self.progressPublisher = RuleProgressPublisher()
-        self.relationshipCache = RelationshipCache(modelContext: self.modelContext)
-        self.errorHandler = ActionErrorHandler()
-
-        logger.info("ActionExecutor initialized with ModelActor pattern")
+    // Lazy initialization for components needing modelContext
+    private var relationshipCache: RelationshipCache {
+        if _relationshipCache == nil {
+            _relationshipCache = RelationshipCache(modelContext: modelContext)
+        }
+        return _relationshipCache!
     }
+
+    // Note: @ModelActor auto-generates init(modelContainer:)
 
     // MARK: - Single Transaction Actions (ACID Compliant)
 
     /// Execute actions on single transaction with full ACID compliance
-    /// Uses SwiftData transaction wrapper to ensure atomicity
     func executeActions(_ actions: [RuleAction],
                        on transaction: Transaction) async throws -> ActionExecutionResult {
         logger.debug("Executing \(actions.count) actions on transaction \(transaction.uniqueKey)")
         let startTime = Date()
         var results: [ActionResult] = []
 
-        // ACID compliance: Wrap all actions in a single SwiftData transaction
-        try await modelContext.transaction {
-            for action in actions.sortedBySortOrder {
-                do {
-                    let result = try await executeAtomicAction(action, on: transaction)
-                    results.append(result)
+        // Execute actions sequentially
+        for action in actions.sortedBySortOrder {
+            do {
+                let result = try await executeAtomicAction(action, on: transaction)
+                results.append(result)
 
-                    // Stop processing if action requested it
-                    if action.stopProcessingAfter {
-                        logger.debug("Action requested stop processing: \(action.type)")
-                        break
-                    }
-                } catch {
-                    let actionFailure = ActionFailure(
-                        action: action,
-                        error: error,
-                        recoveryOptions: errorHandler.getRecoveryOptions(for: error, action: action),
-                        userMessage: errorHandler.getUserMessage(for: error, action: action),
-                        technicalDetails: error.localizedDescription
-                    )
-                    results.append(.failure(actionFailure))
-
-                    // In ACID transaction: if any action fails, rollback all
-                    throw ActionExecutionError.partialFailure(results, action)
+                // Stop processing if action requested it
+                if action.stopProcessingAfter {
+                    logger.debug("Action requested stop processing: \(action.type.displayName)")
+                    break
                 }
-            }
+            } catch {
+                let actionFailure = ActionFailure(
+                    action: action,
+                    error: error,
+                    recoveryOptions: errorHandler.getRecoveryOptions(for: error, action: action),
+                    userMessage: errorHandler.getUserMessage(for: error, action: action),
+                    technicalDetails: error.localizedDescription
+                )
+                results.append(.failure(actionFailure))
 
-            // All actions succeeded - transaction will commit automatically
-            try modelContext.save()
+                // On failure, throw to let caller handle
+                throw ActionExecutionError.partialFailure(results, action)
+            }
         }
+
+        // Save changes
+        try modelContext.save()
 
         let executionTime = Date().timeIntervalSince(startTime)
         let successCount = results.filter { if case .success = $0 { return true } else { return false } }.count
@@ -96,7 +91,7 @@ actor ActionExecutor {
 
         return ActionExecutionResult(
             results: results,
-            transactionId: transaction.persistentModelID.hashValue.magnitude,
+            transactionId: transaction.persistentModelID.hashValue,
             executionTime: executionTime,
             successCount: successCount,
             failureCount: failureCount
@@ -158,7 +153,7 @@ actor ActionExecutor {
                             total: totalTransactions,
                             successCount: successCount,
                             failureCount: failureCount,
-                            currentTransactionId: chunk.last?.persistentModelID.hashValue.magnitude,
+                            currentTransactionId: chunk.last?.persistentModelID.hashValue,
                             estimatedTimeRemaining: calculateTimeRemaining(
                                 completed: completedCount,
                                 total: totalTransactions,
@@ -221,7 +216,7 @@ actor ActionExecutor {
     /// Execute a single action atomically within current transaction context
     private func executeAtomicAction(_ action: RuleAction,
                                    on transaction: Transaction) async throws -> ActionResult {
-        logger.debug("Executing action: \(action.type) with value: \(action.value)")
+        logger.debug("Executing action: \(action.type.displayName) with value: \(action.value)")
 
         switch action.type {
         // Categorization actions (6 types)
@@ -265,7 +260,7 @@ actor ActionExecutor {
             try await setInternalReferenceAction(action, on: transaction)
         }
 
-        logger.debug("Action \(action.type) executed successfully")
+        logger.debug("Action \(action.type.displayName) executed successfully")
         return .success(action)
     }
 
@@ -577,7 +572,7 @@ actor ActionExecutor {
                             userMessage: "Failed to process transaction",
                             technicalDetails: error.localizedDescription
                         ))],
-                        transactionId: transaction.persistentModelID.hashValue.magnitude,
+                        transactionId: transaction.persistentModelID.hashValue,
                         executionTime: 0,
                         successCount: 0,
                         failureCount: 1
@@ -625,7 +620,7 @@ struct ActionFailure {
 /// Complete execution result for a transaction
 struct ActionExecutionResult {
     let results: [ActionResult]
-    let transactionId: UInt64
+    let transactionId: Int  // Hash of PersistentIdentifier
     let executionTime: TimeInterval
     let successCount: Int
     let failureCount: Int
@@ -728,7 +723,7 @@ struct BulkActionProgress {
     let total: Int
     let successCount: Int
     let failureCount: Int
-    let currentTransactionId: UInt64?
+    let currentTransactionId: Int?  // Hash of PersistentIdentifier
     let estimatedTimeRemaining: TimeInterval?
 
     var percentageComplete: Double {
@@ -865,20 +860,11 @@ enum RecoveryStrategy {
     case failFast
 }
 
-// MARK: - Array Extensions for Chunking
-
-extension Array {
-    /// Split array into chunks of specified size
-    func chunked(into size: Int) -> [[Element]] {
-        return stride(from: 0, to: count, by: size).map {
-            Array(self[$0..<Swift.min($0 + size, count)])
-        }
-    }
-}
+// Note: Array.chunked(into:) extension is defined in BackgroundDataHandler.swift
 
 extension UUID {
     /// Convert UUID to UInt64 for simple ID representation
     var uint64Value: UInt64 {
-        return self.hashValue.magnitude
+        return UInt64(self.hashValue.magnitude)
     }
 }

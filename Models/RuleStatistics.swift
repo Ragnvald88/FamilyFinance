@@ -190,7 +190,7 @@ actor RuleStatisticsAnalyzer {
 
     /// Get top performing rules by match count
     func getTopPerformingRules(limit: Int = 10) async throws -> [RuleStatistics] {
-        let descriptor = FetchDescriptor<RuleStatistics>(
+        var descriptor = FetchDescriptor<RuleStatistics>(
             sortBy: [SortDescriptor(\.matchCount, order: .reverse)]
         )
         descriptor.fetchLimit = limit

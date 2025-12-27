@@ -1969,7 +1969,7 @@ struct RulesListView: View {
             } else {
                 List {
                     ForEach(filteredRules) { rule in
-                        RuleRowView(rule: rule)
+                        CategorizationRuleRowView(rule: rule)
                             .contextMenu {
                                 Button("Edit") {
                                     editingRule = rule
@@ -2049,7 +2049,7 @@ struct RulesListView: View {
     }
 }
 
-struct RuleRowView: View {
+struct CategorizationRuleRowView: View {
     let rule: CategorizationRule
 
     var body: some View {

@@ -23,45 +23,7 @@ import Foundation
 // Note: This file replaces the RulesPlaceholder in FamilyFinanceApp.swift
 // To use: Replace case .rules: RulesPlaceholder() with case .rules: RulesView()
 
-// Import the DesignTokens from main app file
-// Note: In a real project, this would be in a separate file, but for now we need these locally
-
-struct DesignTokens {
-    struct Spacing {
-        static let xs: CGFloat = 4
-        static let s: CGFloat = 8
-        static let m: CGFloat = 12
-        static let l: CGFloat = 16
-        static let xl: CGFloat = 24
-        static let xxl: CGFloat = 32
-        static let xxxl: CGFloat = 40
-    }
-
-    struct CornerRadius {
-        static let small: CGFloat = 4
-        static let medium: CGFloat = 8
-        static let large: CGFloat = 12
-    }
-
-    struct Shadow {
-        static let primary = ShadowStyle(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
-        static let secondary = ShadowStyle(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
-        static let elevated = ShadowStyle(color: .black.opacity(0.12), radius: 8, x: 0, y: 4)
-    }
-
-    struct Animation {
-        static let spring = SwiftUI.Animation.spring(response: 0.3, dampingFraction: 0.8)
-        static let springFast = SwiftUI.Animation.spring(response: 0.2, dampingFraction: 0.8)
-        static let springSlow = SwiftUI.Animation.spring(response: 0.4, dampingFraction: 0.8)
-        static let numberTicker = SwiftUI.Animation.spring(response: 0.6, dampingFraction: 0.7)
-    }
-
-    struct Opacity {
-        static let light: Double = 0.1
-        static let medium: Double = 0.2
-        static let strong: Double = 0.3
-    }
-}
+// Note: DesignTokens is defined in FamilyFinanceApp.swift and available globally
 
 private let logger = Logger(subsystem: "com.familyfinance", category: "RulesView")
 
@@ -131,7 +93,7 @@ struct RulesView: View {
                     onRunRules: {
                         Task {
                             if let groupID = selectedGroupID,
-                               let group = groups.first(where: { $0.id == groupID }) {
+                               let group = groups.first(where: { $0.uuid == groupID }) {
                                 await coordinator.executeRules(in: group)
                             } else {
                                 await coordinator.executeRules()
@@ -154,16 +116,8 @@ struct RulesView: View {
         .sheet(item: $presentedModal) { modal in
             modalView(for: modal)
         }
-        .commands {
-            RulesCommands(
-                showingInspector: $showingInspector,
-                onNewRule: { presentedModal = .newRule(groupID: selectedGroupID) },
-                onNewGroup: { presentedModal = .newGroup },
-                onRunRules: {
-                    Task { await coordinator.executeRules() }
-                }
-            )
-        }
+        // Note: .commands modifier must be used at App level, not View level
+        // See RulesCommands struct for available keyboard shortcuts
         .task {
             // Initialize performance monitoring
             coordinator.initialize(modelContext: modelContext)
@@ -186,8 +140,8 @@ struct RulesView: View {
                 coordinator.clearExecutionState()
             }
         } message: {
-            if case .failed(let error) = coordinator.executionState {
-                Text("Failed to execute rules: \(error.localizedDescription)")
+            if case .failed(let errorMessage) = coordinator.executionState {
+                Text("Failed to execute rules: \(errorMessage)")
             } else {
                 Text("An unknown error occurred")
             }
@@ -197,12 +151,12 @@ struct RulesView: View {
     // MARK: - Helper Methods
 
     private func rulesForGroup(_ groupID: UUID) -> [Rule] {
-        return rules.filter { $0.group?.id == groupID }
+        return rules.filter { $0.group?.uuid == groupID }
     }
 
     private func deleteSelectedRules() {
         for ruleID in selectedRuleIDs {
-            if let rule = rules.first(where: { $0.id == ruleID }) {
+            if let rule = rules.first(where: { $0.uuid == ruleID }) {
                 modelContext.delete(rule)
             }
         }
@@ -227,7 +181,7 @@ struct RulesView: View {
         case .editRule(let rule):
             RuleEditorView(
                 rule: rule,
-                groupID: rule.group?.id,
+                groupID: rule.group?.uuid,
                 groups: groups,
                 onSave: { updatedRule in
                     // Update existing rule
@@ -303,7 +257,7 @@ struct RuleGroupsSidebar: View {
             List(selection: $selection) {
                 Section("Rule Groups") {
                     ForEach(filteredGroups) { group in
-                        NavigationLink(value: group.id) {
+                        NavigationLink(value: group.uuid) {
                             RuleGroupRow(group: group)
                         }
                         .contextMenu {
@@ -318,7 +272,7 @@ struct RuleGroupsSidebar: View {
                         Label("New Group", systemImage: "plus")
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(.accentColor)
+                    .foregroundStyle(Color.accentColor)
                 }
             }
             .listStyle(.sidebar)
@@ -425,7 +379,7 @@ struct RulesDetailView: View {
                     ForEach(filteredRules) { rule in
                         RuleRowView(
                             rule: rule,
-                            stats: stats[rule.id],
+                            stats: stats[rule.uuid],
                             onEdit: { onEditRule(rule) }
                         )
                         .contextMenu {
@@ -534,7 +488,7 @@ struct RuleRowView: View {
 
     private func triggerSummary(_ trigger: RuleTrigger) -> String {
         let field = trigger.field.displayName
-        let op = trigger.operator.displayName
+        let op = trigger.triggerOperator.displayName
         let value = trigger.value.prefix(20)
         return "\(field) \(op) \"\(value)\""
     }
@@ -543,11 +497,11 @@ struct RuleRowView: View {
         switch action.type {
         case .setCategory:
             return "Set category to \(action.value)"
-        case .setDescription:
-            return "Set description to \(action.value)"
+        case .setNotes:
+            return "Set notes to \(action.value)"
         case .addTag:
             return "Add tag \(action.value)"
-        case .setAccount:
+        case .setSourceAccount:
             return "Move to account \(action.value)"
         default:
             return action.type.displayName
@@ -603,7 +557,7 @@ struct RulesOverviewView: View {
                 VStack(spacing: DesignTokens.Spacing.m) {
                     Image(systemName: "slider.horizontal.3")
                         .font(.system(size: 48))
-                        .foregroundStyle(.accentColor)
+                        .foregroundStyle(Color.accentColor)
 
                     Text("Rules Overview")
                         .font(.largeTitle)
@@ -733,7 +687,7 @@ struct QuickActionCard: View {
             VStack(spacing: DesignTokens.Spacing.m) {
                 Image(systemName: systemImage)
                     .font(.title)
-                    .foregroundStyle(.accentColor)
+                    .foregroundStyle(Color.accentColor)
 
                 VStack(spacing: 4) {
                     Text(title)
@@ -842,7 +796,7 @@ struct RuleInspectorView: View {
     let stats: [UUID: RuleStats]
 
     private var selectedRules: [Rule] {
-        rules.filter { selectedRuleIDs.contains($0.id) }
+        rules.filter { selectedRuleIDs.contains($0.uuid) }
     }
 
     var body: some View {
@@ -858,7 +812,7 @@ struct RuleInspectorView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             } else if selectedRules.count == 1, let rule = selectedRules.first {
                 // Single rule details
-                RuleInspectorDetail(rule: rule, stats: stats[rule.id])
+                RuleInspectorDetail(rule: rule, stats: stats[rule.uuid])
             } else {
                 // Multiple rules summary
                 MultipleRulesInspector(rules: selectedRules, stats: stats)
@@ -952,11 +906,11 @@ struct MultipleRulesInspector: View {
     let stats: [UUID: RuleStats]
 
     private var totalMatches: Int {
-        rules.compactMap { stats[$0.id]?.totalMatches }.reduce(0, +)
+        rules.compactMap { stats[$0.uuid]?.totalMatches }.reduce(0, +)
     }
 
     private var averageSuccessRate: Double {
-        let rates = rules.compactMap { stats[$0.id]?.successRate }
+        let rates = rules.compactMap { stats[$0.uuid]?.successRate }
         return rates.isEmpty ? 0 : rates.reduce(0, +) / Double(rates.count)
     }
 
@@ -1095,11 +1049,11 @@ enum RulesModal: Identifiable {
         case .newRule(let groupID):
             return "newRule-\(groupID?.uuidString ?? "nil")"
         case .editRule(let rule):
-            return "editRule-\(rule.id)"
+            return "editRule-\(rule.uuid.uuidString)"
         case .newGroup:
             return "newGroup"
         case .groupSettings(let group):
-            return "groupSettings-\(group.id)"
+            return "groupSettings-\(group.uuid.uuidString)"
         }
     }
 }
@@ -1145,7 +1099,7 @@ final class RulesCoordinator: ObservableObject {
             executionState = .completed
         } catch {
             logger.error("Rule execution failed: \(error)")
-            executionState = .failed(error)
+            executionState = .failed(error.localizedDescription)
         }
     }
 
@@ -1200,7 +1154,7 @@ final class RuleStatsManager: ObservableObject {
                 let matches = Int.random(in: 0...100)
                 let successes = Int.random(in: 0...matches)
 
-                newStats[rule.id] = RuleStats(
+                newStats[rule.uuid] = RuleStats(
                     totalMatches: matches,
                     successfulActions: successes,
                     lastExecution: rule.isActive ? Date().addingTimeInterval(-Double.random(in: 0...86400)) : nil,
@@ -1223,11 +1177,22 @@ final class RuleStatsManager: ObservableObject {
 
 // MARK: - Execution State Types
 
-enum RuleExecutionState {
+enum RuleExecutionState: Equatable {
     case idle
     case executing
     case completed
-    case failed(Error)
+    case failed(String)  // Store error message instead of Error for Equatable
+
+    static func == (lhs: RuleExecutionState, rhs: RuleExecutionState) -> Bool {
+        switch (lhs, rhs) {
+        case (.idle, .idle), (.executing, .executing), (.completed, .completed):
+            return true
+        case (.failed(let lMsg), .failed(let rMsg)):
+            return lMsg == rMsg
+        default:
+            return false
+        }
+    }
 }
 
 struct RuleOperationProgress {

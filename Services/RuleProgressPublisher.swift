@@ -486,14 +486,4 @@ struct RuleProcessingError: Identifiable, Equatable, Sendable {
     }
 }
 
-// MARK: - Convenience Extensions
-
-extension Decimal {
-    /// Format as currency string
-    func toCurrencyString() -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale.current
-        return formatter.string(from: self as NSDecimalNumber) ?? "€0.00"
-    }
-}
+// Note: toCurrencyString() extension is defined in TransactionQueryService.swift

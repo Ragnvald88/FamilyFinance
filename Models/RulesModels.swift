@@ -23,6 +23,9 @@ import Foundation
 
 @Model
 final class RuleGroup {
+    /// Stable UUID for UI identification (SwiftData's PersistentIdentifier changes)
+    @Attribute(.unique) var uuid: UUID
+
     var name: String
 
     /// Execution order for rule groups - indexed for sorting performance
@@ -41,6 +44,7 @@ final class RuleGroup {
     var modifiedAt: Date
 
     init(name: String, executionOrder: Int = 0) {
+        self.uuid = UUID()
         self.name = name
         self.executionOrder = executionOrder
         self.isActive = true
@@ -65,6 +69,9 @@ final class RuleGroup {
 
 @Model
 final class Rule {
+    /// Stable UUID for UI identification
+    @Attribute(.unique) var uuid: UUID
+
     var name: String
 
     /// Active status - indexed for filtering in rule evaluation (queried every time)
@@ -92,6 +99,7 @@ final class Rule {
     var modifiedAt: Date
 
     init(name: String, group: RuleGroup? = nil) {
+        self.uuid = UUID()
         self.name = name
         self.isActive = true
         self.stopProcessing = false
@@ -137,7 +145,7 @@ final class Rule {
             summary += triggerLogic == .all ? "\(triggerCount) conditions (ALL)" : "\(triggerCount) conditions (ANY)"
         } else if let firstTrigger = triggers.first {
             let notPrefix = firstTrigger.isInverted ? "NOT " : ""
-            summary += "\(notPrefix)\(firstTrigger.field.displayName) \(firstTrigger.operator.displayName) \"\(firstTrigger.value)\""
+            summary += "\(notPrefix)\(firstTrigger.field.displayName) \(firstTrigger.triggerOperator.displayName) \"\(firstTrigger.value)\""
         } else {
             summary += "no conditions"
         }
@@ -168,8 +176,11 @@ final class Rule {
 
 @Model
 final class RuleTrigger {
+    /// Stable UUID for UI identification
+    var uuid: UUID
+
     var field: TriggerField
-    var operator: TriggerOperator
+    var triggerOperator: TriggerOperator
     var value: String
     var isInverted: Bool // NOT logic
     var sortOrder: Int
@@ -177,9 +188,10 @@ final class RuleTrigger {
     // Relationship
     var rule: Rule?
 
-    init(field: TriggerField, operator: TriggerOperator, value: String, isInverted: Bool = false) {
+    init(field: TriggerField, triggerOperator: TriggerOperator, value: String, isInverted: Bool = false) {
+        self.uuid = UUID()
         self.field = field
-        self.operator = `operator`
+        self.triggerOperator = triggerOperator
         self.value = value
         self.isInverted = isInverted
         self.sortOrder = 0
@@ -188,14 +200,14 @@ final class RuleTrigger {
     /// Human-readable display text for this trigger
     var displayText: String {
         let notPrefix = isInverted ? "NOT " : ""
-        return "\(notPrefix)\(field.displayName) \(operator.displayName) \"\(value)\""
+        return "\(notPrefix)\(field.displayName) \(triggerOperator.displayName) \"\(value)\""
     }
 
     /// Create a duplicate of this trigger
     func duplicate() -> RuleTrigger {
         return RuleTrigger(
             field: field,
-            operator: `operator`,
+            triggerOperator: triggerOperator,
             value: value,
             isInverted: isInverted
         )
@@ -206,6 +218,9 @@ final class RuleTrigger {
 
 @Model
 final class RuleAction {
+    /// Stable UUID for UI identification
+    var uuid: UUID
+
     var type: ActionType
     var value: String
     var stopProcessingAfter: Bool
@@ -215,6 +230,7 @@ final class RuleAction {
     var rule: Rule?
 
     init(type: ActionType, value: String, stopProcessingAfter: Bool = false) {
+        self.uuid = UUID()
         self.type = type
         self.value = value
         self.stopProcessingAfter = stopProcessingAfter

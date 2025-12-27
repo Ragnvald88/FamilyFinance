@@ -655,7 +655,7 @@ class CSVImportService: ObservableObject {
 
     /// Validate international IBAN format for major countries.
     /// Returns nil if valid, or error message if invalid.
-    static func validateIBAN(_ iban: String) -> String? {
+    nonisolated static func validateIBAN(_ iban: String) -> String? {
         let cleanIBAN = iban.uppercased().replacingOccurrences(of: " ", with: "")
 
         // Basic format check: minimum 15, maximum 34 characters

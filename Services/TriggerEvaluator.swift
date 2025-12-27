@@ -39,15 +39,8 @@ actor TriggerEvaluator {
     /// Batch size for parallel processing (optimize for CPU cores)
     private static let BATCH_SIZE = 25
 
-    // MARK: - Initialization
-
-    /// Initialize TriggerEvaluator with ModelActor pattern
-    init(modelContainer: ModelContainer) {
-        let modelContext = ModelContext(modelContainer)
-        self.modelExecutor = DefaultSerialModelExecutor(modelContext: modelContext)
-    }
-
     // MARK: - Shared Caches
+    // Note: @ModelActor macro auto-generates init(modelContainer:)
 
     /// Compiled regex cache for pattern matching
     private static let regexCache = RegexCache()
@@ -88,23 +81,23 @@ actor TriggerEvaluator {
     /// Validate a trigger for UI feedback with helpful error messages
     func validateTrigger(_ trigger: RuleTrigger) -> TriggerValidationResult {
         // Check if field and operator are compatible
-        if !trigger.field.validOperators.contains(trigger.operator) {
+        if !trigger.field.validOperators.contains(trigger.triggerOperator) {
             return .invalid(
-                message: "\(trigger.operator.displayName) is not valid for \(trigger.field.displayName)",
+                message: "\(trigger.triggerOperator.displayName) is not valid for \(trigger.field.displayName)",
                 suggestion: "Try operators: \(trigger.field.validOperators.map(\.displayName).joined(separator: ", "))"
             )
         }
 
         // Check if value is required but missing
-        if trigger.operator.requiresValue && trigger.value.trimmingCharacters(in: .whitespaces).isEmpty {
+        if trigger.triggerOperator.requiresValue && trigger.value.trimmingCharacters(in: .whitespaces).isEmpty {
             return .invalid(
-                message: "\(trigger.operator.displayName) requires a value",
-                suggestion: trigger.operator.valuePlaceholder
+                message: "\(trigger.triggerOperator.displayName) requires a value",
+                suggestion: trigger.triggerOperator.valuePlaceholder
             )
         }
 
         // Validate specific operator requirements
-        switch trigger.operator {
+        switch trigger.triggerOperator {
         case .matches:
             // Validate regex pattern
             do {
@@ -149,7 +142,7 @@ actor TriggerEvaluator {
 
         // Fast paths for common operations (no caching overhead)
         let result: Bool
-        switch (trigger.operator, trigger.field) {
+        switch (trigger.triggerOperator, trigger.field) {
         case (.equals, .description):
             result = fieldValue.lowercased() == trigger.value.lowercased()
         case (.contains, .description):
@@ -157,7 +150,7 @@ actor TriggerEvaluator {
         case (.greaterThan, .amount), (.lessThan, .amount):
             if let triggerAmount = Decimal(string: trigger.value),
                let transactionAmount = Decimal(string: fieldValue) {
-                result = trigger.operator == .greaterThan ?
+                result = trigger.triggerOperator == .greaterThan ?
                     transactionAmount > triggerAmount :
                     transactionAmount < triggerAmount
             } else {
@@ -165,7 +158,7 @@ actor TriggerEvaluator {
             }
         default:
             // Use cached evaluation for complex operations
-            result = await evaluateWithCache(trigger.operator, value: trigger.value, fieldValue: fieldValue)
+            result = await evaluateWithCache(trigger.triggerOperator, value: trigger.value, fieldValue: fieldValue)
         }
 
         // Apply NOT logic if inverted
@@ -173,10 +166,10 @@ actor TriggerEvaluator {
     }
 
     /// Evaluate with caching for performance
-    private func evaluateWithCache(_ operator: TriggerOperator, value: String, fieldValue: String) async -> Bool {
+    private func evaluateWithCache(_ triggerOp: TriggerOperator, value: String, fieldValue: String) async -> Bool {
         // Create cache key (truncate field value to prevent huge keys)
         let truncatedFieldValue = String(fieldValue.prefix(50))
-        let cacheKey = "\(operator.rawValue):\(value):\(truncatedFieldValue)"
+        let cacheKey = "\(triggerOp.rawValue):\(value):\(truncatedFieldValue)"
 
         // Check cache first
         if let cached = await Self.evaluationCache.get(cacheKey) {
@@ -184,7 +177,7 @@ actor TriggerEvaluator {
         }
 
         // Evaluate and cache result
-        let result = evaluateOperator(operator, value: value, fieldValue: fieldValue)
+        let result = await evaluateOperator(triggerOp, value: value, fieldValue: fieldValue)
         await Self.evaluationCache.set(cacheKey, value: result)
 
         return result
@@ -227,8 +220,8 @@ actor TriggerEvaluator {
     // MARK: - Operator Evaluation
 
     /// Evaluate specific operator against field value
-    private func evaluateOperator(_ operator: TriggerOperator, value: String, fieldValue: String) -> Bool {
-        switch operator {
+    private func evaluateOperator(_ triggerOp: TriggerOperator, value: String, fieldValue: String) async -> Bool {
+        switch triggerOp {
         // String operators
         case .contains:
             return fieldValue.localizedCaseInsensitiveContains(value)
@@ -239,15 +232,15 @@ actor TriggerEvaluator {
         case .equals:
             return fieldValue.lowercased() == value.lowercased()
         case .matches:
-            return evaluateRegex(pattern: value, against: fieldValue)
+            return await evaluateRegex(pattern: value, against: fieldValue)
 
         // Numeric operators
         case .greaterThan, .lessThan, .greaterThanOrEqual, .lessThanOrEqual:
-            return evaluateNumeric(operator, triggerValue: value, fieldValue: fieldValue)
+            return evaluateNumeric(triggerOp, triggerValue: value, fieldValue: fieldValue)
 
         // Date operators
         case .before, .after, .on:
-            return evaluateDate(operator, triggerValue: value, fieldValue: fieldValue)
+            return evaluateDate(triggerOp, triggerValue: value, fieldValue: fieldValue)
         case .today:
             return Calendar.current.isDateInToday(Self.parseDate(fieldValue) ?? Date.distantPast)
         case .yesterday:
@@ -260,9 +253,9 @@ actor TriggerEvaluator {
     // MARK: - Specialized Evaluations
 
     /// Evaluate regex pattern with caching
-    private func evaluateRegex(pattern: String, against text: String) -> Bool {
+    private func evaluateRegex(pattern: String, against text: String) async -> Bool {
         do {
-            let regex = try Self.regexCache.getRegex(for: pattern)
+            let regex = try await Self.regexCache.getRegex(for: pattern)
             return text.contains(regex)
         } catch {
             logger.warning("Invalid regex pattern '\(pattern)': \(error.localizedDescription)")
@@ -271,13 +264,13 @@ actor TriggerEvaluator {
     }
 
     /// Evaluate numeric comparison
-    private func evaluateNumeric(_ operator: TriggerOperator, triggerValue: String, fieldValue: String) -> Bool {
+    private func evaluateNumeric(_ triggerOp: TriggerOperator, triggerValue: String, fieldValue: String) -> Bool {
         guard let triggerAmount = Decimal(string: triggerValue),
               let fieldAmount = Decimal(string: fieldValue) else {
             return false
         }
 
-        switch operator {
+        switch triggerOp {
         case .greaterThan:
             return fieldAmount > triggerAmount
         case .lessThan:
@@ -292,13 +285,13 @@ actor TriggerEvaluator {
     }
 
     /// Evaluate date comparison
-    private func evaluateDate(_ operator: TriggerOperator, triggerValue: String, fieldValue: String) -> Bool {
+    private func evaluateDate(_ triggerOp: TriggerOperator, triggerValue: String, fieldValue: String) -> Bool {
         guard let triggerDate = Self.parseDate(triggerValue),
               let fieldDate = Self.parseDate(fieldValue) else {
             return false
         }
 
-        switch operator {
+        switch triggerOp {
         case .before:
             return fieldDate < triggerDate
         case .after:
@@ -405,10 +398,10 @@ struct TriggerValidationResult: Sendable {
 
 /// Thread-safe regex compilation cache
 actor RegexCache {
-    private var cache: [String: Regex<Substring>] = [:]
+    private var cache: [String: Regex<AnyRegexOutput>] = [:]
     private let maxSize = 1000
 
-    func getRegex(for pattern: String) throws -> Regex<Substring> {
+    func getRegex(for pattern: String) throws -> Regex<AnyRegexOutput> {
         if let cached = cache[pattern] {
             return cached
         }
@@ -479,15 +472,7 @@ class LRUCache<Key: Hashable, Value> {
 }
 
 // MARK: - Extensions
-
-extension Array {
-    /// Split array into chunks of specified size
-    func chunked(into size: Int) -> [[Element]] {
-        return stride(from: 0, to: count, by: size).map {
-            Array(self[$0..<Swift.min($0 + size, count)])
-        }
-    }
-}
+// Note: Array.chunked(into:) extension is defined in BackgroundDataHandler.swift
 
 extension DateFormatter {
     /// Pre-configured formatter for ISO date format (YYYY-MM-DD)

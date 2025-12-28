@@ -78,7 +78,14 @@ final class Rule {
     @Attribute(.spotlight) var isActive: Bool
 
     var stopProcessing: Bool
+
+    /// How flat triggers combine (for simple mode without groups)
     var triggerLogic: TriggerLogic
+
+    /// How trigger groups combine (for advanced mode with nested AND/OR)
+    /// Only used when triggerGroups is not empty
+    var groupMatchMode: TriggerLogic
+
     var notes: String?
 
     /// Denormalized group execution order for efficient sorting without joins
@@ -86,7 +93,14 @@ final class Rule {
     var groupExecutionOrder: Int
 
     // Relationships
+    /// Direct triggers (simple mode - all evaluated with triggerLogic)
     @Relationship(deleteRule: .cascade) var triggers: [RuleTrigger]
+
+    /// Trigger groups (advanced mode - each group has its own matchMode)
+    /// When not empty, these are used instead of direct triggers
+    @Relationship(deleteRule: .cascade, inverse: \TriggerGroup.rule)
+    var triggerGroups: [TriggerGroup]
+
     @Relationship(deleteRule: .cascade) var actions: [RuleAction]
     var group: RuleGroup?
 
@@ -104,10 +118,12 @@ final class Rule {
         self.isActive = true
         self.stopProcessing = false
         self.triggerLogic = .all
+        self.groupMatchMode = .all
         self.notes = nil
         self.group = group
         self.groupExecutionOrder = group?.executionOrder ?? Int.max // Ungrouped rules last
         self.triggers = []
+        self.triggerGroups = []
         self.actions = []
         self.matchCount = 0
         self.lastMatchedAt = nil
@@ -136,18 +152,28 @@ final class Rule {
 
     /// Human-readable rule summary
     var displaySummary: String {
-        let triggerCount = triggers.count
         let actionCount = actions.count
 
         var summary = "IF "
 
-        if triggerCount > 1 {
-            summary += triggerLogic == .all ? "\(triggerCount) conditions (ALL)" : "\(triggerCount) conditions (ANY)"
-        } else if let firstTrigger = triggers.first {
-            let notPrefix = firstTrigger.isInverted ? "NOT " : ""
-            summary += "\(notPrefix)\(firstTrigger.field.displayName) \(firstTrigger.triggerOperator.displayName) \"\(firstTrigger.value)\""
+        // Handle advanced trigger groups
+        if usesAdvancedTriggers {
+            let groupCount = triggerGroups.count
+            let totalCount = totalTriggerCount
+            let groupConnector = groupMatchMode == .all ? "AND" : "OR"
+            summary += "\(totalCount) conditions in \(groupCount) groups (\(groupConnector))"
         } else {
-            summary += "no conditions"
+            // Handle simple flat triggers
+            let triggerCount = triggers.count
+            if triggerCount > 1 {
+                summary += triggerLogic == .all ? "\(triggerCount) conditions (ALL)" : "\(triggerCount) conditions (ANY)"
+            } else if let firstTrigger = triggers.first {
+                let notPrefix = firstTrigger.isInverted ? "NOT " : ""
+                let valueDisplay = firstTrigger.triggerOperator.requiresValue ? " \"\(firstTrigger.value)\"" : ""
+                summary += "\(notPrefix)\(firstTrigger.field.displayName) \(firstTrigger.triggerOperator.displayName)\(valueDisplay)"
+            } else {
+                summary += "no conditions"
+            }
         }
 
         summary += " THEN "
@@ -168,7 +194,33 @@ final class Rule {
 
     /// True if rule is ready for execution (has triggers and actions)
     var isValidForExecution: Bool {
-        !triggers.isEmpty && !actions.isEmpty && isActive
+        hasTriggers && !actions.isEmpty && isActive
+    }
+
+    /// True if rule uses advanced trigger groups (nested AND/OR)
+    var usesAdvancedTriggers: Bool {
+        !triggerGroups.isEmpty
+    }
+
+    /// True if rule has any triggers (simple or grouped)
+    var hasTriggers: Bool {
+        !triggers.isEmpty || triggerGroups.contains { !$0.triggers.isEmpty }
+    }
+
+    /// Total count of all triggers (simple + grouped)
+    var totalTriggerCount: Int {
+        if usesAdvancedTriggers {
+            return triggerGroups.reduce(0) { $0 + $1.triggers.count }
+        }
+        return triggers.count
+    }
+
+    /// All triggers flattened (for simple iteration)
+    var allTriggers: [RuleTrigger] {
+        if usesAdvancedTriggers {
+            return triggerGroups.flatMap(\.triggers)
+        }
+        return triggers
     }
 }
 
@@ -185,8 +237,12 @@ final class RuleTrigger {
     var isInverted: Bool // NOT logic
     var sortOrder: Int
 
-    // Relationship
+    // Relationships
+    /// Direct rule relationship (for simple rules without groups)
     var rule: Rule?
+
+    /// Group relationship (for advanced rules with nested AND/OR)
+    var triggerGroup: TriggerGroup?
 
     init(field: TriggerField, triggerOperator: TriggerOperator, value: String, isInverted: Bool = false) {
         self.uuid = UUID()
@@ -211,6 +267,58 @@ final class RuleTrigger {
             value: value,
             isInverted: isInverted
         )
+    }
+}
+
+// MARK: - Trigger Group Model (for nested AND/OR logic)
+
+/// Groups triggers together with their own match logic.
+/// Enables complex conditions like: (A AND B) OR (C AND D)
+///
+/// Example:
+/// - Group 1 (matchMode: .all): [description contains "spotify", amount > 10]
+/// - Group 2 (matchMode: .all): [counterParty equals "Netflix"]
+/// - Rule.groupMatchMode: .any → matches if EITHER group matches
+@Model
+final class TriggerGroup {
+    /// Stable UUID for UI identification
+    var uuid: UUID
+
+    /// Optional name/label for the group (e.g., "Amount conditions")
+    var name: String?
+
+    /// How triggers within this group combine (all=AND, any=OR)
+    var matchMode: TriggerLogic
+
+    /// Display order within the rule
+    var sortOrder: Int
+
+    // Relationships
+    @Relationship(deleteRule: .cascade, inverse: \RuleTrigger.triggerGroup)
+    var triggers: [RuleTrigger]
+
+    var rule: Rule?
+
+    init(name: String? = nil, matchMode: TriggerLogic = .all, sortOrder: Int = 0) {
+        self.uuid = UUID()
+        self.name = name
+        self.matchMode = matchMode
+        self.sortOrder = sortOrder
+        self.triggers = []
+    }
+
+    /// Human-readable display text for this group
+    var displayText: String {
+        let triggerTexts = triggers.sortedBySortOrder.map(\.displayText)
+        let connector = matchMode == .all ? " AND " : " OR "
+        return "(\(triggerTexts.joined(separator: connector)))"
+    }
+
+    /// Create a duplicate of this group with its triggers
+    func duplicate() -> TriggerGroup {
+        let newGroup = TriggerGroup(name: name, matchMode: matchMode, sortOrder: sortOrder)
+        newGroup.triggers = triggers.map { $0.duplicate() }
+        return newGroup
     }
 }
 
@@ -360,7 +468,9 @@ enum TriggerField: String, CaseIterable, Codable, Sendable {
         } else if isDate {
             return [.equals, .before, .after, .on, .today, .yesterday, .tomorrow]
         } else {
-            return [.contains, .startsWith, .endsWith, .equals, .matches]
+            // Text fields support text matching + presence checks
+            return [.contains, .startsWith, .endsWith, .equals, .matches,
+                    .isEmpty, .isNotEmpty, .hasValue]
         }
     }
 }
@@ -372,6 +482,11 @@ enum TriggerOperator: String, CaseIterable, Codable, Sendable {
     case endsWith = "ends_with"
     case equals = "equals"
     case matches = "matches" // regex
+
+    // Presence operators (NEW)
+    case isEmpty = "is_empty"
+    case isNotEmpty = "is_not_empty"
+    case hasValue = "has_value"  // Same as isNotEmpty, clearer for "has category"
 
     // Numeric operators
     case greaterThan = "greater_than"
@@ -394,6 +509,9 @@ enum TriggerOperator: String, CaseIterable, Codable, Sendable {
         case .endsWith: return "ends with"
         case .equals: return "equals"
         case .matches: return "matches pattern"
+        case .isEmpty: return "is empty"
+        case .isNotEmpty: return "is not empty"
+        case .hasValue: return "has value"
         case .greaterThan: return "greater than"
         case .lessThan: return "less than"
         case .greaterThanOrEqual: return "greater than or equal"
@@ -410,7 +528,7 @@ enum TriggerOperator: String, CaseIterable, Codable, Sendable {
     /// True if this operator requires a value input
     var requiresValue: Bool {
         switch self {
-        case .today, .yesterday, .tomorrow:
+        case .today, .yesterday, .tomorrow, .isEmpty, .isNotEmpty, .hasValue:
             return false
         default:
             return true
@@ -428,7 +546,7 @@ enum TriggerOperator: String, CaseIterable, Codable, Sendable {
         case .greaterThanOrEqual: return "At least..."
         case .lessThanOrEqual: return "At most..."
         case .before, .after, .on: return "Date (YYYY-MM-DD)"
-        case .today, .yesterday, .tomorrow: return ""
+        case .today, .yesterday, .tomorrow, .isEmpty, .isNotEmpty, .hasValue: return ""
         }
     }
 }
@@ -438,6 +556,9 @@ enum ActionType: String, CaseIterable, Codable, Sendable {
     case setCategory = "set_category"
     case clearCategory = "clear_category"
     case setNotes = "set_notes"
+    case setDescription = "set_description"
+    case appendDescription = "append_description"
+    case prependDescription = "prepend_description"
     case addTag = "add_tag"
     case removeTag = "remove_tag"
     case clearAllTags = "clear_all_tags"
@@ -463,6 +584,9 @@ enum ActionType: String, CaseIterable, Codable, Sendable {
         case .setCategory: return "Set Category"
         case .clearCategory: return "Clear Category"
         case .setNotes: return "Set Notes"
+        case .setDescription: return "Set Description"
+        case .appendDescription: return "Append to Description"
+        case .prependDescription: return "Prepend to Description"
         case .addTag: return "Add Tag"
         case .removeTag: return "Remove Tag"
         case .clearAllTags: return "Clear All Tags"
@@ -484,6 +608,9 @@ enum ActionType: String, CaseIterable, Codable, Sendable {
         case .setCategory: return "folder.badge.plus"
         case .clearCategory: return "folder.badge.minus"
         case .setNotes: return "note.text.badge.plus"
+        case .setDescription: return "text.badge.plus"
+        case .appendDescription: return "text.append"
+        case .prependDescription: return "text.insert"
         case .addTag: return "tag.circle.fill"
         case .removeTag: return "tag.slash"
         case .clearAllTags: return "tag.slash.fill"
@@ -525,6 +652,9 @@ enum ActionType: String, CaseIterable, Codable, Sendable {
         switch self {
         case .setCategory: return "Category name..."
         case .setNotes: return "Note text..."
+        case .setDescription: return "New description..."
+        case .appendDescription: return "Text to append..."
+        case .prependDescription: return "Text to prepend..."
         case .addTag, .removeTag: return "Tag name..."
         case .setCounterParty: return "Counter party name..."
         case .setSourceAccount: return "Source account..."
@@ -540,7 +670,7 @@ enum ActionType: String, CaseIterable, Codable, Sendable {
     static var categorized: [ActionCategory: [ActionType]] {
         return [
             .categorization: [.setCategory, .clearCategory, .addTag, .removeTag, .clearAllTags],
-            .content: [.setNotes, .setCounterParty],
+            .content: [.setDescription, .appendDescription, .prependDescription, .setNotes, .setCounterParty],
             .accounts: [.setSourceAccount, .setDestinationAccount, .swapAccounts],
             .conversion: [.convertToDeposit, .convertToWithdrawal, .convertToTransfer],
             .metadata: [.setExternalId, .setInternalReference],
@@ -606,5 +736,17 @@ extension Array where Element == RuleAction {
     /// Sort actions by sort order
     var sortedBySortOrder: [RuleAction] {
         sorted { $0.sortOrder < $1.sortOrder }
+    }
+}
+
+extension Array where Element == TriggerGroup {
+    /// Sort trigger groups by sort order
+    var sortedBySortOrder: [TriggerGroup] {
+        sorted { $0.sortOrder < $1.sortOrder }
+    }
+
+    /// Get next available sort order number
+    var nextSortOrder: Int {
+        (map(\.sortOrder).max() ?? -1) + 1
     }
 }

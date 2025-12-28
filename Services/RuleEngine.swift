@@ -53,8 +53,6 @@ actor RuleEngine {
         return _actionExecutor!
     }
 
-    private let progressPublisher = RuleProgressPublisher()
-
     // MARK: - Performance Management
     private let concurrencyManager = ConcurrencyManager()
     private let circuitBreaker = CircuitBreaker(threshold: 0.5, timeout: 30.0)
@@ -111,10 +109,6 @@ actor RuleEngine {
         logger.info("Starting bulk processing for \(transactions.count) transactions")
         let startTime = Date()
 
-        // Reset progress publisher for new operation
-        await progressPublisher.reset()
-        await progressPublisher.setState(.preparing)
-
         // Determine optimal batch size
         let batchSize = await concurrencyManager.optimalBatchSize(for: transactions.count)
         let batches = transactions.chunked(into: batchSize)
@@ -122,8 +116,6 @@ actor RuleEngine {
         var totalSuccessful = 0
         var totalFailed = 0
         var allErrors: [RuleExecutionError: Int] = [:]
-
-        await progressPublisher.setState(.evaluatingRules)
 
         // Process batches with TaskGroup for performance
         try await withThrowingTaskGroup(of: BatchResult.self) { group in
@@ -146,11 +138,9 @@ actor RuleEngine {
                 }
 
                 // Check for cancellation
-                try await progressPublisher.checkCancellation()
+                try Task.checkCancellation()
             }
         }
-
-        await progressPublisher.setState(.complete)
         let totalDuration = Date().timeIntervalSince(startTime)
         let throughput = Double(totalSuccessful) / totalDuration
 
@@ -171,7 +161,6 @@ actor RuleEngine {
                             ruleGroups: [RuleGroup]) async throws -> ManualExecutionResult {
         logger.info("Manual execution started for \(transactions.count) transactions, \(ruleGroups.count) rule groups")
 
-        await progressPublisher.setState(.evaluatingRules)
         let startTime = Date()
 
         var processedCount = 0
@@ -181,6 +170,9 @@ actor RuleEngine {
 
         for transaction in transactions {
             do {
+                // Check for cancellation
+                try Task.checkCancellation()
+
                 // Process only specified rule groups
                 let result = try await processRuleGroups(ruleGroups, transaction: transaction)
                 processedCount += 1
@@ -189,34 +181,11 @@ actor RuleEngine {
                     successCount += 1
                     executedRules.formUnion(result.matchedRules)
                 }
-
-                // Report progress
-                let progress = RuleProcessingProgress(
-                    totalTransactions: transactions.count,
-                    processedTransactions: processedCount,
-                    totalRuleGroups: ruleGroups.count,
-                    currentRuleGroupIndex: 0,
-                    totalRules: ruleGroups.flatMap(\.rules).count,
-                    currentRuleIndex: 0,
-                    totalMatches: successCount,
-                    totalActions: result.results.count,
-                    currentBatchStart: processedCount,
-                    currentBatchEnd: min(processedCount + 50, transactions.count),
-                    estimatedTimeRemaining: nil,
-                    throughputTPS: Double(processedCount) / Date().timeIntervalSince(startTime),
-                    startTime: startTime
-                )
-
-                progressPublisher.updateProgress(progress)
-
-                try await progressPublisher.checkCancellation()
             } catch {
                 failureCount += 1
                 logger.error("Manual rule execution failed for transaction \(transaction.uniqueKey): \(error)")
             }
         }
-
-        await progressPublisher.setState(.complete)
 
         return ManualExecutionResult(
             totalTransactions: transactions.count,
@@ -384,7 +353,7 @@ actor RuleEngine {
                             errors.append(RuleExecutionError.actionExecutionFailed(
                                 ruleId: rule.persistentModelID.hashValue,
                                 actionType: failure.action.type,
-                                underlying: ActionExecutionError.invalidAction(failure.action)
+                                underlying: ActionExecutionError.invalidAction(typeName: failure.action.type.displayName, value: failure.action.value)
                             ))
                             return nil
                         case .skipped:
@@ -481,23 +450,6 @@ actor RuleEngine {
             }
         }
 
-        // Report batch progress
-        await progressPublisher.updateProgress(RuleProcessingProgress(
-            totalTransactions: transactions.count * totalBatches,
-            processedTransactions: (batchIndex + 1) * transactions.count,
-            totalRuleGroups: 1,
-            currentRuleGroupIndex: 0,
-            totalRules: 1,
-            currentRuleIndex: 0,
-            totalMatches: successCount,
-            totalActions: successCount,
-            currentBatchStart: batchIndex * transactions.count,
-            currentBatchEnd: (batchIndex + 1) * transactions.count,
-            estimatedTimeRemaining: nil,
-            throughputTPS: 0,
-            startTime: Date()
-        ))
-
         return BatchResult(
             successCount: successCount,
             failureCount: failureCount,
@@ -518,30 +470,14 @@ actor RuleEngine {
 
         case .permanent:
             logger.error("Permanent error in \(context.operation): \(error). Cannot recover.")
-            await progressPublisher.reportError(RuleProcessingError.error(
-                rule: "System",
-                transaction: context.transaction?.fullDescription ?? "Unknown",
-                message: error.localizedDescription,
-                recoverable: false
-            ))
             return .fail
 
         case .continuable:
             logger.warning("Continuable error in \(context.operation): \(error). Continuing processing.")
-            await progressPublisher.reportError(RuleProcessingError.warning(
-                rule: "System",
-                transaction: context.transaction?.fullDescription ?? "Unknown",
-                message: error.localizedDescription
-            ))
             return .continueProcessing
 
         case .stopProcessing:
             logger.error("Fatal error in \(context.operation): \(error). Stopping all processing.")
-            await progressPublisher.reportError(RuleProcessingError.critical(
-                rule: "System",
-                transaction: context.transaction?.fullDescription ?? "Unknown",
-                message: error.localizedDescription
-            ))
             return .fail
         }
     }

@@ -2,7 +2,7 @@
 
 > **App Store-Quality macOS Finance App** | SwiftUI + SwiftData | Premium UI/UX
 >
-> **Status: 85% App Store Quality** — Core functionality excellent, rules system compiles and runs
+> **Status: 90% App Store Quality** — Core app production-ready, rules UI complete
 
 ## Current Status (December 27, 2025)
 
@@ -13,25 +13,21 @@
 - **Categories management** - hierarchical system
 - **Account management** - multi-bank support
 - **Performance** - 60fps animations, virtualized scrolling
-- **Build system** - compiles cleanly
 
-### Rules System: Backend Complete, UI Pending
+### Rules System: Firefly III-Style Complete
+
+**Design Philosophy** (from [Firefly III](https://docs.firefly-iii.org/how-to/firefly-iii/features/rules/)):
+- **Rules are primary** - Not groups
+- **Groups are optional** - Just folders for organization
+- **Simple workflow** - Create rule → Add triggers → Add actions → Done
 
 | Component | Status |
 |-----------|--------|
-| `RulesModels.swift` | Complete (4 @Model classes with UUID) |
-| `TriggerEvaluator.swift` | Production ready (15 operators, parallel processing) |
-| `ActionExecutor.swift` | Production ready (16 actions, ACID compliance) |
-| `RuleEngine.swift` | Compiles and integrates correctly |
-| `RulesView.swift` | UI framework complete (NavigationSplitView) |
-| `RuleEditorView.swift` | Placeholder - needs implementation |
-| `RuleGroupEditorView.swift` | Placeholder - needs implementation |
-
-### Next Steps
-
-1. **Implement RuleEditorView.swift** - Rule creation/editing UI
-2. **Implement RuleGroupEditorView.swift** - Group management UI
-3. **End-to-end testing** - Verify complete workflow
+| `SimpleRulesView.swift` | **Complete** - Rules-first UI with built-in editor |
+| `RulesModels.swift` | Complete (Rule, RuleGroup, RuleTrigger, RuleAction) |
+| `TriggerEvaluator.swift` | Production ready (15 operators) |
+| `ActionExecutor.swift` | Production ready (16 action types) |
+| `RuleEngine.swift` | Compiles and integrates |
 
 ---
 
@@ -40,126 +36,163 @@
 ### File Structure
 
 ```
-FamilyFinanceApp.swift           — Main app + design tokens + UI components
+FamilyFinanceApp.swift           — Main app + design tokens
 
 Models/
-├── SwiftDataModels.swift        — Core transaction/account/category models
+├── SwiftDataModels.swift        — Transaction/Account/Category
 ├── RulesModels.swift            — Rule/RuleGroup/RuleTrigger/RuleAction
-└── RuleStatistics.swift         — Performance metrics tracking
+└── RuleStatistics.swift         — Performance metrics
 
 Services/
-├── RuleEngine.swift             — Main rule orchestration (@ModelActor)
-├── TriggerEvaluator.swift       — Trigger evaluation with caching
-├── ActionExecutor.swift         — Action execution with ACID compliance
-├── TransactionQueryService.swift — Pagination + analytics
-├── BackgroundDataHandler.swift  — Thread-safe data operations
-└── CSVImportService.swift       — Dutch banking format support
+├── RuleEngine.swift             — Rule orchestration
+├── TriggerEvaluator.swift       — Trigger evaluation
+├── ActionExecutor.swift         — Action execution
+└── [Other services]             — CSV import, queries, etc.
 
 Views/
-├── DashboardView.swift          — Animated KPIs + charts
-├── TransactionDetailView.swift  — Full editing with splits
-├── ImportView.swift             — Drag-drop CSV import
-└── RulesView.swift              — Rules management interface
+├── SimpleRulesView.swift        — Firefly III-style rules UI (ACTIVE)
+├── RulesView.swift              — Old groups-first UI (deprecated)
+└── [Other views]                — Dashboard, transactions, etc.
 ```
 
-### Design Tokens
+### Rules UI Design
 
-```swift
-DesignTokens.Animation.spring        // 0.3s professional animations
-DesignTokens.Spacing.xl              // Consistent 24pt spacing
-DesignTokens.Typography.currencyLarge // Monospaced financial display
+```
+Sidebar (Filters):              Main Area:
+├── All Rules (12)              ┌─────────────────────────────┐
+├── Active (10)                 │ [+ Create Rule]             │
+├── Inactive (2)                ├─────────────────────────────┤
+├── Ungrouped (5)               │ ● Rule Name                 │
+└── Groups:                     │   IF description contains   │
+    ├── Bills (4)               │   "spotify" THEN Set        │
+    └── Shopping (3)            │   Category                  │
+                                └─────────────────────────────┘
 ```
 
 ---
 
-## Key Technical Patterns
+## Key Patterns
 
-### SwiftData Rules
-
-```swift
-// CRITICAL: Always use updateDate() for date changes
-transaction.updateDate(newDate)  // Keeps year/month indexes synced
-
-// CRITICAL: Use @ModelActor for background operations
-@ModelActor final class BackgroundDataHandler { ... }
-```
-
-### Rules System Identity
-
-SwiftData uses `PersistentIdentifier` but UI needs stable IDs. Each model has a `uuid: UUID` property:
+### SwiftData Identity
 
 ```swift
 @Model final class Rule {
     @Attribute(.unique) var uuid: UUID  // Stable for UI bindings
-    // ...
 }
 
-// In views - use .uuid not .id:
+// Use .uuid in views, not .id
 ForEach(rules) { rule in
-    RuleRowView(rule: rule, stats: stats[rule.uuid])
-}
-```
-
-### Actor-Based Concurrency
-
-```swift
-@ModelActor actor RuleEngine {
-    // Lazy initialization for child actors
-    private var _triggerEvaluator: TriggerEvaluator?
-
-    private var triggerEvaluator: TriggerEvaluator {
-        if _triggerEvaluator == nil {
-            _triggerEvaluator = TriggerEvaluator(modelContainer: modelContainer)
-        }
-        return _triggerEvaluator!
-    }
+    RuleRow(rule: rule)
 }
 ```
 
 ### Reserved Keywords
 
-Swift's `operator` is reserved. Use `triggerOperator`:
+```swift
+// Swift's "operator" is reserved
+var triggerOperator: TriggerOperator  // Not "operator"
+```
+
+### Design Tokens
 
 ```swift
-@Model final class RuleTrigger {
-    var triggerOperator: TriggerOperator  // Not "operator"
-}
+DesignTokens.Animation.spring        // 0.3s
+DesignTokens.Spacing.xl              // 24pt
 ```
 
 ---
 
 ## Quality Standards
 
-- [x] All state changes animated (0.3s spring)
-- [x] Handles 15k+ transactions smoothly
-- [x] Zero compiler warnings or errors
-- [x] Memory usage stays under 100MB
-- [x] SwiftData relationships properly set
-- [x] Sendable compliance for Swift 6
+- [x] All animations 0.3s spring
+- [x] 15k+ transactions smoothly
+- [x] Zero compiler errors
+- [x] Memory under 100MB
+- [x] Swift 6 Sendable compliance
 
 ---
 
-## Development Workflow
+## Development
 
-1. **Read before edit** - Understand existing patterns
-2. **Use design tokens** - Consistent spacing and animations
-3. **Test with large datasets** - 15k+ transactions
-4. **Verify compilation** - `xcodebuild -scheme FamilyFinance build`
+1. **Verify build**: `xcodebuild -scheme FamilyFinance build`
+2. **Use design tokens** for spacing/animations
+3. **Test with real data** - 15k+ transactions
 
 ---
 
-## Recent Fixes (December 27, 2025)
+## Recent Changes (December 27, 2025)
 
-### Expert Panel Solution
+### Simplified to Firefly III Pattern
 
-Minimal-change approach to fix compilation:
+**Problem**: Old UI put "Groups" first - users had to understand groups before creating rules.
 
-1. **Added `uuid: UUID`** to RuleGroup, Rule, RuleTrigger, RuleAction
-2. **Changed `.id` to `.uuid`** in RulesView throughout
-3. **Fixed reserved keyword** - `operator` → `triggerOperator`
-4. **Fixed styles** - `.accentColor` → `Color.accentColor`
-5. **Fixed Equatable** - `RuleExecutionState` now conforms
-6. **Removed `.commands`** - App-level only modifier
-7. **Renamed duplicate** - `RuleRowView` → `CategorizationRuleRowView`
+**Solution**: New `SimpleRulesView.swift` with:
+- Rules shown in flat list (primary view)
+- "Create Rule" as main action
+- Groups as optional filters in sidebar
+- Built-in rule editor (no separate placeholder views)
 
-**Result**: BUILD SUCCEEDED
+**Files Changed**:
+- Created `Views/SimpleRulesView.swift` (700 lines, complete)
+- Updated `FamilyFinanceApp.swift` to use `SimpleRulesView`
+- Deprecated `RulesView.swift` (old groups-first approach)
+
+**Result**: Clean, Firefly III-style interface - BUILD SUCCEEDED
+
+---
+
+## Code Enhancement Protocol
+
+> **The best code change is the smallest one that completely solves the problem.**
+
+### Core Principles
+
+1. **Understand First, Code Second**
+   - Read existing code thoroughly before touching anything
+   - Identify patterns, conventions, and architectural decisions already in place
+   - Ask: "Why was it built this way?" before changing it
+
+2. **The Simplicity Test** - Before every change, ask:
+   - Can I solve this with LESS code?
+   - Am I adding complexity to handle a case that won't happen?
+   - Would a junior developer understand this in 6 months?
+
+3. **Creative Debugging Loop**
+   ```
+   OBSERVE → What exactly is broken/suboptimal?
+   HYPOTHESIZE → What's the root cause? (not symptoms)
+   DEBATE → Challenge your hypothesis. What else could it be?
+   IMPLEMENT → Smallest possible fix that addresses root cause
+   VERIFY → Build/run. Does it actually work?
+   REFLECT → Could this be simpler? Did I introduce new issues?
+   ```
+
+4. **Anti-Patterns to Avoid**
+   - ❌ "While I'm here, let me also refactor..."
+   - ❌ Adding abstractions for hypothetical future needs
+   - ❌ Fixing symptoms instead of causes
+   - ❌ Over-engineering simple problems
+   - ❌ Changing code style of untouched code
+
+5. **Creative Problem Solving** - When stuck:
+   - **Invert**: What if I did the opposite?
+   - **Eliminate**: What if I removed this entirely?
+   - **Combine**: Can two things become one?
+   - **Steal**: How do other codebases solve this?
+   - **Simplify**: What's the 80/20 solution?
+
+6. **Self-Debate Protocol** - Before finalizing significant changes:
+   ```
+   "I'm about to [change].
+   - What could go wrong?
+   - Is there a simpler way?
+   - Am I solving the right problem?
+   - What would a skeptical senior dev say?"
+   ```
+
+7. **Quality Checklist**
+   - ✓ Does it compile/build?
+   - ✓ Does it solve the actual problem?
+   - ✓ Is it the minimal change needed?
+   - ✓ Does it follow existing patterns?
+   - ✓ Would I be proud to show this code?

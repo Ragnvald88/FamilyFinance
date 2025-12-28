@@ -30,7 +30,6 @@ import OSLog
 
 @ModelActor
 actor ActionExecutor {
-    private let progressPublisher = RuleProgressPublisher()
     private var _relationshipCache: RelationshipCache?
     private let errorHandler = ActionErrorHandler()
     private let logger = Logger(subsystem: "com.familyfinance", category: "ActionExecutor")
@@ -76,7 +75,7 @@ actor ActionExecutor {
                 results.append(.failure(actionFailure))
 
                 // On failure, throw to let caller handle
-                throw ActionExecutionError.partialFailure(results, action)
+                throw ActionExecutionError.partialFailure(processedCount: results.count, failedActionType: action.type.displayName)
             }
         }
 
@@ -108,8 +107,6 @@ actor ActionExecutor {
 
         return AsyncThrowingStream { continuation in
             Task {
-                await progressPublisher.setState(.applyingActions)
-
                 let totalTransactions = transactions.count
                 let chunkSize = options.chunkSize
                 let chunks = transactions.chunked(into: chunkSize)
@@ -123,8 +120,8 @@ actor ActionExecutor {
 
                 do {
                     for (chunkIndex, chunk) in chunks.enumerated() {
-                        // Check for cancellation
-                        try await progressPublisher.checkCancellation()
+                        // Check for cancellation via Task
+                        try Task.checkCancellation()
 
                         // Process chunk
                         let chunkResults = try await processTransactionChunk(
@@ -164,23 +161,6 @@ actor ActionExecutor {
                         // Stream progress update
                         continuation.yield(.progress(progress))
 
-                        // Update progress publisher (throttled)
-                        await progressPublisher.updateProgress(RuleProcessingProgress(
-                            totalTransactions: totalTransactions,
-                            processedTransactions: completedCount,
-                            totalRuleGroups: 1,
-                            currentRuleGroupIndex: 1,
-                            totalRules: 1,
-                            currentRuleIndex: 1,
-                            totalMatches: successCount,
-                            totalActions: successCount + failureCount,
-                            currentBatchStart: chunkIndex * chunkSize,
-                            currentBatchEnd: min((chunkIndex + 1) * chunkSize, totalTransactions),
-                            estimatedTimeRemaining: progress.estimatedTimeRemaining,
-                            throughputTPS: Double(completedCount) / Date().timeIntervalSince(startTime),
-                            startTime: startTime
-                        ))
-
                         // Memory management: Clear relationship cache every 1000 operations
                         if completedCount % 1000 == 0 {
                             await relationshipCache.clearCache()
@@ -198,13 +178,10 @@ actor ActionExecutor {
 
                     continuation.yield(.completed(summary))
                     continuation.finish()
-
-                    await progressPublisher.setState(.complete)
                     logger.info("Bulk action execution completed: \(completedCount) transactions processed")
 
                 } catch {
                     continuation.finish(throwing: error)
-                    await progressPublisher.setState(.failed(error.localizedDescription))
                     logger.error("Bulk action execution failed: \(error)")
                 }
             }
@@ -226,6 +203,12 @@ actor ActionExecutor {
             try await clearCategoryAction(action, on: transaction)
         case .setNotes:
             try await setNotesAction(action, on: transaction)
+        case .setDescription:
+            try await setDescriptionAction(action, on: transaction)
+        case .appendDescription:
+            try await appendDescriptionAction(action, on: transaction)
+        case .prependDescription:
+            try await prependDescriptionAction(action, on: transaction)
         case .addTag:
             try await addTagAction(action, on: transaction)
         case .removeTag:
@@ -269,7 +252,7 @@ actor ActionExecutor {
     /// Set transaction category (find or create category)
     private func setCategoryAction(_ action: RuleAction, on transaction: Transaction) async throws {
         guard !action.value.isEmpty else {
-            throw ActionExecutionError.invalidAction(action)
+            throw ActionExecutionError.invalidAction(typeName: action.type.displayName, value: action.value)
         }
 
         let category = try await relationshipCache.findOrCreateCategory(action.value)
@@ -289,7 +272,7 @@ actor ActionExecutor {
     /// Set transaction notes
     private func setNotesAction(_ action: RuleAction, on transaction: Transaction) async throws {
         guard !action.value.isEmpty else {
-            throw ActionExecutionError.invalidAction(action)
+            throw ActionExecutionError.invalidAction(typeName: action.type.displayName, value: action.value)
         }
 
         let oldNotes = transaction.notes
@@ -310,10 +293,91 @@ actor ActionExecutor {
         logger.debug("Set notes on transaction \(transaction.uniqueKey)")
     }
 
+    /// Set (replace) transaction description
+    /// Note: Modifies description1 field; fullDescription is computed from description1-3
+    private func setDescriptionAction(_ action: RuleAction, on transaction: Transaction) async throws {
+        guard !action.value.isEmpty else {
+            throw ActionExecutionError.invalidAction(typeName: action.type.displayName, value: action.value)
+        }
+
+        let oldDescription = transaction.description1
+
+        // Set description1, clear others for clean replacement
+        transaction.description1 = action.value
+        transaction.description2 = nil
+        transaction.description3 = nil
+
+        // Create audit trail
+        let auditEntry = TransactionAuditLog(
+            action: .manualReview,
+            previousValue: oldDescription,
+            newValue: action.value,
+            reason: "Description set by rule action"
+        )
+        if transaction.auditLog == nil {
+            transaction.auditLog = []
+        }
+        transaction.auditLog?.append(auditEntry)
+
+        logger.debug("Set description on transaction \(transaction.uniqueKey)")
+    }
+
+    /// Append text to transaction description
+    /// Note: Appends to description1 field; fullDescription is computed from description1-3
+    private func appendDescriptionAction(_ action: RuleAction, on transaction: Transaction) async throws {
+        guard !action.value.isEmpty else {
+            throw ActionExecutionError.invalidAction(typeName: action.type.displayName, value: action.value)
+        }
+
+        let oldDescription = transaction.description1 ?? ""
+        let newDescription = oldDescription + action.value
+        transaction.description1 = newDescription
+
+        // Create audit trail
+        let auditEntry = TransactionAuditLog(
+            action: .manualReview,
+            previousValue: oldDescription,
+            newValue: newDescription,
+            reason: "Description appended by rule action"
+        )
+        if transaction.auditLog == nil {
+            transaction.auditLog = []
+        }
+        transaction.auditLog?.append(auditEntry)
+
+        logger.debug("Appended to description on transaction \(transaction.uniqueKey)")
+    }
+
+    /// Prepend text to transaction description
+    /// Note: Prepends to description1 field; fullDescription is computed from description1-3
+    private func prependDescriptionAction(_ action: RuleAction, on transaction: Transaction) async throws {
+        guard !action.value.isEmpty else {
+            throw ActionExecutionError.invalidAction(typeName: action.type.displayName, value: action.value)
+        }
+
+        let oldDescription = transaction.description1 ?? ""
+        let newDescription = action.value + oldDescription
+        transaction.description1 = newDescription
+
+        // Create audit trail
+        let auditEntry = TransactionAuditLog(
+            action: .manualReview,
+            previousValue: oldDescription,
+            newValue: newDescription,
+            reason: "Description prepended by rule action"
+        )
+        if transaction.auditLog == nil {
+            transaction.auditLog = []
+        }
+        transaction.auditLog?.append(auditEntry)
+
+        logger.debug("Prepended to description on transaction \(transaction.uniqueKey)")
+    }
+
     /// Add tag to transaction (avoid duplicates)
     private func addTagAction(_ action: RuleAction, on transaction: Transaction) async throws {
         guard !action.value.isEmpty else {
-            throw ActionExecutionError.invalidAction(action)
+            throw ActionExecutionError.invalidAction(typeName: action.type.displayName, value: action.value)
         }
 
         // Parse current tags (stored as comma-separated string)
@@ -333,7 +397,7 @@ actor ActionExecutor {
     /// Remove specific tag from transaction
     private func removeTagAction(_ action: RuleAction, on transaction: Transaction) async throws {
         guard !action.value.isEmpty else {
-            throw ActionExecutionError.invalidAction(action)
+            throw ActionExecutionError.invalidAction(typeName: action.type.displayName, value: action.value)
         }
 
         // Parse current tags
@@ -359,7 +423,7 @@ actor ActionExecutor {
     /// Set counter party name
     private func setCounterPartyAction(_ action: RuleAction, on transaction: Transaction) async throws {
         guard !action.value.isEmpty else {
-            throw ActionExecutionError.invalidAction(action)
+            throw ActionExecutionError.invalidAction(typeName: action.type.displayName, value: action.value)
         }
 
         transaction.counterName = action.value
@@ -371,7 +435,7 @@ actor ActionExecutor {
     /// Set source account (find existing account)
     private func setSourceAccountAction(_ action: RuleAction, on transaction: Transaction) async throws {
         guard !action.value.isEmpty else {
-            throw ActionExecutionError.invalidAction(action)
+            throw ActionExecutionError.invalidAction(typeName: action.type.displayName, value: action.value)
         }
 
         guard let account = try await relationshipCache.findAccount(action.value) else {
@@ -386,7 +450,7 @@ actor ActionExecutor {
     /// Set destination account (for transfers)
     private func setDestinationAccountAction(_ action: RuleAction, on transaction: Transaction) async throws {
         guard !action.value.isEmpty else {
-            throw ActionExecutionError.invalidAction(action)
+            throw ActionExecutionError.invalidAction(typeName: action.type.displayName, value: action.value)
         }
 
         guard let account = try await relationshipCache.findAccount(action.value) else {
@@ -515,7 +579,7 @@ actor ActionExecutor {
     /// Set external ID for transaction
     private func setExternalIdAction(_ action: RuleAction, on transaction: Transaction) async throws {
         guard !action.value.isEmpty else {
-            throw ActionExecutionError.invalidAction(action)
+            throw ActionExecutionError.invalidAction(typeName: action.type.displayName, value: action.value)
         }
 
         // Store external ID in notes (in a full implementation, add externalId field to Transaction model)
@@ -532,7 +596,7 @@ actor ActionExecutor {
     /// Set internal reference for transaction
     private func setInternalReferenceAction(_ action: RuleAction, on transaction: Transaction) async throws {
         guard !action.value.isEmpty else {
-            throw ActionExecutionError.invalidAction(action)
+            throw ActionExecutionError.invalidAction(typeName: action.type.displayName, value: action.value)
         }
 
         // Store internal reference in notes
@@ -629,29 +693,30 @@ struct ActionExecutionResult {
 // MARK: - Error Handling
 
 /// Action execution errors with recovery options
-enum ActionExecutionError: Error, LocalizedError {
-    case invalidAction(RuleAction)
+/// Uses Sendable types to avoid concurrency issues
+enum ActionExecutionError: Error, LocalizedError, Sendable {
+    case invalidAction(typeName: String, value: String)
     case relationshipConstraintViolation(String)
     case transactionNotFound(UUID)
-    case partialFailure([ActionResult], RuleAction)
+    case partialFailure(processedCount: Int, failedActionType: String)
 
     var errorDescription: String? {
         switch self {
-        case .invalidAction(let action):
-            return "Invalid action: \(action.type.displayName) with value '\(action.value)'"
+        case .invalidAction(let typeName, let value):
+            return "Invalid action: \(typeName) with value '\(value)'"
         case .relationshipConstraintViolation(let message):
             return "Relationship error: \(message)"
         case .transactionNotFound(let id):
             return "Transaction not found: \(id)"
-        case .partialFailure(let results, let failedAction):
-            return "Partial failure: \(results.count) actions processed, failed at \(failedAction.type.displayName)"
+        case .partialFailure(let count, let failedType):
+            return "Partial failure: \(count) actions processed, failed at \(failedType)"
         }
     }
 
     var recoveryOptions: [RecoveryOption] {
         switch self {
         case .invalidAction:
-            return [.modifyAction(RuleAction(type: .setCategory, value: "")), .skip]
+            return [.modify, .skip]
         case .relationshipConstraintViolation:
             return [.retry, .skip]
         case .transactionNotFound:
@@ -663,17 +728,17 @@ enum ActionExecutionError: Error, LocalizedError {
 }
 
 /// Recovery options for failed actions
-enum RecoveryOption {
+enum RecoveryOption: Sendable {
     case retry
     case skip
-    case modifyAction(RuleAction)
+    case modify
     case abort
 
     var displayName: String {
         switch self {
         case .retry: return "Retry"
         case .skip: return "Skip"
-        case .modifyAction: return "Modify Action"
+        case .modify: return "Modify Action"
         case .abort: return "Abort"
         }
     }
@@ -825,11 +890,11 @@ class ActionErrorHandler {
         // Default recovery options based on action type
         switch action.type {
         case .setCategory, .addTag:
-            return [.retry, .modifyAction(action), .skip]
+            return [.retry, .modify, .skip]
         case .deleteTransaction:
             return [.retry, .abort]
         case .setSourceAccount, .setDestinationAccount:
-            return [.modifyAction(action), .skip]
+            return [.modify, .skip]
         default:
             return [.retry, .skip]
         }

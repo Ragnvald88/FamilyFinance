@@ -177,11 +177,11 @@ class CSVImportService: ObservableObject {
     // NOTE: IBANs are centralized in FamilyAccountsConfig.swift for privacy
 
     /// Maximum file size for CSV import (50MB)
-    static let maxFileSizeBytes = 50_000_000
+    nonisolated static let maxFileSizeBytes = 50_000_000
 
     /// Supported encodings for CSV files (try in order)
     /// Made nonisolated static for background thread access
-    private static let supportedEncodings: [String.Encoding] = [
+    private nonisolated static let supportedEncodings: [String.Encoding] = [
         .isoLatin1,     // Primary encoding for Rabobank
         .windowsCP1252, // Fallback for Windows
         .utf8           // Modern fallback
@@ -218,8 +218,9 @@ class CSVImportService: ObservableObject {
     }
 
     // MARK: - Thread-Safe DateFormatter (static for safety)
+    // Must be nonisolated to access from background parsing functions
 
-    private static let dateFormatter: DateFormatter = {
+    private nonisolated static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         formatter.locale = Locale(identifier: "en_US_POSIX")

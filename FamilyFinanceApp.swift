@@ -474,7 +474,7 @@ struct ContentView: View {
         case .insights:
             InsightsViewWrapper()
         case .rules:
-            RulesView()
+            SimpleRulesView()  // Firefly III-style: Rules first, groups optional
         case .import:
             ImportViewWrapper()
         }
@@ -1000,7 +1000,7 @@ struct TransactionEditorSheet: View {
                     Picker("Account", selection: $selectedAccount) {
                         Text("Select Account").tag(nil as Account?)
                         ForEach(accounts) { account in
-                            Text("\(account.name ?? account.iban)")
+                            Text(account.name.isEmpty ? account.iban : account.name)
                                 .tag(account as Account?)
                         }
                     }
@@ -3483,7 +3483,7 @@ struct FocusDetector: NSViewRepresentable {
         Coordinator(onFocusChange: onFocusChange)
     }
 
-    class Coordinator: NSObject {
+    class Coordinator: NSObject, @unchecked Sendable {
         let onFocusChange: (Bool) -> Void
         private var textField: NSTextField?
 
@@ -3499,16 +3499,16 @@ struct FocusDetector: NSViewRepresentable {
                 forName: NSControl.textDidBeginEditingNotification,
                 object: textField,
                 queue: .main
-            ) { _ in
-                self.onFocusChange(true)
+            ) { [weak self] _ in
+                self?.onFocusChange(true)
             }
 
             NotificationCenter.default.addObserver(
                 forName: NSControl.textDidEndEditingNotification,
                 object: textField,
                 queue: .main
-            ) { _ in
-                self.onFocusChange(false)
+            ) { [weak self] _ in
+                self?.onFocusChange(false)
             }
         }
 

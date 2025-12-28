@@ -134,6 +134,80 @@ actor TriggerEvaluator {
         return .valid
     }
 
+    // MARK: - Rule Trigger Group Evaluation
+
+    /// Evaluate a complete rule (with trigger groups or flat triggers) against a transaction
+    /// Returns true if the rule matches, according to its logic
+    func evaluateRule(_ rule: Rule, against transaction: Transaction) async -> Bool {
+        if rule.usesAdvancedTriggers {
+            return await evaluateTriggerGroups(rule.triggerGroups, groupMatchMode: rule.groupMatchMode, against: transaction)
+        } else {
+            return await evaluateFlatTriggers(rule.triggers, matchMode: rule.triggerLogic, against: transaction)
+        }
+    }
+
+    /// Evaluate trigger groups with nested AND/OR logic
+    /// Each group's triggers are combined with the group's matchMode
+    /// Groups are then combined with the rule's groupMatchMode
+    func evaluateTriggerGroups(
+        _ groups: [TriggerGroup],
+        groupMatchMode: TriggerLogic,
+        against transaction: Transaction
+    ) async -> Bool {
+        guard !groups.isEmpty else { return false }
+
+        let sortedGroups = groups.sortedBySortOrder
+
+        for group in sortedGroups {
+            let groupMatches = await evaluateFlatTriggers(
+                group.triggers,
+                matchMode: group.matchMode,
+                against: transaction
+            )
+
+            switch groupMatchMode {
+            case .any:
+                // Short-circuit: if any group matches, rule matches
+                if groupMatches { return true }
+            case .all:
+                // Short-circuit: if any group fails, rule fails
+                if !groupMatches { return false }
+            }
+        }
+
+        // For .any mode: none matched = false
+        // For .all mode: all matched = true
+        return groupMatchMode == .all
+    }
+
+    /// Evaluate flat triggers with AND/OR logic
+    func evaluateFlatTriggers(
+        _ triggers: [RuleTrigger],
+        matchMode: TriggerLogic,
+        against transaction: Transaction
+    ) async -> Bool {
+        guard !triggers.isEmpty else { return false }
+
+        let sortedTriggers = triggers.sortedBySortOrder
+
+        for trigger in sortedTriggers {
+            let matches = await evaluate(trigger, against: transaction)
+
+            switch matchMode {
+            case .any:
+                // Short-circuit: if any trigger matches, group matches
+                if matches { return true }
+            case .all:
+                // Short-circuit: if any trigger fails, group fails
+                if !matches { return false }
+            }
+        }
+
+        // For .any mode: none matched = false
+        // For .all mode: all matched = true
+        return matchMode == .all
+    }
+
     // MARK: - Core Evaluation Logic
 
     /// Evaluate a single trigger against a transaction with fast paths
@@ -233,6 +307,12 @@ actor TriggerEvaluator {
             return fieldValue.lowercased() == value.lowercased()
         case .matches:
             return await evaluateRegex(pattern: value, against: fieldValue)
+
+        // Presence operators (no value required)
+        case .isEmpty:
+            return fieldValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        case .isNotEmpty, .hasValue:
+            return !fieldValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
 
         // Numeric operators
         case .greaterThan, .lessThan, .greaterThanOrEqual, .lessThanOrEqual:
@@ -419,7 +499,8 @@ actor RegexCache {
 }
 
 /// Thread-safe LRU cache implementation
-class LRUCache<Key: Hashable, Value> {
+/// @unchecked Sendable because internal synchronization via DispatchQueue
+final class LRUCache<Key: Hashable & Sendable, Value: Sendable>: @unchecked Sendable {
     private let capacity: Int
     private var cache: [Key: Value] = [:]
     private var accessOrder: [Key] = []

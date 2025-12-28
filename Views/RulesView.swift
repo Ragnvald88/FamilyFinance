@@ -1234,7 +1234,8 @@ struct OverallRuleStats {
 
 // MARK: - Helper Extensions
 
-private let relativeDateFormatter: RelativeDateTimeFormatter = {
+// nonisolated(unsafe) because initialized once and only used for formatting
+private nonisolated(unsafe) let relativeDateFormatter: RelativeDateTimeFormatter = {
     let formatter = RelativeDateTimeFormatter()
     formatter.unitsStyle = .abbreviated
     return formatter

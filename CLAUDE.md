@@ -2,7 +2,7 @@
 
 > **App Store-Quality macOS Finance App** | SwiftUI + SwiftData | Premium UI/UX
 >
-> **Status: 90% App Store Quality** — Core app production-ready, rules UI complete
+> **Status: 77% Quality Score** — Core app works, cleanup needed before production
 
 ## Current Status (December 27, 2025)
 
@@ -50,9 +50,10 @@ Services/
 └── [Other services]             — CSV import, queries, etc.
 
 Views/
-├── SimpleRulesView.swift        — Firefly III-style rules UI (ACTIVE)
-├── RulesView.swift              — Old groups-first UI (deprecated)
-└── [Other views]                — Dashboard, transactions, etc.
+├── SimpleRulesView.swift        — Firefly III-style rules UI
+├── DashboardView.swift          — KPIs, charts, analytics
+├── TransactionDetailView.swift  — Transaction editing
+└── ImportView.swift             — CSV import UI
 ```
 
 ### Rules UI Design
@@ -120,24 +121,84 @@ DesignTokens.Spacing.xl              // 24pt
 
 ---
 
-## Recent Changes (December 27, 2025)
+## Recent Changes (December 28, 2025)
 
-### Simplified to Firefly III Pattern
+### Legacy Rules System Removed
 
-**Problem**: Old UI put "Groups" first - users had to understand groups before creating rules.
+**Cleaned up legacy code** - Only ONE rules system now:
+- Removed `CategorizationRule` model from SwiftDataModels.swift
+- Removed `RuleCondition` model from SwiftDataModels.swift
+- Removed `RuleMatchType` enum (unused)
+- Updated `CategorizationEngine.swift` - now only uses NEW Rule model
+- Updated `ExportService.swift` - exports NEW Rule model
+- Updated all test files to use NEW Rule model schema
 
-**Solution**: New `SimpleRulesView.swift` with:
+### Rules → CSV Import Integration Fixed
+
+**Critical fix**: Rules created in SimpleRulesView now apply during CSV import:
+- `CategorizationEngine.refreshCompiledRules()` fetches from `Rule` model
+- `compileNewRule()` converts Rule triggers to CompiledCondition format
+- Rules with `setCategory` action are applied during bulk import
+
+### Rules System (Firefly III-Style)
+
+**Single unified system**: `SimpleRulesView.swift` with:
 - Rules shown in flat list (primary view)
-- "Create Rule" as main action
-- Groups as optional filters in sidebar
-- Built-in rule editor (no separate placeholder views)
+- Multi-trigger support with AND/OR logic
+- Smart pickers for categories/accounts
+- TriggerGroup model for nested conditions
+- **Integrated with CSV import** via CategorizationEngine
 
-**Files Changed**:
-- Created `Views/SimpleRulesView.swift` (700 lines, complete)
-- Updated `FamilyFinanceApp.swift` to use `SimpleRulesView`
-- Deprecated `RulesView.swift` (old groups-first approach)
+**Result**: Clean codebase, BUILD SUCCEEDED
 
-**Result**: Clean, Firefly III-style interface - BUILD SUCCEEDED
+---
+
+## Quality Assessment (December 29, 2025)
+
+### Benchmark Results
+
+| Dimension | Target | Actual | Status |
+|-----------|--------|--------|--------|
+| Functionality | 100% | 85% | ⚠️ PARTIAL |
+| Code Quality | <5 violations | 3 | ✅ PASS |
+| Optimization | <3 issues | 5 | ❌ FAIL |
+| Redundancy | <200 lines | ~960 lines | ❌ FAIL |
+| Overengineering | <3 patterns | 12 patterns | ❌ FAIL |
+
+### Critical Issues (P0)
+
+| Issue | Location | Status |
+|-------|----------|--------|
+| TriggerGroups ignored during CSV import | `CategorizationEngine.compileNewRule()` | **TODO** |
+| Rules without setCategory silently dropped | `CategorizationEngine.compileNewRule()` | **TODO** |
+| Categorization errors not reported | `CSVImportService.importFiles()` | **TODO** |
+| CircuitBreaker state hidden from users | `RuleEngine.swift` | **TODO** |
+
+### Known Technical Debt
+
+**Dead Code to Remove (~960 lines):**
+- `AdvancedBooleanLogicBuilder.swift` (673 lines) - superseded by SimpleRulesView
+- `RuleStatisticsAnalyzer` in RuleStatistics.swift (~100 lines) - never called
+- Placeholder editors in RulesView.swift (~66 lines)
+- `ThreadSafeCategorization.swift` (11 lines) - stub marked for deletion
+
+**Overengineered Patterns (~560 lines):**
+- CircuitBreaker in RuleEngine (75 lines) - enterprise pattern for single-user app
+- SystemMonitor with fake random "load" (20 lines) - provides zero value
+- LRU evaluation cache in TriggerEvaluator (50 lines) - cache thrashing, no invalidation
+- Frame-rate throttling in RuleProgressPublisher (150 lines) - overkill for 3-5 updates
+
+### Architecture Notes
+
+**CategorizationEngine vs RuleEngine:**
+- `CategorizationEngine` - Used during CSV import, compiles Rules to CompiledRules
+- `RuleEngine` - Used for manual rule execution, uses Rule model directly
+- **Gap**: CategorizationEngine only handles setCategory action, ignores TriggerGroups
+
+**Data stored in wrong fields:**
+- Tags stored as comma-separated in notes field
+- ExternalId and InternalReference appended to notes
+- **Fix needed**: Add dedicated fields to Transaction model
 
 ---
 

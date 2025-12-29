@@ -27,13 +27,18 @@ final class TransactionDetailViewTests: XCTestCase {
             Transaction.self,
             Account.self,
             Category.self,
-            CategorizationRule.self,
             Liability.self,
             Merchant.self,
             BudgetPeriod.self,
             TransactionSplit.self,
             RecurringTransaction.self,
-            TransactionAuditLog.self
+            TransactionAuditLog.self,
+            // Rules System
+            RuleGroup.self,
+            Rule.self,
+            RuleTrigger.self,
+            RuleAction.self,
+            TriggerGroup.self
         ])
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         modelContainer = try ModelContainer(for: schema, configurations: [config])

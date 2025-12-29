@@ -71,25 +71,30 @@ class ExportService: ObservableObject {
         isExporting = true
         defer { isExporting = false }
 
-        let descriptor = FetchDescriptor<CategorizationRule>(
-            sortBy: [SortDescriptor(\CategorizationRule.priority)]
+        let descriptor = FetchDescriptor<Rule>(
+            sortBy: [SortDescriptor(\.groupExecutionOrder)]
         )
 
         let rules = try modelContext.fetch(descriptor)
 
-        var csvContent = "Name,Conditions,Category,Priority,Active,Match Count\n"
+        var csvContent = "Name,Triggers,Actions,Priority,Active,Match Count\n"
 
         for rule in rules {
-            // Create a summary of conditions for the new rule format
-            let conditionsSummary = rule.conditions.isEmpty
-                ? "No conditions"
-                : rule.conditions.map { $0.displayText }.joined(separator: "; ")
+            // Create a summary of triggers
+            let triggersSummary = rule.triggers.isEmpty
+                ? "No triggers"
+                : rule.triggers.map { $0.displayText }.joined(separator: "; ")
+
+            // Create a summary of actions
+            let actionsSummary = rule.actions.isEmpty
+                ? "No actions"
+                : rule.actions.map { $0.displayText }.joined(separator: "; ")
 
             let row = [
                 escapeCSV(rule.name),
-                escapeCSV(conditionsSummary),
-                escapeCSV(rule.targetCategory),
-                String(rule.priority),
+                escapeCSV(triggersSummary),
+                escapeCSV(actionsSummary),
+                String(rule.groupExecutionOrder),
                 rule.isActive ? "Yes" : "No",
                 String(rule.matchCount)
             ].joined(separator: ",")

@@ -201,8 +201,8 @@ class CategorizationEngine {
     }
 
     /// Test a specific rule against a transaction for live preview
-    func testRule(_ rule: CategorizationRule, against transaction: ParsedTransaction) async -> Bool {
-        let compiledRule = compileRule(rule)
+    func testRule(_ rule: Rule, against transaction: ParsedTransaction) async -> Bool {
+        guard let compiledRule = compileNewRule(rule) else { return false }
         let evalTransaction = convertToEvaluationTransaction(transaction)
         return evaluateCompiledRule(compiledRule, against: evalTransaction)
     }
@@ -224,17 +224,26 @@ class CategorizationEngine {
     }
 
     /// Refresh the compiled rules cache
+    /// Reads from Rule model (Firefly III-style rules from SimpleRulesView)
     private func refreshCompiledRules() async {
         do {
-            let descriptor = FetchDescriptor<CategorizationRule>(
+            // Fetch Rule model (Firefly III-style rules from SimpleRulesView)
+            let descriptor = FetchDescriptor<Rule>(
                 predicate: #Predicate { $0.isActive },
-                sortBy: [SortDescriptor(\.priority)]
+                sortBy: [SortDescriptor(\.groupExecutionOrder)]
             )
-
             let rules = try modelContext.fetch(descriptor)
 
-            // Compile rules for maximum performance
-            compiledRules = rules.map { compileRule($0) }
+            // Convert rules that have a setCategory action
+            var allCompiledRules: [CompiledRule] = []
+            for rule in rules {
+                if let compiled = compileNewRule(rule) {
+                    allCompiledRules.append(compiled)
+                }
+            }
+
+            // Sort by priority (lower number = higher priority)
+            compiledRules = allCompiledRules.sorted { $0.priority < $1.priority }
             cacheLastUpdated = Date()
 
         } catch {
@@ -243,45 +252,91 @@ class CategorizationEngine {
         }
     }
 
-    /// Compile a single rule for high-performance evaluation
-    private func compileRule(_ rule: CategorizationRule) -> CompiledRule {
-        let compiledConditions = rule.conditions.map { condition in
+    /// Convert NEW Rule model to CompiledRule format for evaluation
+    private func compileNewRule(_ rule: Rule) -> CompiledRule? {
+        // Only process rules that have a setCategory action
+        guard let setCategoryAction = rule.actions.first(where: { $0.type == .setCategory }) else {
+            return nil // Skip rules without setCategory (those are handled by RuleEngine later)
+        }
+
+        // Use allTriggers to include both flat triggers AND triggers from TriggerGroups
+        // This ensures grouped triggers are not silently ignored during import
+        let compiledConditions: [CompiledCondition] = rule.allTriggers.compactMap { trigger in
+            // Map TriggerField to ConditionField
+            let conditionField: ConditionField
+            switch trigger.field {
+            case .description: conditionField = .description
+            case .counterParty: conditionField = .counterParty
+            case .counterIban: conditionField = .counterIBAN
+            case .amount: conditionField = .amount
+            case .accountName: conditionField = .account
+            case .iban: conditionField = .account // User's IBAN maps to account
+            case .transactionType: conditionField = .transactionType
+            case .date: conditionField = .date
+            case .category, .notes, .tags, .externalId, .internalReference: return nil // Not supported in old system
+            }
+
+            // Map TriggerOperator to ConditionOperator
+            let conditionOperator: ConditionOperator
+            switch trigger.triggerOperator {
+            case .contains: conditionOperator = .contains
+            case .equals: conditionOperator = .equals
+            case .startsWith: conditionOperator = .startsWith
+            case .endsWith: conditionOperator = .endsWith
+            case .matches: conditionOperator = .matches
+            case .greaterThan: conditionOperator = .greaterThan
+            case .lessThan: conditionOperator = .lessThan
+            case .greaterThanOrEqual: conditionOperator = .greaterThan // Approximate
+            case .lessThanOrEqual: conditionOperator = .lessThan // Approximate
+            case .before, .after, .on, .today, .yesterday, .tomorrow: return nil // Date operators not in old system
+            case .isEmpty, .isNotEmpty, .hasValue: return nil // Presence operators not in old system
+            }
+
             var compiledRegex: NSRegularExpression?
             var numericValue: Double?
 
-            // Pre-compile regex patterns for performance
-            if condition.operatorType == .matches {
-                compiledRegex = try? NSRegularExpression(
-                    pattern: condition.value,
-                    options: [.caseInsensitive]
-                )
+            if conditionOperator == .matches {
+                compiledRegex = try? NSRegularExpression(pattern: trigger.value, options: [.caseInsensitive])
             }
-
-            // Pre-parse numeric values for performance
-            if condition.field.isNumeric {
-                numericValue = Double(condition.value)
+            if conditionField.isNumeric {
+                numericValue = Double(trigger.value)
             }
 
             return CompiledCondition(
-                field: condition.field,
-                operatorType: condition.operatorType,
-                value: condition.value.lowercased(), // Pre-lowercase for performance
+                field: conditionField,
+                operatorType: conditionOperator,
+                value: trigger.value.lowercased(),
                 compiledRegex: compiledRegex,
                 numericValue: numericValue,
-                sortOrder: condition.sortOrder
+                sortOrder: trigger.sortOrder
             )
         }
 
+        // Must have at least one valid condition
+        guard !compiledConditions.isEmpty else { return nil }
+
+        // Map trigger logic to logical operator
+        // For advanced triggers (TriggerGroups), use AND to be conservative
+        // This prevents false positives when nested group logic can't be fully evaluated
+        let logicalOp: LogicalOperator
+        if rule.usesAdvancedTriggers {
+            // Conservative: require ALL triggers to match (avoids false categorization)
+            logicalOp = .and
+        } else {
+            // Simple triggers: use configured logic
+            logicalOp = rule.triggerLogic == .all ? .and : .or
+        }
+
         return CompiledRule(
-            id: rule.persistentModelID.hashValue.description,
+            id: rule.uuid.uuidString,
             name: rule.name,
-            targetCategory: rule.targetCategory,
-            priority: rule.priority,
+            targetCategory: setCategoryAction.value,
+            priority: rule.groupExecutionOrder,
             isActive: rule.isActive,
-            standardizedName: rule.standardizedName,
+            standardizedName: nil,
             conditions: compiledConditions.sorted { $0.sortOrder < $1.sortOrder },
-            logicalOperator: rule.logicalOperator,
-            isSimple: rule.isSimple
+            logicalOperator: logicalOp,
+            isSimple: compiledConditions.count == 1
         )
     }
 

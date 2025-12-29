@@ -713,7 +713,7 @@ private struct TransactionDetailPreview: View {
             let schema = Schema([
                 Transaction.self, Account.self, Category.self,
                 TransactionSplit.self, RecurringTransaction.self, TransactionAuditLog.self,
-                CategorizationRule.self, Liability.self, Merchant.self, BudgetPeriod.self
+                Liability.self, Merchant.self, BudgetPeriod.self
             ])
             let newContainer = try ModelContainer(
                 for: schema,

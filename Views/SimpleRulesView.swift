@@ -572,11 +572,16 @@ struct SimpleRuleEditorView: View {
                         .padding(.vertical, 8)
                     } else {
                         ForEach($actions) { $action in
-                            ActionEditor(data: $action, onDelete: {
-                                withAnimation {
-                                    actions.removeAll { $0.id == action.id }
+                            ActionEditor(
+                                data: $action,
+                                categories: categories,
+                                accounts: accounts,
+                                onDelete: {
+                                    withAnimation {
+                                        actions.removeAll { $0.id == action.id }
+                                    }
                                 }
-                            })
+                            )
                         }
                     }
 
@@ -832,6 +837,8 @@ struct TriggerEditor: View {
 
 struct ActionEditor: View {
     @Binding var data: ActionData
+    var categories: [Category] = []
+    var accounts: [Account] = []
     var onDelete: (() -> Void)?
 
     var body: some View {
@@ -857,13 +864,8 @@ struct ActionEditor: View {
                 }
             }
 
-            // Value field (only if required)
-            if data.type.requiresValue {
-                TextField(data.type.valuePlaceholder, text: $data.value)
-                    .textFieldStyle(.roundedBorder)
-            } else {
-                Spacer()
-            }
+            // Smart value field based on action type
+            valueEditor
 
             // Delete button
             if let onDelete = onDelete {
@@ -880,6 +882,50 @@ struct ActionEditor: View {
         .padding(8)
         .background(Color(nsColor: .controlBackgroundColor).opacity(0.3))
         .clipShape(RoundedRectangle(cornerRadius: 6))
+    }
+
+    @ViewBuilder
+    private var valueEditor: some View {
+        switch data.type {
+        case .setCategory:
+            // Category picker
+            Picker("Category", selection: $data.value) {
+                Text("Select...").tag("")
+                ForEach(categories) { category in
+                    Text(category.name).tag(category.name)
+                }
+            }
+            .frame(minWidth: 150)
+
+        case .setSourceAccount, .setDestinationAccount:
+            // Account picker
+            Picker("Account", selection: $data.value) {
+                Text("Select...").tag("")
+                ForEach(accounts) { account in
+                    Text(account.name).tag(account.name)
+                }
+            }
+            .frame(minWidth: 150)
+
+        case .convertToDeposit, .convertToWithdrawal, .convertToTransfer:
+            // Account picker for conversions
+            Picker("Account", selection: $data.value) {
+                Text("Select...").tag("")
+                ForEach(accounts) { account in
+                    Text(account.name).tag(account.name)
+                }
+            }
+            .frame(minWidth: 150)
+
+        default:
+            // Default: TextField or empty
+            if data.type.requiresValue {
+                TextField(data.type.valuePlaceholder, text: $data.value)
+                    .textFieldStyle(.roundedBorder)
+            } else {
+                Spacer()
+            }
+        }
     }
 }
 

@@ -161,7 +161,7 @@ struct DashboardView: View {
                 // Animated KPI cards with staggered appearance
                 Group {
                     EnhancedKPICard(
-                        title: "Inkomen",
+                        title: "Income",
                         value: viewModel.kpis?.totalIncome ?? 0,
                         icon: "arrow.down.circle.fill",
                         color: .green,
@@ -170,7 +170,7 @@ struct DashboardView: View {
                     )
 
                     EnhancedKPICard(
-                        title: "Uitgaven",
+                        title: "Expenses",
                         value: abs(viewModel.kpis?.totalExpenses ?? 0),
                         icon: "arrow.up.circle.fill",
                         color: .red.opacity(0.85),
@@ -179,7 +179,7 @@ struct DashboardView: View {
                     )
 
                     EnhancedKPICard(
-                        title: "Gespaard",
+                        title: "Saved",
                         value: viewModel.kpis?.netSavings ?? 0,
                         icon: "banknote.fill",
                         color: .blue,
@@ -188,7 +188,7 @@ struct DashboardView: View {
                     )
 
                     EnhancedKPICard(
-                        title: "Spaarrate",
+                        title: "Savings Rate",
                         percentage: Double(truncating: ((viewModel.kpis?.savingsRate ?? 0) * 100) as NSNumber),
                         icon: "percent",
                         color: .orange,
@@ -338,7 +338,7 @@ struct DashboardView: View {
                 }
                 .padding(DesignTokens.Spacing.l)
             } else {
-                // Show empty state guidance instead of empty account list
+                // Show empty state guidance
                 VStack(spacing: DesignTokens.Spacing.l) {
                     Image(systemName: "building.columns.circle")
                         .font(.system(size: 48))
@@ -349,15 +349,10 @@ struct DashboardView: View {
                             .font(DesignTokens.Typography.headline)
                             .foregroundStyle(.primary)
 
-                        Text("Import your bank statements to see account balances and transaction history")
+                        Text("Use the Import tab in the sidebar to add your bank statements")
                             .font(DesignTokens.Typography.subheadline)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
-                    }
-
-                    EnhancedButton("Import Bank Data", icon: "square.and.arrow.down", style: .primary) {
-                        // Navigate to import tab
-                        // TODO: Add navigation to import
                     }
                 }
                 .padding(DesignTokens.Spacing.xl)
@@ -612,50 +607,6 @@ struct AnimatedPercentage: View {
                     displayValue = value
                 }
             }
-    }
-}
-
-// MARK: - Legacy KPI Card (Keep for Compatibility)
-
-struct KPICard: View {
-    let title: String
-    let value: String
-    let icon: String
-    let color: Color
-    let trend: Double?
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.m) {
-            HStack {
-                Image(systemName: icon)
-                    .font(DesignTokens.Typography.title)
-                    .foregroundStyle(color)
-
-                Spacer()
-
-                if let trend = trend {
-                    HStack(spacing: DesignTokens.Spacing.xs) {
-                        Image(systemName: trend >= 0 ? "arrow.up.right" : "arrow.down.right")
-                        Text(String(format: "%.1f%%", abs(trend)))
-                    }
-                    .font(DesignTokens.Typography.caption)
-                    .foregroundStyle(trend >= 0 ? .green : .red)
-                }
-            }
-
-            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
-                Text(title)
-                    .font(DesignTokens.Typography.caption)
-                    .foregroundStyle(.secondary)
-
-                Text(value)
-                    .font(DesignTokens.Typography.currencyLarge)
-                    .foregroundStyle(.primary)
-            }
-        }
-        .padding(DesignTokens.Spacing.l)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .primaryCard()
     }
 }
 

@@ -15,13 +15,18 @@ final class TransactionModelTests: XCTestCase {
             Transaction.self,
             Account.self,
             Category.self,
-            CategorizationRule.self,
             Liability.self,
             Merchant.self,
             BudgetPeriod.self,
             TransactionSplit.self,
             RecurringTransaction.self,
-            TransactionAuditLog.self
+            TransactionAuditLog.self,
+            // Rules System
+            RuleGroup.self,
+            Rule.self,
+            RuleTrigger.self,
+            RuleAction.self,
+            TriggerGroup.self
         ])
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         modelContainer = try ModelContainer(for: schema, configurations: [config])
@@ -348,50 +353,7 @@ final class TransactionModelTests: XCTestCase {
         XCTAssertNil(result)
     }
 
-    // MARK: - CategorizationRule Tests
-
-    /// Test rule matching with contains
-    func testRuleMatchingContains() {
-        let rule = CategorizationRule(
-            pattern: "albert heijn",
-            matchType: .contains,
-            standardizedName: "Albert Heijn",
-            targetCategory: "Boodschappen",
-            priority: 1
-        )
-
-        XCTAssertTrue(rule.matches("ALBERT HEIJN 1234"))
-        XCTAssertTrue(rule.matches("Something albert heijn something"))
-        XCTAssertFalse(rule.matches("Jumbo"))
-    }
-
-    /// Test rule matching with exact
-    func testRuleMatchingExact() {
-        let rule = CategorizationRule(
-            pattern: "albert heijn",
-            matchType: .exact,
-            standardizedName: "Albert Heijn",
-            targetCategory: "Boodschappen",
-            priority: 1
-        )
-
-        XCTAssertTrue(rule.matches("Albert Heijn"))
-        XCTAssertFalse(rule.matches("Albert Heijn 1234"))
-    }
-
-    /// Test inactive rule doesn't match
-    func testInactiveRuleNoMatch() {
-        let rule = CategorizationRule(
-            pattern: "albert heijn",
-            matchType: .contains,
-            standardizedName: "Albert Heijn",
-            targetCategory: "Boodschappen",
-            priority: 1,
-            isActive: false
-        )
-
-        XCTAssertFalse(rule.matches("albert heijn"))
-    }
+    // Note: Legacy CategorizationRule tests removed - use Rule model for new tests
 }
 
 // MARK: - Dutch Number Parser

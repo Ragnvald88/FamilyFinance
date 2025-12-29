@@ -27,8 +27,8 @@ final class ActionExecutorTests: XCTestCase {
         // Create in-memory model container for testing
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         modelContainer = try ModelContainer(
-            for: Transaction.self, Account.self, Category.self, CategorizationRule.self,
-                 RuleGroup.self, Rule.self, RuleTrigger.self, RuleAction.self,
+            for: Transaction.self, Account.self, Category.self,
+                 RuleGroup.self, Rule.self, RuleTrigger.self, RuleAction.self, TriggerGroup.self,
             configurations: config
         )
         modelContext = ModelContext(modelContainer)

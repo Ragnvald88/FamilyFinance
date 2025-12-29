@@ -26,13 +26,18 @@ final class FamilyFinanceTests: XCTestCase {
             Transaction.self,
             Account.self,
             Category.self,
-            CategorizationRule.self,
             Merchant.self,
             BudgetPeriod.self,
             Liability.self,
             TransactionSplit.self,
             RecurringTransaction.self,
-            TransactionAuditLog.self
+            TransactionAuditLog.self,
+            // Rules System
+            RuleGroup.self,
+            Rule.self,
+            RuleTrigger.self,
+            RuleAction.self,
+            TriggerGroup.self
         ])
 
         let config = ModelConfiguration(
@@ -125,79 +130,7 @@ final class FamilyFinanceTests: XCTestCase {
     }
 
     // MARK: - Categorization Tests
-
-    func testCategorizationRuleMatching() {
-        let rule1 = CategorizationRule(
-            pattern: "albert heijn",
-            matchType: .contains,
-            standardizedName: "Albert Heijn",
-            targetCategory: "Boodschappen",
-            priority: 1
-        )
-
-        XCTAssertTrue(rule1.matches("ALBERT HEIJN 1234"))
-        XCTAssertTrue(rule1.matches("albert heijn to go"))
-        XCTAssertFalse(rule1.matches("jumbo"))
-
-        let rule2 = CategorizationRule(
-            pattern: "^albert",
-            matchType: .regex,
-            standardizedName: "Albert Heijn",
-            targetCategory: "Boodschappen",
-            priority: 1
-        )
-
-        XCTAssertTrue(rule2.matches("albert heijn"))
-        XCTAssertFalse(rule2.matches("super albert"))
-    }
-
-    func testCategorizationPriorityOrder() async throws {
-        let engine = CategorizationEngine(modelContext: modelContext)
-
-        // Add rules with different priorities
-        let lowPriority = CategorizationRule(
-            pattern: "ah",
-            targetCategory: "Generic",
-            priority: 100
-        )
-        modelContext.insert(lowPriority)
-
-        let highPriority = CategorizationRule(
-            pattern: "albert heijn",
-            targetCategory: "Boodschappen",
-            priority: 1
-        )
-        modelContext.insert(highPriority)
-
-        try modelContext.save()
-
-        // Test transaction
-        let transaction = ParsedTransaction(
-            iban: "NL00TEST0000000001",
-            sequenceNumber: 1,
-            date: Date(),
-            amount: -10,
-            balance: 100,
-            counterIBAN: nil,
-            counterName: "Albert Heijn 1234",
-            description1: nil,
-            description2: nil,
-            description3: nil,
-            transactionCode: nil,
-            valueDate: nil,
-            returnReason: nil,
-            mandateReference: nil,
-            transactionType: .expense,
-            contributor: nil,
-            sourceFile: "test.csv"
-        )
-
-        let result = await engine.categorize(transaction)
-
-        // Should match high priority rule
-        XCTAssertEqual(result.category, "Boodschappen")
-        XCTAssertEqual(result.standardizedName, nil) // highPriority has no standardizedName
-    }
+    // Note: Legacy CategorizationRule tests removed - use Rule model for new tests
 
     func testInlegDetectionPartner1() {
         let detector = ContributorDetector()

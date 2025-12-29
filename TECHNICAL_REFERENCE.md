@@ -463,12 +463,16 @@ FamilyFinanceApp.swift                    — 3,500+ lines, complete app archite
 ### **Views (Premium UI/UX)**
 ```
 Views/
-├── DashboardView.swift (650+ lines)     — Animated KPIs + charts + skeleton loading
+├── DashboardView.swift (750+ lines)     — Animated KPIs + charts + skeleton loading
 │   ├── EnhancedKPICard                  — Hover effects + number animations
 │   ├── AnimatedPercentage               — Smooth percentage transitions
 │   └── CategoryRow                      — Progress bars with animations
+├── SimpleRulesView.swift (1000+ lines)  — Firefly III-style rules UI
+│   ├── SimpleRuleEditorView             — Rule creation/editing
+│   ├── TriggerEditor                    — Condition builder with AND/OR
+│   └── ActionEditor                     — Smart pickers for categories/accounts
 ├── TransactionDetailView.swift (750+ lines) — Full editing with splits + audit
-└── ImportView.swift (200+ lines)       — Drag-drop CSV with progress bars
+└── ImportView.swift (200+ lines)        — Drag-drop CSV with progress bars
 ```
 
 ### **Services (Production-Ready)**
@@ -499,14 +503,15 @@ Models/
 │   │   └── generateUniqueKey()         — Prevents duplicates
 │   ├── Account                          — Real-time balance tracking
 │   ├── Category                         — Hierarchical + budget support
-│   ├── CategorizationRule               — Legacy rule system (backward compatible)
+│   ├── CategorizationRule               — Legacy rule system (for migration only)
 │   ├── TransactionSplit                 — Multi-category transactions
 │   └── RecurringTransaction             — Subscription tracking + forecasting
-└── RulesModels.swift (500+ lines)       — ✅ NEW: Firefly III-inspired rules system
+└── RulesModels.swift (750+ lines)       — ✅ ACTIVE: Firefly III-inspired rules system
     ├── RuleGroup                        — Rule organization with execution order
     ├── Rule                             — Trigger-action rule architecture
+    ├── TriggerGroup                     — Nested AND/OR condition groups
     ├── RuleTrigger                      — Advanced triggers (NOT logic, regex, dates)
-    ├── RuleAction                       — Comprehensive actions (15+ types)
+    ├── RuleAction                       — Comprehensive actions (19 types)
     └── Supporting Enums                 — TriggerField, TriggerOperator, ActionType
 ```
 

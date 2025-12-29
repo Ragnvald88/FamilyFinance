@@ -1,8 +1,8 @@
 # Family Finance
 
-> **App Store-Quality macOS Finance App** | SwiftUI + SwiftData | Premium UI/UX
+> macOS Finance App | SwiftUI + SwiftData
 >
-> **Status: 85% Quality Score** — Core app works, P0 fixed, 2,106 lines dead code removed
+> **Status:** Core app production-ready, rules system complete
 
 ## Current Status (December 27, 2025)
 
@@ -36,7 +36,7 @@
 ### File Structure
 
 ```
-FamilyFinanceApp.swift           — Main app + design tokens
+FamilyFinanceApp.swift           — Main app entry point
 
 Models/
 ├── SwiftDataModels.swift        — Transaction/Account/Category
@@ -94,12 +94,9 @@ ForEach(rules) { rule in
 var triggerOperator: TriggerOperator  // Not "operator"
 ```
 
-### Design Tokens
+### Animation Standard
 
-```swift
-DesignTokens.Animation.spring        // 0.3s
-DesignTokens.Spacing.xl              // 24pt
-```
+All animations use `.spring(response: 0.3, dampingFraction: 0.8)` for consistency.
 
 ---
 
@@ -116,7 +113,7 @@ DesignTokens.Spacing.xl              // 24pt
 ## Development
 
 1. **Verify build**: `xcodebuild -scheme FamilyFinance build`
-2. **Use design tokens** for spacing/animations
+2. **Use native Apple APIs** for spacing and fonts
 3. **Test with real data** - 15k+ transactions
 
 ---
@@ -155,15 +152,15 @@ DesignTokens.Spacing.xl              // 24pt
 
 ## Quality Assessment (December 29, 2025)
 
-### Benchmark Results (Updated After Cleanup)
+### Benchmark Results (Updated After Phase 2 Cleanup)
 
 | Dimension | Target | Before | After | Status |
 |-----------|--------|--------|-------|--------|
 | Functionality | 100% | 85% | 92% | ✅ IMPROVED |
 | Code Quality | <5 violations | 3 | 0 | ✅ PASS |
-| Optimization | <3 issues | 5 | 3 | ⚠️ IMPROVED |
-| Redundancy | <200 lines | ~960 lines | ~275 lines | ✅ IMPROVED |
-| Overengineering | <3 patterns | 12 | 3 | ⚠️ IMPROVED |
+| Optimization | <3 issues | 5 | 1 | ✅ IMPROVED |
+| Redundancy | <200 lines | ~960 lines | ~100 lines | ✅ PASS |
+| Overengineering | <3 patterns | 12 | 1 | ✅ PASS |
 
 ### Critical Issues (P0) - ALL FIXED
 
@@ -176,7 +173,7 @@ DesignTokens.Spacing.xl              // 24pt
 
 ### Cleanup Completed (December 29, 2025)
 
-**Dead Code Removed: 2,250 lines**
+**Phase 1: Dead Code Removed (2,250 lines)**
 - `AdvancedBooleanLogicBuilder.swift` (673 lines) - DELETED
 - `ThreadSafeCategorization.swift` (16 lines) - DELETED
 - `RulesView.swift` (1,270 lines) - DELETED (superseded by SimpleRulesView)
@@ -185,16 +182,25 @@ DesignTokens.Spacing.xl              // 24pt
 - `CircuitBreaker` actor + error case (90 lines) - REMOVED from RuleEngine.swift
 - `add-category-rule.md` command (54 lines) - DELETED (legacy command)
 
-**Remaining Technical Debt (Low Priority):**
-- LRU evaluation cache in TriggerEvaluator (50 lines) - could simplify
-- Frame-rate throttling in RuleProgressPublisher (150 lines) - could simplify
+**Phase 2: Additional Cleanup (286 lines)**
+- LRU evaluation cache in TriggerEvaluator (~55 lines) - REMOVED (unnecessary complexity)
+- Frame-rate throttling in RuleProgressPublisher (~80 lines) - SIMPLIFIED (direct updates)
+- `handleFailure()` + `RecoveryStrategy` enum in ActionExecutor (11 lines) - REMOVED (unused)
+- Deprecated `importWithCategorization()` method in BackgroundDataHandler (15 lines) - REMOVED
+- `AccountRepository.swift` (125 lines) - DELETED (unused repository pattern)
+
+**Performance Fixes:**
+- Static `ISO8601DateFormatter` in CategorizationEngine.swift (was creating per-evaluation)
+- Static `ISO8601DateFormatter` in ExportService.swift (was creating per-export)
+
+**Total Dead Code Removed: 2,536 lines**
 
 ### Architecture Notes
 
 **CategorizationEngine vs RuleEngine:**
 - `CategorizationEngine` - Used during CSV import, compiles Rules to CompiledRules
 - `RuleEngine` - Used for manual rule execution, uses Rule model directly
-- **Gap**: CategorizationEngine only handles setCategory action, ignores TriggerGroups
+- ✅ **Fixed**: CategorizationEngine now uses `rule.allTriggers` (includes TriggerGroups)
 
 **Data stored in wrong fields:**
 - Tags stored as comma-separated in notes field

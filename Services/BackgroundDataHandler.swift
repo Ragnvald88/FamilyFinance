@@ -71,22 +71,6 @@ actor BackgroundDataHandler {
 
     // MARK: - Transaction Import
 
-    /// Import transactions with categorization performed on background thread.
-    /// This is the preferred method - categorization happens inside the actor,
-    /// avoiding the MainActor bottleneck.
-    ///
-    /// - Parameters:
-    ///   - parsedTransactions: Array of parsed (uncategorized) transactions
-    ///   - rulesCache: Pre-built Sendable cache of categorization rules
-    /// - Returns: ImportResult with statistics including categorization counts
-    func importWithCategorization(
-        _ parsedTransactions: [ParsedTransaction],
-        rulesCache: Any // RulesCache - deprecated type
-    ) async throws -> Any { // ImportResultWithCategorization - deprecated type
-        // DEPRECATED METHOD - Use new CategorizationEngine.categorizeBulk() instead
-        fatalError("This method is deprecated. Use the new CategorizationEngine for categorization.")
-    }
-
     /// Import transactions from parsed CSV data with duplicate detection.
     /// - Parameter transactions: Array of transaction data to import
     /// - Returns: ImportResult with statistics on imported/skipped transactions

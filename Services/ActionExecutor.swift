@@ -909,20 +909,6 @@ class ActionErrorHandler {
         return "Failed to execute \(action.type.displayName): \(error.localizedDescription)"
     }
 
-    /// Handle failure with recovery strategy
-    func handleFailure(_ failure: ActionFailure,
-                      strategy: RecoveryStrategy) async -> RecoveryOption {
-        // For now, return the first recovery option
-        // In a full implementation, this could present UI choices or use automatic recovery
-        return failure.recoveryOptions.first ?? .skip
-    }
-}
-
-/// Recovery strategy for error handling
-enum RecoveryStrategy {
-    case automatic
-    case userChoice
-    case failFast
 }
 
 // Note: Array.chunked(into:) extension is defined in BackgroundDataHandler.swift

@@ -12,98 +12,30 @@ import SwiftUI
 import Charts
 @preconcurrency import SwiftData
 
-// MARK: - Design Tokens (App Store Quality Design System)
-
-struct DesignTokens {
-    struct Spacing {
-        static let xs: CGFloat = 4
-        static let s: CGFloat = 8
-        static let m: CGFloat = 12
-        static let l: CGFloat = 16
-        static let xl: CGFloat = 24
-        static let xxl: CGFloat = 32
-        static let xxxl: CGFloat = 40
-    }
-
-    struct CornerRadius {
-        static let small: CGFloat = 4
-        static let medium: CGFloat = 8
-        static let large: CGFloat = 12
-    }
-
-    struct Shadow {
-        static let primary = ShadowStyle(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
-        static let secondary = ShadowStyle(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
-        static let elevated = ShadowStyle(color: .black.opacity(0.12), radius: 8, x: 0, y: 4)
-    }
-
-    struct Animation {
-        static let spring = SwiftUI.Animation.spring(response: 0.3, dampingFraction: 0.8)
-        static let springFast = SwiftUI.Animation.spring(response: 0.2, dampingFraction: 0.8)
-        static let springSlow = SwiftUI.Animation.spring(response: 0.4, dampingFraction: 0.8)
-        static let numberTicker = SwiftUI.Animation.spring(response: 0.6, dampingFraction: 0.7)
-    }
-
-    struct Opacity {
-        static let light: Double = 0.1
-        static let medium: Double = 0.2
-        static let strong: Double = 0.3
-        static let overlay: Double = 0.8
-    }
-
-    struct Typography {
-        static let display = Font.system(size: 32, weight: .bold)
-        static let largeTitle = Font.system(size: 28, weight: .bold)
-        static let title = Font.system(size: 24, weight: .semibold)
-        static let headline = Font.headline.weight(.semibold)
-        static let body = Font.body
-        static let subheadline = Font.subheadline
-        static let caption = Font.caption
-        static let caption2 = Font.caption2
-        static let currencyLarge = Font.title2.monospacedDigit().weight(.bold)
-    }
-
-    struct Colors {
-        static let income = Color.green
-        static let expense = Color.red.opacity(0.85)
-        static let success = Color.green
-        static let error = Color.red
-        static let cardBackground = Color(nsColor: .controlBackgroundColor)
-        static let windowBackground = Color(nsColor: .windowBackgroundColor)
-    }
-}
-
-struct ShadowStyle {
-    let color: Color
-    let radius: CGFloat
-    let x: CGFloat
-    let y: CGFloat
-}
+// MARK: - View Modifiers (Native Apple APIs)
 
 extension View {
+    /// Standard card style using native macOS appearance
     func primaryCard() -> some View {
         self
-            .background(DesignTokens.Colors.cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.large))
-            .shadow(
-                color: DesignTokens.Shadow.primary.color,
-                radius: DesignTokens.Shadow.primary.radius,
-                x: DesignTokens.Shadow.primary.x,
-                y: DesignTokens.Shadow.primary.y
-            )
+            .background(Color(nsColor: .controlBackgroundColor))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
     }
 
+    /// Staggered appearance animation for list items
     func staggeredAppearance(index: Int, totalItems: Int) -> some View {
         self
             .opacity(1)
             .offset(y: 0)
             .animation(
-                DesignTokens.Animation.spring.delay(Double(index) * 0.05),
+                .spring(response: 0.3, dampingFraction: 0.8).delay(Double(index) * 0.05),
                 value: true
             )
     }
 }
 
+/// Animated currency display with spring animation
 struct AnimatedNumber: View {
     let value: Decimal
     let font: Font
@@ -115,46 +47,47 @@ struct AnimatedNumber: View {
             .font(font)
             .monospacedDigit()
             .onChange(of: value) { _, newValue in
-                withAnimation(DesignTokens.Animation.numberTicker) {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
                     displayValue = newValue
                 }
             }
             .onAppear {
-                withAnimation(DesignTokens.Animation.numberTicker.delay(0.3)) {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.3)) {
                     displayValue = value
                 }
             }
     }
 }
 
+/// Skeleton loading placeholder for cards
 struct SkeletonCard: View {
     @State private var isAnimating = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.m) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
-                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
+                RoundedRectangle(cornerRadius: 4)
                     .fill(Color.gray.opacity(isAnimating ? 0.3 : 0.2))
                     .frame(width: 24, height: 24)
 
                 Spacer()
 
-                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
+                RoundedRectangle(cornerRadius: 4)
                     .fill(Color.gray.opacity(isAnimating ? 0.2 : 0.1))
                     .frame(width: 60, height: 16)
             }
 
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
+            RoundedRectangle(cornerRadius: 4)
                 .fill(Color.gray.opacity(isAnimating ? 0.4 : 0.3))
                 .frame(height: 24)
                 .frame(maxWidth: 120, alignment: .leading)
 
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.small)
+            RoundedRectangle(cornerRadius: 4)
                 .fill(Color.gray.opacity(isAnimating ? 0.2 : 0.1))
                 .frame(height: 12)
                 .frame(maxWidth: 80, alignment: .leading)
         }
-        .padding(DesignTokens.Spacing.l)
+        .padding(16)
         .primaryCard()
         .onAppear {
             withAnimation(
@@ -2597,7 +2530,7 @@ struct OptimizedTransactionsView: View {
     }
 }
 
-// MARK: - Enhanced High-Performance Transaction Row (Desktop Polish)
+// MARK: - Transaction Row
 
 struct HighPerformanceTransactionRow: View {
     let transaction: Transaction
@@ -2606,119 +2539,111 @@ struct HighPerformanceTransactionRow: View {
     @State private var isHovered = false
 
     var body: some View {
-        HStack(spacing: DesignTokens.Spacing.m) {
-            // Type indicator with enhanced styling
+        HStack(spacing: 12) {
             Image(systemName: transaction.transactionType.icon)
-                .font(DesignTokens.Typography.title)
+                .font(.system(size: 24, weight: .semibold))
                 .foregroundStyle(typeColor)
                 .frame(width: 32)
                 .scaleEffect(isHovered ? 1.05 : 1.0)
-                .animation(DesignTokens.Animation.springFast, value: isHovered)
+                .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isHovered)
 
-            // Main content with improved spacing
-            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(transaction.standardizedName ?? transaction.counterName ?? "Unknown")
-                    .font(DesignTokens.Typography.subheadline)
+                    .font(.subheadline)
                     .fontWeight(.medium)
                     .lineLimit(1)
                     .truncationMode(.tail)
 
-                HStack(spacing: DesignTokens.Spacing.s) {
-                    // Enhanced category badge
+                HStack(spacing: 8) {
                     Text(transaction.effectiveCategory)
-                        .font(DesignTokens.Typography.caption2)
-                        .padding(.horizontal, DesignTokens.Spacing.s)
-                        .padding(.vertical, DesignTokens.Spacing.xs)
+                        .font(.caption2)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
                         .background(categoryBadgeBackground)
                         .foregroundStyle(categoryBadgeColor)
                         .clipShape(Capsule())
-                        .animation(DesignTokens.Animation.springFast, value: isHovered)
+                        .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isHovered)
 
                     Text(transaction.date.formatted(.dateTime.day().month(.abbreviated)))
-                        .font(DesignTokens.Typography.caption)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             }
 
             Spacer()
 
-            // Enhanced amount display
-            VStack(alignment: .trailing, spacing: DesignTokens.Spacing.xs) {
+            VStack(alignment: .trailing, spacing: 4) {
                 Text(transaction.amount.toCurrencyString())
-                    .font(DesignTokens.Typography.currencyLarge)
+                    .font(.title2.monospacedDigit().weight(.bold))
                     .foregroundStyle(amountColor)
                     .scaleEffect(isHovered ? 1.02 : 1.0)
-                    .animation(DesignTokens.Animation.springFast, value: isHovered)
+                    .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isHovered)
 
-                // Account indicator (subtle)
                 if let account = transaction.account {
                     Text(account.name.prefix(4))
-                        .font(DesignTokens.Typography.caption2)
+                        .font(.caption2)
                         .foregroundStyle(.tertiary)
                         .opacity(isHovered ? 1.0 : 0.7)
-                        .animation(DesignTokens.Animation.springFast, value: isHovered)
+                        .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isHovered)
                 }
             }
         }
-        .padding(.vertical, DesignTokens.Spacing.s)
-        .padding(.horizontal, DesignTokens.Spacing.l)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
         .background(rowBackground)
-        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
         .overlay(
-            // Subtle border highlight on hover
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+            RoundedRectangle(cornerRadius: 8)
                 .stroke(
                     Color.accentColor.opacity(isHovered ? 0.3 : 0.0),
                     lineWidth: 1
                 )
-                .animation(DesignTokens.Animation.springFast, value: isHovered)
+                .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isHovered)
         )
         .scaleEffect(isSelected ? 1.01 : (isHovered ? 1.005 : 1.0))
         .shadow(
-            color: isHovered ? DesignTokens.Shadow.secondary.color : Color.clear,
-            radius: isHovered ? DesignTokens.Shadow.secondary.radius : 0,
+            color: isHovered ? .black.opacity(0.05) : .clear,
+            radius: isHovered ? 2 : 0,
             x: 0,
-            y: isHovered ? DesignTokens.Shadow.secondary.y : 0
+            y: isHovered ? 1 : 0
         )
-        .animation(DesignTokens.Animation.springFast, value: isHovered)
-        .animation(DesignTokens.Animation.springFast, value: isSelected)
+        .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isHovered)
+        .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isSelected)
         .onHover { hovering in
-            withAnimation(DesignTokens.Animation.springFast) {
+            withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
                 isHovered = hovering
             }
         }
     }
 
-    // MARK: - Computed Properties
-
     private var typeColor: Color {
         switch transaction.transactionType {
-        case .income: return DesignTokens.Colors.income
-        case .expense: return DesignTokens.Colors.expense
+        case .income: return .green
+        case .expense: return .red.opacity(0.85)
         case .transfer: return .blue
         case .unknown: return .gray
         }
     }
 
     private var amountColor: Color {
-        transaction.amount >= 0 ? DesignTokens.Colors.income : .primary
+        transaction.amount >= 0 ? .green : .primary
     }
 
     private var rowBackground: Color {
         if isSelected {
-            return Color.accentColor.opacity(DesignTokens.Opacity.light)
+            return Color.accentColor.opacity(0.1)
         } else if isHovered {
-            return DesignTokens.Colors.cardBackground.opacity(0.8)
+            return Color(nsColor: .controlBackgroundColor).opacity(0.8)
         } else {
-            return DesignTokens.Colors.cardBackground.opacity(0.4)
+            return Color(nsColor: .controlBackgroundColor).opacity(0.4)
         }
     }
 
     private var categoryBadgeBackground: Color {
         if isHovered {
-            return Color.accentColor.opacity(DesignTokens.Opacity.medium)
+            return Color.accentColor.opacity(0.2)
         } else {
-            return Color.accentColor.opacity(DesignTokens.Opacity.light)
+            return Color.accentColor.opacity(0.1)
         }
     }
 
@@ -2798,9 +2723,9 @@ class OptimizedTransactionsViewModel: ObservableObject {
     }
 }
 
-// MARK: - Enhanced UI Components
+// MARK: - UI Components
 
-/// Enhanced search field with hover effects and smooth animations
+/// Search field with hover effects
 struct EnhancedSearchField: View {
     @Binding var text: String
     let placeholder: String
@@ -2809,16 +2734,16 @@ struct EnhancedSearchField: View {
     @State private var isFocused = false
 
     var body: some View {
-        HStack(spacing: DesignTokens.Spacing.s) {
+        HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(iconColor)
                 .scaleEffect(isFocused ? 1.1 : 1.0)
-                .animation(DesignTokens.Animation.springFast, value: isFocused)
+                .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isFocused)
 
             TextField(placeholder, text: $text)
                 .textFieldStyle(.plain)
                 .onFocus { focused in
-                    withAnimation(DesignTokens.Animation.springFast) {
+                    withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
                         isFocused = focused
                     }
                 }
@@ -2828,30 +2753,28 @@ struct EnhancedSearchField: View {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(.secondary)
                         .scaleEffect(isHovered ? 1.1 : 1.0)
-                        .animation(DesignTokens.Animation.springFast, value: isHovered)
+                        .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isHovered)
                 }
                 .buttonStyle(.plain)
                 .onHover { hovering in
-                    withAnimation(DesignTokens.Animation.springFast) {
+                    withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
                         isHovered = hovering
                     }
                 }
                 .transition(.scale.combined(with: .opacity))
             }
         }
-        .padding(DesignTokens.Spacing.s + 2)
+        .padding(10)
         .background(searchFieldBackground)
-        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
         .overlay(
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+            RoundedRectangle(cornerRadius: 8)
                 .stroke(borderColor, lineWidth: borderWidth)
         )
         .scaleEffect(isFocused ? 1.005 : 1.0)
-        .animation(DesignTokens.Animation.springFast, value: isFocused)
-        .animation(DesignTokens.Animation.springFast, value: !text.isEmpty)
+        .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isFocused)
+        .animation(.spring(response: 0.2, dampingFraction: 0.8), value: !text.isEmpty)
     }
-
-    // MARK: - Computed Properties
 
     private var iconColor: Color {
         isFocused ? Color.accentColor : .secondary
@@ -2859,9 +2782,9 @@ struct EnhancedSearchField: View {
 
     private var searchFieldBackground: Color {
         if isFocused {
-            return DesignTokens.Colors.cardBackground
+            return Color(nsColor: .controlBackgroundColor)
         } else {
-            return DesignTokens.Colors.cardBackground.opacity(0.8)
+            return Color(nsColor: .controlBackgroundColor).opacity(0.8)
         }
     }
 
@@ -2873,16 +2796,14 @@ struct EnhancedSearchField: View {
         isFocused ? 1 : 0
     }
 
-    // MARK: - Actions
-
     private func clearText() {
-        withAnimation(DesignTokens.Animation.springFast) {
+        withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
             text = ""
         }
     }
 }
 
-/// Enhanced button with hover and press feedback
+/// Button with hover and press feedback
 struct EnhancedButton: View {
     let title: String
     let icon: String?
@@ -2905,46 +2826,44 @@ struct EnhancedButton: View {
 
     var body: some View {
         Button(action: performAction) {
-            HStack(spacing: DesignTokens.Spacing.xs) {
+            HStack(spacing: 4) {
                 if let icon = icon {
                     Image(systemName: icon)
-                        .font(DesignTokens.Typography.caption)
+                        .font(.caption)
                 }
                 Text(title)
-                    .font(DesignTokens.Typography.subheadline)
+                    .font(.subheadline)
                     .fontWeight(.medium)
             }
-            .padding(.horizontal, DesignTokens.Spacing.m)
-            .padding(.vertical, DesignTokens.Spacing.s)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
             .background(buttonBackground)
             .foregroundStyle(buttonForeground)
-            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
             .overlay(
-                RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.medium)
+                RoundedRectangle(cornerRadius: 8)
                     .stroke(borderColor, lineWidth: borderWidth)
             )
         }
         .buttonStyle(.plain)
         .scaleEffect(isPressed ? 0.95 : (isHovered ? 1.02 : 1.0))
-        .animation(DesignTokens.Animation.springFast, value: isHovered)
-        .animation(DesignTokens.Animation.springFast, value: isPressed)
+        .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isHovered)
+        .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isPressed)
         .onHover { hovering in
-            withAnimation(DesignTokens.Animation.springFast) {
+            withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
                 isHovered = hovering
             }
         }
     }
-
-    // MARK: - Computed Properties
 
     private var buttonBackground: Color {
         switch style {
         case .primary:
             return isPressed ? Color.accentColor.opacity(0.9) : (isHovered ? Color.accentColor.opacity(0.9) : Color.accentColor)
         case .secondary:
-            return isPressed ? DesignTokens.Colors.cardBackground.opacity(0.8) : (isHovered ? DesignTokens.Colors.cardBackground : DesignTokens.Colors.cardBackground.opacity(0.8))
+            return isPressed ? Color(nsColor: .controlBackgroundColor).opacity(0.8) : (isHovered ? Color(nsColor: .controlBackgroundColor) : Color(nsColor: .controlBackgroundColor).opacity(0.8))
         case .clear:
-            return isHovered ? DesignTokens.Colors.cardBackground.opacity(0.5) : Color.clear
+            return isHovered ? Color(nsColor: .controlBackgroundColor).opacity(0.5) : Color.clear
         }
     }
 
@@ -2972,15 +2891,13 @@ struct EnhancedButton: View {
         style == .secondary ? 1 : 0
     }
 
-    // MARK: - Actions
-
     private func performAction() {
-        withAnimation(DesignTokens.Animation.springFast) {
+        withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
             isPressed = true
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            withAnimation(DesignTokens.Animation.springFast) {
+            withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
                 isPressed = false
             }
             action()

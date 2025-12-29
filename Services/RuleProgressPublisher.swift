@@ -108,7 +108,7 @@ final class RuleProgressPublisher: ObservableObject {
     /// Thread-safe - can be called from any thread or actor
     nonisolated func updateProgress(_ newProgress: RuleProcessingProgress) {
         Task { @MainActor in
-            withAnimation(DesignTokens.Animation.springFast) {
+            withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
                 self.progress = newProgress
             }
         }
@@ -117,7 +117,7 @@ final class RuleProgressPublisher: ObservableObject {
     /// Report a rule match for live preview during processing
     nonisolated func reportMatch(_ match: RuleMatchPreview) {
         Task { @MainActor in
-            withAnimation(DesignTokens.Animation.springFast) {
+            withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
                 self.recentMatches.append(match)
                 // Memory management: Keep only recent matches
                 if self.recentMatches.count > self.maxRecentMatches {
@@ -130,7 +130,7 @@ final class RuleProgressPublisher: ObservableObject {
     /// Report an error encountered during processing
     nonisolated func reportError(_ error: RuleProcessingError) {
         Task { @MainActor in
-            withAnimation(DesignTokens.Animation.springFast) {
+            withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
                 self.errors.append(error)
                 // Memory management: Keep only recent errors
                 if self.errors.count > self.maxDisplayErrors {
@@ -143,7 +143,7 @@ final class RuleProgressPublisher: ObservableObject {
     /// Update processing state (state changes are immediate - low frequency)
     nonisolated func setState(_ newState: ProcessingState) {
         Task { @MainActor in
-            withAnimation(DesignTokens.Animation.spring) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                 self.state = newState
             }
         }

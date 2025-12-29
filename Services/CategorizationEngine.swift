@@ -113,6 +113,12 @@ class CategorizationEngine {
     private var evaluationCount: Int = 0
     private var totalEvaluationTime: TimeInterval = 0
 
+    /// Static date formatter to avoid per-evaluation allocation
+    private static let iso8601Formatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        return formatter
+    }()
+
     // MARK: - Initialization
 
     init(modelContext: ModelContext) {
@@ -422,7 +428,7 @@ class CategorizationEngine {
         case .amount: return String(transaction.amount)
         case .account: return transaction.lowercaseAccount
         case .transactionType: return transaction.transactionType.lowercased()
-        case .date: return ISO8601DateFormatter().string(from: transaction.date).lowercased()
+        case .date: return Self.iso8601Formatter.string(from: transaction.date).lowercased()
         case .transactionCode: return transaction.transactionCode.lowercased()
         }
     }

@@ -176,7 +176,7 @@ struct SimpleRulesView: View {
     // MARK: - Empty State
 
     private var emptyState: some View {
-        VStack(spacing: DesignTokens.Spacing.l) {
+        VStack(spacing: 16) {
             Spacer()
 
             Image(systemName: "slider.horizontal.3")
@@ -363,7 +363,7 @@ struct SimpleRuleRow: View {
     @State private var isHovered = false
 
     var body: some View {
-        HStack(spacing: DesignTokens.Spacing.m) {
+        HStack(spacing: 12) {
             // Active indicator
             Circle()
                 .fill(rule.isActive ? Color.green : Color.orange)

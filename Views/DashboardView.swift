@@ -2,8 +2,7 @@
 //  DashboardView.swift
 //  Family Finance
 //
-//  Stunning Firefly III-inspired dashboard with KPIs, charts, and insights
-//  macOS-native design with smooth animations
+//  Dashboard with KPIs, charts, and insights
 //
 //  Created: 2025-12-22
 //
@@ -149,7 +148,7 @@ struct DashboardView: View {
             GridItem(.flexible()),
             GridItem(.flexible()),
             GridItem(.flexible())
-        ], spacing: DesignTokens.Spacing.l) {
+        ], spacing: 16) {
 
             if viewModel.isLoading && viewModel.kpis == nil {
                 // Skeleton loading states
@@ -198,7 +197,7 @@ struct DashboardView: View {
                 }
             }
         }
-        .animation(DesignTokens.Animation.spring, value: viewModel.kpis != nil)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: viewModel.kpis != nil)
     }
 
     // MARK: - Charts Section
@@ -325,37 +324,37 @@ struct DashboardView: View {
         Group {
             // Only show accounts section if there are accounts with actual data
             if let accounts = viewModel.accountBalances, !accounts.isEmpty {
-                VStack(alignment: .leading, spacing: DesignTokens.Spacing.m) {
+                VStack(alignment: .leading, spacing: 12) {
                     Text("Accounts")
-                        .font(DesignTokens.Typography.headline)
+                        .font(.headline)
                         .foregroundStyle(.primary)
 
-                    LazyVStack(spacing: DesignTokens.Spacing.s) {
+                    LazyVStack(spacing: 8) {
                         ForEach(accounts) { account in
                             AccountRow(account: account)
                         }
                     }
                 }
-                .padding(DesignTokens.Spacing.l)
+                .padding(16)
             } else {
                 // Show empty state guidance
-                VStack(spacing: DesignTokens.Spacing.l) {
+                VStack(spacing: 16) {
                     Image(systemName: "building.columns.circle")
                         .font(.system(size: 48))
                         .foregroundStyle(.secondary)
 
-                    VStack(spacing: DesignTokens.Spacing.s) {
+                    VStack(spacing: 8) {
                         Text("No Bank Accounts Yet")
-                            .font(DesignTokens.Typography.headline)
+                            .font(.headline)
                             .foregroundStyle(.primary)
 
                         Text("Use the Import tab in the sidebar to add your bank statements")
-                            .font(DesignTokens.Typography.subheadline)
+                            .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
                     }
                 }
-                .padding(DesignTokens.Spacing.xl)
+                .padding(24)
                 .frame(maxWidth: .infinity)
             }
         }
@@ -452,9 +451,9 @@ struct DashboardView: View {
     }
 }
 
-// MARK: - Enhanced KPI Card Component (App Store Quality)
+// MARK: - KPI Card Component
 
-/// Enhanced KPI card with animations, hover effects, and design tokens
+/// KPI card with hover effects and spring animations
 struct EnhancedKPICard: View {
     let title: String
     let value: Decimal?
@@ -478,47 +477,40 @@ struct EnhancedKPICard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.m) {
-            // Header with icon and trend
+        VStack(alignment: .leading, spacing: 12) {
             headerSection
-
-            // Value section with animated numbers
             valueSection
         }
-        .padding(DesignTokens.Spacing.l)
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(cardBackground)
         .primaryCard()
         .scaleEffect(isHovered ? 1.02 : 1.0)
         .shadow(
-            color: isHovered ? DesignTokens.Shadow.elevated.color : DesignTokens.Shadow.primary.color,
-            radius: isHovered ? DesignTokens.Shadow.elevated.radius : DesignTokens.Shadow.primary.radius,
+            color: isHovered ? .black.opacity(0.12) : .black.opacity(0.08),
+            radius: isHovered ? 8 : 4,
             x: 0,
-            y: isHovered ? DesignTokens.Shadow.elevated.y : DesignTokens.Shadow.primary.y
+            y: isHovered ? 4 : 2
         )
-        .animation(DesignTokens.Animation.springFast, value: isHovered)
+        .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isHovered)
         .onHover { hovering in
-            withAnimation(DesignTokens.Animation.springFast) {
+            withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
                 isHovered = hovering
             }
         }
         .opacity(hasAppeared ? 1.0 : 0.0)
         .offset(y: hasAppeared ? 0 : 20)
         .onAppear {
-            withAnimation(
-                DesignTokens.Animation.spring.delay(Double(index) * 0.1)
-            ) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8).delay(Double(index) * 0.1)) {
                 hasAppeared = true
             }
         }
     }
 
-    // MARK: - Header Section
-
     private var headerSection: some View {
         HStack {
             Image(systemName: icon)
-                .font(DesignTokens.Typography.title.bold())
+                .font(.system(size: 24, weight: .semibold))
                 .foregroundStyle(color)
 
             Spacer()
@@ -529,56 +521,46 @@ struct EnhancedKPICard: View {
         }
     }
 
-    // MARK: - Value Section
-
     private var valueSection: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(title)
-                .font(DesignTokens.Typography.caption)
+                .font(.caption)
                 .foregroundStyle(.secondary)
 
-            // Animated value display
             if let value = value {
                 AnimatedNumber(
                     value: value,
-                    font: DesignTokens.Typography.currencyLarge
+                    font: .title2.monospacedDigit().weight(.bold)
                 )
             } else if let percentage = percentage {
                 AnimatedPercentage(
                     value: percentage,
-                    font: DesignTokens.Typography.currencyLarge
+                    font: .title2.monospacedDigit().weight(.bold)
                 )
             }
         }
     }
 
-    // MARK: - Trend Indicator
-
     private func trendIndicator(trend: Double) -> some View {
-        HStack(spacing: DesignTokens.Spacing.xs) {
+        HStack(spacing: 4) {
             Image(systemName: trend >= 0 ? "arrow.up.right" : "arrow.down.right")
-                .font(DesignTokens.Typography.caption2)
+                .font(.caption2)
             Text(String(format: "%.1f%%", abs(trend)))
-                .font(DesignTokens.Typography.caption2)
+                .font(.caption2)
                 .fontWeight(.medium)
         }
-        .foregroundStyle(trend >= 0 ? DesignTokens.Colors.success : DesignTokens.Colors.error)
-        .padding(.horizontal, DesignTokens.Spacing.s)
-        .padding(.vertical, DesignTokens.Spacing.xs)
-        .background(
-            (trend >= 0 ? DesignTokens.Colors.success : DesignTokens.Colors.error)
-                .opacity(DesignTokens.Opacity.light)
-        )
+        .foregroundStyle(trend >= 0 ? .green : .red)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background((trend >= 0 ? Color.green : Color.red).opacity(0.1))
         .clipShape(Capsule())
     }
 
-    // MARK: - Card Background
-
     private var cardBackground: Color {
         if isHovered {
-            return DesignTokens.Colors.cardBackground.opacity(0.95)
+            return Color(nsColor: .controlBackgroundColor).opacity(0.95)
         } else {
-            return DesignTokens.Colors.cardBackground
+            return Color(nsColor: .controlBackgroundColor)
         }
     }
 }
@@ -598,12 +580,12 @@ struct AnimatedPercentage: View {
             .fontWeight(.bold)
             .foregroundStyle(.primary)
             .onChange(of: value) { _, newValue in
-                withAnimation(DesignTokens.Animation.numberTicker) {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
                     displayValue = newValue
                 }
             }
             .onAppear {
-                withAnimation(DesignTokens.Animation.numberTicker.delay(0.5)) {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.5)) {
                     displayValue = value
                 }
             }

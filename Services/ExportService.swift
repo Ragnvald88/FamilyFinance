@@ -33,6 +33,12 @@ class ExportService: ObservableObject {
     @Published var isExporting = false
     @Published var exportProgress: Double = 0
 
+    /// Static date formatter to avoid per-export allocation
+    private static let iso8601Formatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        return formatter
+    }()
+
     // MARK: - Initialization
 
     init(modelContext: ModelContext) {
@@ -116,7 +122,7 @@ class ExportService: ObservableObject {
             [
                 "iban": transaction.iban,
                 "sequenceNumber": transaction.sequenceNumber,
-                "date": ISO8601DateFormatter().string(from: transaction.date),
+                "date": Self.iso8601Formatter.string(from: transaction.date),
                 "amount": NSDecimalNumber(decimal: transaction.amount).doubleValue,
                 "balance": NSDecimalNumber(decimal: transaction.balance).doubleValue,
                 "counterIBAN": transaction.counterIBAN as Any,

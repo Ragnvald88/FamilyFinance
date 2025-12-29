@@ -180,11 +180,12 @@ class CSVImportService: ObservableObject {
     nonisolated static let maxFileSizeBytes = 50_000_000
 
     /// Supported encodings for CSV files (try in order)
+    /// UTF-8 first (modern), then Windows-1252 (common for Dutch banking exports)
     /// Made nonisolated static for background thread access
     private nonisolated static let supportedEncodings: [String.Encoding] = [
-        .isoLatin1,     // Primary encoding for Rabobank
-        .windowsCP1252, // Fallback for Windows
-        .utf8           // Modern fallback
+        .utf8,          // Modern encoding (try first)
+        .windowsCP1252, // Common for Dutch banking exports (Windows default)
+        .isoLatin1      // Legacy fallback
     ]
 
     /// Rabobank CSV column indices (26 columns total)
@@ -374,6 +375,7 @@ class CSVImportService: ObservableObject {
 
     /// Parse all CSV files in background to avoid blocking MainActor.
     /// Updates progress on MainActor via explicit hops.
+    /// Returns transactions AND any row-level parse errors (resilient - doesn't fail on bad rows).
     private func parseFilesInBackground(_ urls: [URL]) async -> ParsingResult {
         // Capture what we need for background work
         let urlCount = urls.count
@@ -382,6 +384,7 @@ class CSVImportService: ObservableObject {
         let result = await Task.detached(priority: .userInitiated) { [self] in
             var transactions: [ParsedTransaction] = []
             var errors: [CSVImportError] = []
+            var totalRowErrors = 0
 
             for (index, url) in urls.enumerated() {
                 // Update progress on MainActor
@@ -396,13 +399,26 @@ class CSVImportService: ObservableObject {
 
                 do {
                     // parseCSVFile is nonisolated - runs on this background thread
-                    let parsed = try Self.parseCSVFile(url, sourceFile: url.lastPathComponent)
-                    transactions.append(contentsOf: parsed)
+                    // Now returns ParseFileResult with transactions AND row errors
+                    let result = try Self.parseCSVFile(url, sourceFile: url.lastPathComponent)
+                    transactions.append(contentsOf: result.transactions)
+
+                    // Track row-level errors
+                    if !result.rowErrors.isEmpty {
+                        totalRowErrors += result.rowErrors.count
+                        // Add summary error for visibility
+                        errors.append(.warning("\(url.lastPathComponent): \(result.rowErrors.count) rows skipped due to parse errors"))
+                    }
                 } catch let error as CSVImportError {
                     errors.append(error)
                 } catch {
                     errors.append(.fileReadFailed(url.lastPathComponent, error.localizedDescription))
                 }
+            }
+
+            // Log summary
+            if totalRowErrors > 0 {
+                print("⚠️ Import completed with \(totalRowErrors) row-level parse errors (transactions still imported)")
             }
 
             return ParsingResult(transactions: transactions, errors: errors)
@@ -413,9 +429,16 @@ class CSVImportService: ObservableObject {
 
     // MARK: - CSV Parsing (nonisolated static - runs on background thread)
 
+    /// Result of parsing a single CSV file
+    private struct ParseFileResult: Sendable {
+        let transactions: [ParsedTransaction]
+        let rowErrors: [String]  // Row-level parse errors
+    }
+
     /// Parse a single CSV file with automatic encoding detection.
+    /// Returns transactions AND row-level errors (resilient parsing - doesn't fail on bad rows).
     /// Made `nonisolated static` to allow calling from background Task.detached
-    private nonisolated static func parseCSVFile(_ url: URL, sourceFile: String) throws -> [ParsedTransaction] {
+    private nonisolated static func parseCSVFile(_ url: URL, sourceFile: String) throws -> ParseFileResult {
         // Check file size before loading (prevent memory exhaustion)
         let fileAttributes = try? FileManager.default.attributesOfItem(atPath: url.path)
         if let fileSize = fileAttributes?[.size] as? Int, fileSize > Self.maxFileSizeBytes {
@@ -426,14 +449,16 @@ class CSVImportService: ObservableObject {
             )
         }
 
-        // Try each encoding until one works
+        // Fuzzy encoding detection: try each encoding until one produces valid content
         var csvContent: String?
+        var detectedEncoding: String.Encoding?
 
         for encoding in supportedEncodings {
             if let content = try? String(contentsOf: url, encoding: encoding) {
-                // Validate the content looks like valid CSV
+                // Validate content looks like valid Rabobank CSV (header check)
                 if content.contains("IBAN") || content.contains("Volgnr") || content.contains("Datum") {
                     csvContent = content
+                    detectedEncoding = encoding
                     break
                 }
             }
@@ -443,9 +468,15 @@ class CSVImportService: ObservableObject {
             throw CSVImportError.encodingNotSupported(url.lastPathComponent)
         }
 
-        // Parse CSV lines
+        // Log encoding used for debugging
+        let encodingName = detectedEncoding == .utf8 ? "UTF-8" :
+                          detectedEncoding == .windowsCP1252 ? "Windows-1252" : "ISO-8859-1"
+        print("📄 \(sourceFile): Using \(encodingName) encoding")
+
+        // Parse CSV lines with resilient error handling
         let lines = content.components(separatedBy: .newlines)
         var transactions: [ParsedTransaction] = []
+        var rowErrors: [String] = []
 
         for (lineIndex, line) in lines.enumerated() {
             // Skip header and empty lines
@@ -459,17 +490,20 @@ class CSVImportService: ObservableObject {
                 continue
             }
 
+            // Resilient parsing: catch errors per row, log them, continue
             do {
                 if let transaction = try parseCSVLine(trimmedLine, rowNumber: lineIndex + 1, sourceFile: sourceFile) {
                     transactions.append(transaction)
                 }
             } catch {
-                // Log but continue - don't abort entire import for one bad row
-                print("⚠️ Row \(lineIndex + 1): \(error.localizedDescription)")
+                // Track error but continue processing
+                let errorMsg = "Row \(lineIndex + 1): \(error.localizedDescription)"
+                rowErrors.append(errorMsg)
+                print("⚠️ \(sourceFile): \(errorMsg)")
             }
         }
 
-        return transactions
+        return ParseFileResult(transactions: transactions, rowErrors: rowErrors)
     }
 
     /// Parse a single CSV line using custom parser (handles Rabobank quirks).

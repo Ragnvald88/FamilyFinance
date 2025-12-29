@@ -2,23 +2,12 @@
 //  RuleProgressPublisher.swift
 //  Family Finance
 //
-//  Real-time progress reporting with 30fps throttling
-//  UX Engineering Lead recommendation for maintaining UI responsiveness
+//  Real-time progress reporting for rule processing
 //
 //  Features:
-//  - Frame-rate aware progress updates (30fps = 33ms intervals)
-//  - Batched updates to prevent UI thread saturation
 //  - Real-time rule match previews during processing
 //  - Cooperative cancellation support
-//  - Progressive error disclosure with severity levels
-//  - Memory-efficient match preview management
-//
-//  Architecture: Three-layer system:
-//  • UI Layer: Observes lightweight progress models
-//  • Aggregation Layer: Batches updates at controlled frequency
-//  • Processing Layer: Emits raw progress events
-//
-//  Created: 2025-12-26
+//  - Memory-efficient match preview management (max 100 matches, 50 errors)
 //
 
 import Foundation
@@ -102,16 +91,6 @@ final class RuleProgressPublisher: ObservableObject {
 
     // MARK: - Private State
 
-    private var pendingProgress: RuleProcessingProgress?
-    private var pendingMatches: [RuleMatchPreview] = []
-    private var pendingErrors: [RuleProcessingError] = []
-    private var updateTask: Task<Void, Never>?
-    private var lastUpdateTime: Date = .distantPast
-
-    /// UX Expert: Minimum interval between UI updates (30fps = 33ms)
-    /// Ensures smooth animations without overwhelming the main thread
-    private let minimumUpdateInterval: TimeInterval = 0.033
-
     /// Maximum matches to keep in memory (prevent memory growth during bulk operations)
     private let maxRecentMatches = 100
 
@@ -129,21 +108,35 @@ final class RuleProgressPublisher: ObservableObject {
     /// Thread-safe - can be called from any thread or actor
     nonisolated func updateProgress(_ newProgress: RuleProcessingProgress) {
         Task { @MainActor in
-            await self.scheduleProgressUpdate(newProgress)
+            withAnimation(DesignTokens.Animation.springFast) {
+                self.progress = newProgress
+            }
         }
     }
 
     /// Report a rule match for live preview during processing
     nonisolated func reportMatch(_ match: RuleMatchPreview) {
         Task { @MainActor in
-            await self.scheduleMatchUpdate(match)
+            withAnimation(DesignTokens.Animation.springFast) {
+                self.recentMatches.append(match)
+                // Memory management: Keep only recent matches
+                if self.recentMatches.count > self.maxRecentMatches {
+                    self.recentMatches = Array(self.recentMatches.suffix(self.maxRecentMatches))
+                }
+            }
         }
     }
 
     /// Report an error encountered during processing
     nonisolated func reportError(_ error: RuleProcessingError) {
         Task { @MainActor in
-            await self.scheduleErrorUpdate(error)
+            withAnimation(DesignTokens.Animation.springFast) {
+                self.errors.append(error)
+                // Memory management: Keep only recent errors
+                if self.errors.count > self.maxDisplayErrors {
+                    self.errors = Array(self.errors.suffix(self.maxDisplayErrors))
+                }
+            }
         }
     }
 
@@ -181,97 +174,7 @@ final class RuleProgressPublisher: ObservableObject {
         progress = .initial
         recentMatches = []
         errors = []
-        pendingProgress = nil
-        pendingMatches = []
-        pendingErrors = []
         isCancelled = false
-        updateTask?.cancel()
-        updateTask = nil
-    }
-
-    // MARK: - Private Update Scheduling (UX Expert: Frame-Rate Aware Batching)
-
-    private func scheduleProgressUpdate(_ newProgress: RuleProcessingProgress) async {
-        pendingProgress = newProgress
-        scheduleFlush()
-    }
-
-    private func scheduleMatchUpdate(_ match: RuleMatchPreview) async {
-        pendingMatches.append(match)
-
-        // Memory management: Keep only recent matches
-        if pendingMatches.count > maxRecentMatches {
-            pendingMatches.removeFirst(pendingMatches.count - maxRecentMatches)
-        }
-        scheduleFlush()
-    }
-
-    private func scheduleErrorUpdate(_ error: RuleProcessingError) async {
-        pendingErrors.append(error)
-
-        // Memory management: Keep only recent errors
-        if pendingErrors.count > maxDisplayErrors {
-            pendingErrors.removeFirst()
-        }
-        scheduleFlush()
-    }
-
-    /// Central scheduling logic for frame-rate aware updates
-    private func scheduleFlush() {
-        // Cancel existing scheduled update
-        updateTask?.cancel()
-
-        let timeSinceLastUpdate = Date().timeIntervalSince(lastUpdateTime)
-
-        if timeSinceLastUpdate >= minimumUpdateInterval {
-            // Enough time has passed since last update
-            flushPendingUpdates()
-        } else {
-            // Schedule update for next available frame
-            let delay = minimumUpdateInterval - timeSinceLastUpdate
-            updateTask = Task {
-                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-                if !Task.isCancelled {
-                    await MainActor.run {
-                        self.flushPendingUpdates()
-                    }
-                }
-            }
-        }
-    }
-
-    /// Flush all pending updates in a single animation frame
-    private func flushPendingUpdates() {
-        lastUpdateTime = Date()
-
-        // Batch all pending updates into a single animation to prevent frame drops
-        withAnimation(DesignTokens.Animation.springFast) {
-            // Update progress
-            if let newProgress = pendingProgress {
-                self.progress = newProgress
-                pendingProgress = nil
-            }
-
-            // Update matches feed
-            if !pendingMatches.isEmpty {
-                var allMatches = recentMatches + pendingMatches
-                if allMatches.count > maxRecentMatches {
-                    allMatches = Array(allMatches.suffix(maxRecentMatches))
-                }
-                self.recentMatches = allMatches
-                pendingMatches = []
-            }
-
-            // Update errors list
-            if !pendingErrors.isEmpty {
-                var allErrors = errors + pendingErrors
-                if allErrors.count > maxDisplayErrors {
-                    allErrors = Array(allErrors.suffix(maxDisplayErrors))
-                }
-                self.errors = allErrors
-                pendingErrors = []
-            }
-        }
     }
 }
 

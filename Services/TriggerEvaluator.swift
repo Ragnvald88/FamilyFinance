@@ -2,24 +2,17 @@
 //  TriggerEvaluator.swift
 //  Family Finance
 //
-//  Phase 2: Component 5/8 - Advanced trigger evaluation system
-//  Implements expert-approved architecture with adaptive parallelization
+//  Trigger evaluation system with adaptive parallelization
 //
-//  Architecture Features:
+//  Architecture:
 //  • @ModelActor with TaskGroup for thread-safe parallel processing
 //  • Adaptive strategy: sequential <10 triggers, batched parallel for larger sets
-//  • Two-level caching: LRU evaluation cache + regex compilation cache
-//  • Hybrid field access: direct model properties with cached computed values
-//  • Multi-layer error handling: validation + graceful degradation + logging
+//  • Regex compilation cache for pattern matching
 //  • Fast paths for common operations (equals, contains, numeric comparisons)
 //
-//  Performance Targets:
+//  Performance:
 //  • Single trigger evaluation: <1ms
 //  • 100+ triggers in parallel: <10ms
-//  • Regex compilation cached for repeated patterns
-//  • LRU cache hit ratio >80% in normal usage
-//
-//  Created: 2025-12-26
 //
 
 import SwiftData
@@ -44,9 +37,6 @@ actor TriggerEvaluator {
 
     /// Compiled regex cache for pattern matching
     private static let regexCache = RegexCache()
-
-    /// LRU cache for evaluation results (cache key: operator:value:fieldValue)
-    private static let evaluationCache = LRUCache<String, Bool>(capacity: 5000)
 
     // MARK: - Public Interface
 
@@ -231,30 +221,12 @@ actor TriggerEvaluator {
                 result = false
             }
         default:
-            // Use cached evaluation for complex operations
-            result = await evaluateWithCache(trigger.triggerOperator, value: trigger.value, fieldValue: fieldValue)
+            // Direct evaluation - simple string operations don't benefit from caching
+            result = await evaluateOperator(trigger.triggerOperator, value: trigger.value, fieldValue: fieldValue)
         }
 
         // Apply NOT logic if inverted
         return trigger.isInverted ? !result : result
-    }
-
-    /// Evaluate with caching for performance
-    private func evaluateWithCache(_ triggerOp: TriggerOperator, value: String, fieldValue: String) async -> Bool {
-        // Create cache key (truncate field value to prevent huge keys)
-        let truncatedFieldValue = String(fieldValue.prefix(50))
-        let cacheKey = "\(triggerOp.rawValue):\(value):\(truncatedFieldValue)"
-
-        // Check cache first
-        if let cached = await Self.evaluationCache.get(cacheKey) {
-            return cached
-        }
-
-        // Evaluate and cache result
-        let result = await evaluateOperator(triggerOp, value: value, fieldValue: fieldValue)
-        await Self.evaluationCache.set(cacheKey, value: result)
-
-        return result
     }
 
     // MARK: - Field Extraction
@@ -495,60 +467,6 @@ actor RegexCache {
 
         cache[pattern] = regex
         return regex
-    }
-}
-
-/// Thread-safe LRU cache implementation
-/// @unchecked Sendable because internal synchronization via DispatchQueue
-final class LRUCache<Key: Hashable & Sendable, Value: Sendable>: @unchecked Sendable {
-    private let capacity: Int
-    private var cache: [Key: Value] = [:]
-    private var accessOrder: [Key] = []
-    private let queue = DispatchQueue(label: "LRUCache", qos: .userInitiated)
-
-    init(capacity: Int) {
-        self.capacity = capacity
-    }
-
-    func get(_ key: Key) async -> Value? {
-        return await withCheckedContinuation { continuation in
-            queue.async {
-                let value = self.cache[key]
-                if value != nil {
-                    // Move to front (most recently used)
-                    self.accessOrder.removeAll { $0 == key }
-                    self.accessOrder.append(key)
-                }
-                continuation.resume(returning: value)
-            }
-        }
-    }
-
-    func set(_ key: Key, value: Value) async {
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            queue.async {
-                if self.cache[key] != nil {
-                    // Update existing
-                    self.cache[key] = value
-                    self.accessOrder.removeAll { $0 == key }
-                    self.accessOrder.append(key)
-                } else {
-                    // Add new
-                    if self.cache.count >= self.capacity {
-                        // Evict least recently used
-                        if let lru = self.accessOrder.first {
-                            self.accessOrder.removeFirst()
-                            self.cache.removeValue(forKey: lru)
-                        }
-                    }
-
-                    self.cache[key] = value
-                    self.accessOrder.append(key)
-                }
-
-                continuation.resume()
-            }
-        }
     }
 }
 

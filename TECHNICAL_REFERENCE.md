@@ -503,7 +503,6 @@ Models/
 │   │   └── generateUniqueKey()         — Prevents duplicates
 │   ├── Account                          — Real-time balance tracking
 │   ├── Category                         — Hierarchical + budget support
-│   ├── CategorizationRule               — Legacy rule system (for migration only)
 │   ├── TransactionSplit                 — Multi-category transactions
 │   └── RecurringTransaction             — Subscription tracking + forecasting
 └── RulesModels.swift (750+ lines)       — ✅ ACTIVE: Firefly III-inspired rules system

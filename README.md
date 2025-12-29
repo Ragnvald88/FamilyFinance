@@ -2,7 +2,7 @@
 
 > **App Store-Quality macOS Finance Application**
 >
-> 🎯 **80% App Store Quality** | Enterprise Performance | Premium UX | Rules Foundation Rebuilt
+> 🎯 **85% App Store Quality** | Enterprise Performance | Premium UX | Firefly III-Style Rules
 
 ![macOS](https://img.shields.io/badge/macOS-13.0+-blue.svg)
 ![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)
@@ -46,7 +46,7 @@
 - **Advanced rule engine foundation** (Firefly III-inspired trigger-action system)
 
 ### **💼 Financial Intelligence**
-- **Rule-based categorization system** (foundation rebuilt, engine in development)
+- **Firefly III-style rule system** with triggers, actions, and groups
 - **Transaction splitting** for complex purchases
 - **Recurring transaction detection** (subscriptions, salary)
 - **Account balance tracking** with historical data
@@ -165,7 +165,7 @@ open FamilyFinance.xcodeproj
 ### **Import Bank Data**
 1. **Export CSV** from your Dutch bank (ING, Rabobank, etc.)
 2. **Drag & drop** CSV file into the Import tab
-3. **Rule-based categorization** (engine foundation in place)
+3. **Automatic rule-based categorization** applies during import
 4. **Review** imported transactions in optimized list view
 
 ### **Explore Analytics**

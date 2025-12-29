@@ -253,10 +253,16 @@ class CategorizationEngine {
     }
 
     /// Convert NEW Rule model to CompiledRule format for evaluation
+    /// Note: Only rules with setCategory action are compiled. Other action types
+    /// (addTag, setNotes, etc.) require manual rule execution after import.
     private func compileNewRule(_ rule: Rule) -> CompiledRule? {
         // Only process rules that have a setCategory action
         guard let setCategoryAction = rule.actions.first(where: { $0.type == .setCategory }) else {
-            return nil // Skip rules without setCategory (those are handled by RuleEngine later)
+            // Log skipped rules for transparency (not silent drop)
+            if rule.isActive && !rule.actions.isEmpty {
+                print("ℹ️ Rule '\(rule.name)' skipped during import (no setCategory action). Use 'Run Rules' after import for other actions.")
+            }
+            return nil
         }
 
         // Use allTriggers to include both flat triggers AND triggers from TriggerGroups

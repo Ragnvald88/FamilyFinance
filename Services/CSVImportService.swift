@@ -278,7 +278,7 @@ class CSVImportService: ObservableObject {
 
         let allParsedTransactions = parsingResult.transactions
         let totalRows = allParsedTransactions.count
-        let errors = parsingResult.errors
+        var errors = parsingResult.errors
 
         // Phase 2: Build rules cache (fast, on MainActor - needs ModelContext)
         progress = CSVImportProgress(
@@ -334,6 +334,13 @@ class CSVImportService: ObservableObject {
         // Calculate categorization statistics from our results
         let categorizedCount = categorizationResults.filter { $0.category != nil }.count
         let uncategorizedCount = categorizationResults.count - categorizedCount
+
+        // Warn if categorization rate is 0% but we have transactions
+        // This may indicate rule fetching failed or no rules are configured
+        if categorizedCount == 0 && !allParsedTransactions.isEmpty {
+            errors.append(.warning("No transactions were categorized. Check that rules are configured with 'Set Category' action."))
+            print("⚠️ Import complete but 0% categorization. Possible causes: no rules, rules without setCategory action, or rule fetch error.")
+        }
 
         progress = CSVImportProgress(
             processedRows: importResult.imported,
@@ -815,6 +822,7 @@ enum CSVImportError: Error, LocalizedError, Sendable {
     case saveFailed(String)
     case fileTooLarge(String, Int, Int)
     case invalidIBAN(String, String)
+    case warning(String)
 
     var errorDescription: String? {
         switch self {
@@ -834,6 +842,8 @@ enum CSVImportError: Error, LocalizedError, Sendable {
             return "File \(filename) is too large (\(String(format: "%.1f", actualMB))MB). Maximum size is \(String(format: "%.0f", maxMB))MB"
         case .invalidIBAN(let iban, let reason):
             return "Invalid IBAN '\(iban)': \(reason)"
+        case .warning(let message):
+            return "Warning: \(message)"
         }
     }
 }

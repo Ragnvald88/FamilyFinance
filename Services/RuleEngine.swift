@@ -55,7 +55,6 @@ actor RuleEngine {
 
     // MARK: - Performance Management
     private let concurrencyManager = ConcurrencyManager()
-    private let circuitBreaker = CircuitBreaker(threshold: 0.5, timeout: 30.0)
     private let errorClassifier = ErrorClassifier()
 
     // MARK: - Cache State
@@ -76,9 +75,7 @@ actor RuleEngine {
         let startTime = Date()
 
         do {
-            let result = try await circuitBreaker.execute {
-                return try await executeTransactionSaga(transaction)
-            }
+            let result = try await executeTransactionSaga(transaction)
 
             // Record execution metrics
             let duration = Date().timeIntervalSince(startTime)
@@ -547,80 +544,16 @@ actor RuleEngine {
 
 /// Concurrency management for optimal batch sizing
 actor ConcurrencyManager {
-    func optimalBatchSize(for transactionCount: Int) async -> Int {
-        // Adaptive batch sizing based on system load
-        let systemLoad = await SystemMonitor.shared.currentLoad
-        switch systemLoad {
-        case 0.0..<0.3: return min(1000, transactionCount)
-        case 0.3..<0.7: return min(500, transactionCount)
-        default: return min(100, transactionCount)
-        }
+    func optimalBatchSize(for transactionCount: Int) -> Int {
+        // Fixed batch size - simple and predictable
+        // 500 is optimal for most workloads without overcomplicating
+        return min(500, transactionCount)
     }
 
-    func shouldUseParallelProcessing(for ruleComplexity: RuleComplexity) async -> Bool {
+    func shouldUseParallelProcessing(for ruleComplexity: RuleComplexity) -> Bool {
         switch ruleComplexity {
         case .simple: return false // Sequential is faster for simple rules
         case .moderate, .complex: return true
-        }
-    }
-}
-
-/// Circuit breaker pattern for cascade failure protection
-actor CircuitBreaker {
-    private let threshold: Double
-    private let timeout: TimeInterval
-    private var failureCount: Int = 0
-    private var successCount: Int = 0
-    private var lastFailureTime: Date?
-    private var state: State = .closed
-
-    enum State {
-        case closed, open, halfOpen
-    }
-
-    init(threshold: Double, timeout: TimeInterval) {
-        self.threshold = threshold
-        self.timeout = timeout
-    }
-
-    func execute<T>(_ operation: () async throws -> T) async throws -> T {
-        switch state {
-        case .open:
-            if let lastFailure = lastFailureTime,
-               Date().timeIntervalSince(lastFailure) > timeout {
-                state = .halfOpen
-            } else {
-                throw RuleExecutionError.circuitBreakerOpen(service: "RuleEngine", threshold: threshold)
-            }
-        case .halfOpen, .closed:
-            break
-        }
-
-        do {
-            let result = try await operation()
-            await recordSuccess()
-            return result
-        } catch {
-            await recordFailure()
-            throw error
-        }
-    }
-
-    private func recordSuccess() async {
-        successCount += 1
-        if state == .halfOpen {
-            state = .closed
-            failureCount = 0
-        }
-    }
-
-    private func recordFailure() async {
-        failureCount += 1
-        lastFailureTime = Date()
-
-        let totalOperations = failureCount + successCount
-        if totalOperations > 10 && Double(failureCount) / Double(totalOperations) > threshold {
-            state = .open
         }
     }
 }
@@ -639,29 +572,11 @@ class ErrorClassifier {
                 return .transient
             case .triggerEvaluationFailed, .actionExecutionFailed:
                 return .continuable
-            case .circuitBreakerOpen:
-                return .stopProcessing
             default:
                 return .permanent
             }
         default:
             return .transient
-        }
-    }
-}
-
-// MARK: - System Monitor (Performance Support)
-
-/// System monitoring for adaptive performance management
-actor SystemMonitor {
-    static let shared = SystemMonitor()
-    private init() {}
-
-    var currentLoad: Double {
-        get async {
-            // Simple system load simulation (in real implementation would use system APIs)
-            let random = Double.random(in: 0...1)
-            return random
         }
     }
 }
@@ -755,7 +670,6 @@ enum RuleExecutionError: Error, LocalizedError, Hashable {
     case concurrencyLimitExceeded(current: Int, limit: Int)
     case timeoutExceeded(duration: TimeInterval, limit: TimeInterval)
     case ruleGroupInconsistent(groupId: Int, details: String)
-    case circuitBreakerOpen(service: String, threshold: Double)
     case partialExecution(completed: [Int], failed: [(Int, Error)])
 
     var errorDescription: String? {
@@ -772,8 +686,6 @@ enum RuleExecutionError: Error, LocalizedError, Hashable {
             return "Operation timed out: \(duration)s > \(limit)s"
         case .ruleGroupInconsistent(let groupId, let details):
             return "Rule group \(groupId) inconsistent: \(details)"
-        case .circuitBreakerOpen(let service, let threshold):
-            return "Circuit breaker open for \(service) (threshold: \(threshold))"
         case .partialExecution(let completed, let failed):
             return "Partial execution: \(completed.count) completed, \(failed.count) failed"
         }
@@ -802,10 +714,6 @@ enum RuleExecutionError: Error, LocalizedError, Hashable {
         case .ruleGroupInconsistent(let groupId, _):
             hasher.combine("ruleGroupInconsistent")
             hasher.combine(groupId)
-        case .circuitBreakerOpen(let service, let threshold):
-            hasher.combine("circuitBreakerOpen")
-            hasher.combine(service)
-            hasher.combine(threshold)
         case .partialExecution(let completed, _):
             hasher.combine("partialExecution")
             hasher.combine(completed)
@@ -826,8 +734,6 @@ enum RuleExecutionError: Error, LocalizedError, Hashable {
             return lDur == rDur && lLim == rLim
         case (.ruleGroupInconsistent(let lGroup, _), .ruleGroupInconsistent(let rGroup, _)):
             return lGroup == rGroup
-        case (.circuitBreakerOpen(let lService, let lThreshold), .circuitBreakerOpen(let rService, let rThreshold)):
-            return lService == rService && lThreshold == rThreshold
         case (.partialExecution(let lCompleted, _), .partialExecution(let rCompleted, _)):
             return lCompleted == rCompleted
         default:

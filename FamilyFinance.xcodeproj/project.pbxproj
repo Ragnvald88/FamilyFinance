@@ -16,7 +16,6 @@
 		A1000001232312340007 /* TransactionQueryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340107 /* TransactionQueryService.swift */; };
 		A1000001232312340008 /* DataIntegrityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340108 /* DataIntegrityService.swift */; };
 		A1000001232312340009 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340109 /* ExportService.swift */; };
-		A1000001232312340010 /* ThreadSafeCategorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340110 /* ThreadSafeCategorization.swift */; };
 		A1000001232312340011 /* AccountRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340111 /* AccountRepository.swift */; };
 		A1000001232312340012 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340112 /* DashboardView.swift */; };
 		A1000001232312340013 /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340113 /* ImportView.swift */; };
@@ -53,7 +52,6 @@
 		A1000001232312340107 /* TransactionQueryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionQueryService.swift; sourceTree = "<group>"; };
 		A1000001232312340108 /* DataIntegrityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataIntegrityService.swift; sourceTree = "<group>"; };
 		A1000001232312340109 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
-		A1000001232312340110 /* ThreadSafeCategorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeCategorization.swift; sourceTree = "<group>"; };
 		A1000001232312340111 /* AccountRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRepository.swift; sourceTree = "<group>"; };
 		A1000001232312340112 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		A1000001232312340113 /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
@@ -133,7 +131,6 @@
 				A1000001232312340107 /* TransactionQueryService.swift */,
 				A1000001232312340108 /* DataIntegrityService.swift */,
 				A1000001232312340109 /* ExportService.swift */,
-				A1000001232312340110 /* ThreadSafeCategorization.swift */,
 				A1000001232312340111 /* AccountRepository.swift */,
 				A1000001232312340117 /* ActionExecutor.swift */,
 				A1000001232312340118 /* RuleEngine.swift */,
@@ -278,7 +275,6 @@
 				A1000001232312340007 /* TransactionQueryService.swift in Sources */,
 				A1000001232312340008 /* DataIntegrityService.swift in Sources */,
 				A1000001232312340009 /* ExportService.swift in Sources */,
-				A1000001232312340010 /* ThreadSafeCategorization.swift in Sources */,
 				A1000001232312340011 /* AccountRepository.swift in Sources */,
 				A1000001232312340012 /* DashboardView.swift in Sources */,
 				A1000001232312340013 /* ImportView.swift in Sources */,

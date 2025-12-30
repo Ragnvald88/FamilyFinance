@@ -37,7 +37,7 @@ struct DashboardView: View {
     var body: some View {
         ZStack {
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: Spacing.large) {
                     // Header with filters
                     headerSection
 
@@ -56,9 +56,9 @@ struct DashboardView: View {
                     // Net worth
                     netWorthSection
 
-                    Spacer(minLength: 40)
+                    Spacer(minLength: Spacing.xlarge)
                 }
-                .padding(24)
+                .padding(Spacing.large)
             }
             .background(Color(nsColor: .windowBackgroundColor))
 
@@ -98,14 +98,14 @@ struct DashboardView: View {
 
     private var headerSection: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: PremiumSpacing.tiny) {
                 Text("Dashboard")
-                    .font(.system(size: 32, weight: .bold))
-                    .foregroundStyle(.primary)
+                    .font(.financialHero)
+                    .foregroundStyle(Color.florijnCharcoal)
 
                 Text(periodDescription)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(.bodyRegular)
+                    .foregroundStyle(Color.florijnMediumGray)
             }
 
             Spacer()
@@ -130,14 +130,13 @@ struct DashboardView: View {
             .frame(width: 150)
 
             // Refresh button
-            Button(action: { Task { await loadData() } }) {
-                Image(systemName: "arrow.clockwise")
-                    .foregroundStyle(.secondary)
+            Button("Refresh") {
+                Task { await loadData() }
             }
-            .buttonStyle(.plain)
+            .premiumSecondaryButton()
             .disabled(viewModel.isLoading)
         }
-        .padding(.bottom, 8)
+        .padding(.bottom, PremiumSpacing.small)
     }
 
     // MARK: - KPI Cards Section (Enhanced with Animations)
@@ -148,7 +147,7 @@ struct DashboardView: View {
             GridItem(.flexible()),
             GridItem(.flexible()),
             GridItem(.flexible())
-        ], spacing: 16) {
+        ], spacing: PremiumSpacing.large) {
 
             if viewModel.isLoading && viewModel.kpis == nil {
                 // Skeleton loading states
@@ -157,40 +156,44 @@ struct DashboardView: View {
                         .staggeredAppearance(index: index, totalItems: 4)
                 }
             } else {
-                // Animated KPI cards with staggered appearance
+                // Premium financial KPI cards with sophisticated icons
                 Group {
-                    EnhancedKPICard(
+                    PremiumKPICard(
                         title: "Income",
                         value: viewModel.kpis?.totalIncome ?? 0,
-                        icon: "arrow.down.circle.fill",
-                        color: .green,
+                        percentage: nil,
+                        icon: .income,
+                        color: .florijnGreen,
                         trend: nil,
                         index: 0
                     )
 
-                    EnhancedKPICard(
+                    PremiumKPICard(
                         title: "Expenses",
                         value: abs(viewModel.kpis?.totalExpenses ?? 0),
-                        icon: "arrow.up.circle.fill",
-                        color: .red.opacity(0.85),
+                        percentage: nil,
+                        icon: .expenses,
+                        color: .florijnOrange,
                         trend: nil,
                         index: 1
                     )
 
-                    EnhancedKPICard(
+                    PremiumKPICard(
                         title: "Saved",
                         value: viewModel.kpis?.netSavings ?? 0,
-                        icon: "banknote.fill",
-                        color: .blue,
+                        percentage: nil,
+                        icon: .saved,
+                        color: .florijnBlue,
                         trend: nil,
                         index: 2
                     )
 
-                    EnhancedKPICard(
+                    PremiumKPICard(
                         title: "Savings Rate",
+                        value: nil,
                         percentage: Double(truncating: ((viewModel.kpis?.savingsRate ?? 0) * 100) as NSNumber),
-                        icon: "percent",
-                        color: .orange,
+                        icon: .savingsRate,
+                        color: .florijnNavy,
                         trend: nil,
                         index: 3
                     )
@@ -203,12 +206,11 @@ struct DashboardView: View {
     // MARK: - Charts Section
 
     private var chartsSection: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: PremiumSpacing.large) {
             // Monthly trend chart
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: PremiumSpacing.medium) {
                 Text("Monthly Trends")
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+                    .premiumHeading(Color.florijnCharcoal)
 
                 if let trends = viewModel.monthlyTrends, !trends.isEmpty {
                     Chart(trends) { trend in
@@ -216,14 +218,14 @@ struct DashboardView: View {
                             x: .value("Month", trend.monthName),
                             y: .value("Income", Double(truncating: trend.income as NSNumber))
                         )
-                        .foregroundStyle(.green)
+                        .foregroundStyle(Color.green)
                         .symbol(.circle)
 
                         LineMark(
                             x: .value("Month", trend.monthName),
                             y: .value("Expenses", Double(truncating: trend.expenses as NSNumber))
                         )
-                        .foregroundStyle(.red)
+                        .foregroundStyle(Color.charcoal)
                         .symbol(.square)
                     }
                     .frame(height: 200)
@@ -239,15 +241,14 @@ struct DashboardView: View {
                     .frame(height: 200)
                 }
             }
-            .padding()
-            .background(Color(nsColor: .controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .padding(Spacing.medium)
+            .card()
 
             // Category pie chart (placeholder)
             VStack(alignment: .leading, spacing: 12) {
                 Text("Top Categories")
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+                    .font(.headingMedium)
+                    .foregroundStyle(Color.charcoal)
 
                 if let categories = viewModel.categorySummaries?.prefix(5) {
                     VStack(spacing: 8) {
@@ -258,14 +259,14 @@ struct DashboardView: View {
                                     .frame(width: 8, height: 8)
 
                                 Text(category.category)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .font(.bodySmall)
+                                    .foregroundStyle(Color.gray)
 
                                 Spacer()
 
                                 Text(category.totalAmount.toCurrencyString())
-                                    .font(.caption)
-                                    .foregroundStyle(.primary)
+                                    .font(.bodySmall)
+                                    .foregroundStyle(Color.charcoal)
                             }
                         }
                     }
@@ -279,9 +280,8 @@ struct DashboardView: View {
                     .frame(height: 200)
                 }
             }
-            .padding()
-            .background(Color(nsColor: .controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .padding(Spacing.medium)
+            .card()
         }
     }
 
@@ -291,14 +291,14 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("Budget vs Actual")
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+                    .font(.headingMedium)
+                    .foregroundStyle(Color.charcoal)
 
                 Spacer()
 
                 Text("\(viewModel.categorySummaries?.count ?? 0) categories")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.gray)
             }
 
             if let categories = viewModel.categorySummaries {
@@ -313,9 +313,8 @@ struct DashboardView: View {
                     .padding(40)
             }
         }
-        .padding()
-        .background(Color(nsColor: .controlBackgroundColor))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(Spacing.medium)
+        .card()
     }
 
     // MARK: - Accounts Section
@@ -326,8 +325,8 @@ struct DashboardView: View {
             if let accounts = viewModel.accountBalances, !accounts.isEmpty {
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Accounts")
-                        .font(.headline)
-                        .foregroundStyle(.primary)
+                        .font(.headingMedium)
+                        .foregroundStyle(Color.charcoal)
 
                     LazyVStack(spacing: 8) {
                         ForEach(accounts) { account in
@@ -335,7 +334,7 @@ struct DashboardView: View {
                         }
                     }
                 }
-                .padding(16)
+                .padding(Spacing.medium)
             } else {
                 // Show empty state guidance
                 VStack(spacing: 16) {
@@ -345,20 +344,20 @@ struct DashboardView: View {
 
                     VStack(spacing: 8) {
                         Text("No Bank Accounts Yet")
-                            .font(.headline)
-                            .foregroundStyle(.primary)
+                            .font(.headingMedium)
+                            .foregroundStyle(Color.charcoal)
 
                         Text("Use the Import tab in the sidebar to add your bank statements")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .font(.body)
+                            .foregroundStyle(Color.gray)
                             .multilineTextAlignment(.center)
                     }
                 }
-                .padding(24)
+                .padding(Spacing.large)
                 .frame(maxWidth: .infinity)
             }
         }
-        .primaryCard()
+        .card()
     }
 
     // MARK: - Net Worth Section
@@ -378,7 +377,7 @@ struct DashboardView: View {
                         Text(netWorth.assets.toCurrencyString())
                             .font(.title3)
                             .fontWeight(.semibold)
-                            .foregroundStyle(.green)
+                            .foregroundStyle(Color.green)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
@@ -388,7 +387,7 @@ struct DashboardView: View {
                         Text(netWorth.liabilities.toCurrencyString())
                             .font(.title3)
                             .fontWeight(.semibold)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(Color.charcoal)
                     }
 
                     Divider()
@@ -407,9 +406,8 @@ struct DashboardView: View {
                 .padding(.top, 4)
             }
         }
-        .padding()
-        .background(Color(nsColor: .controlBackgroundColor))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .padding(Spacing.medium)
+        .card()
     }
 
     // MARK: - Helper Methods
@@ -477,31 +475,25 @@ struct EnhancedKPICard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: Spacing.small + 4) {
             headerSection
             valueSection
         }
-        .padding(16)
+        .padding(Spacing.medium)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(cardBackground)
-        .primaryCard()
+        .card()
         .scaleEffect(isHovered ? 1.02 : 1.0)
-        .shadow(
-            color: isHovered ? .black.opacity(0.12) : .black.opacity(0.08),
-            radius: isHovered ? 8 : 4,
-            x: 0,
-            y: isHovered ? 4 : 2
-        )
-        .animation(.spring(response: 0.2, dampingFraction: 0.8), value: isHovered)
+        .animation(.quick, value: isHovered)
         .onHover { hovering in
-            withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
+            withAnimation(.quick) {
                 isHovered = hovering
             }
         }
         .opacity(hasAppeared ? 1.0 : 0.0)
         .offset(y: hasAppeared ? 0 : 20)
         .onAppear {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.8).delay(Double(index) * 0.1)) {
+            withAnimation(.standard.delay(Double(index) * 0.1)) {
                 hasAppeared = true
             }
         }
@@ -522,20 +514,20 @@ struct EnhancedKPICard: View {
     }
 
     private var valueSection: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: Spacing.tiny) {
             Text(title)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.gray)
 
             if let value = value {
                 AnimatedNumber(
                     value: value,
-                    font: .title2.monospacedDigit().weight(.bold)
+                    font: .currencyLarge
                 )
             } else if let percentage = percentage {
                 AnimatedPercentage(
                     value: percentage,
-                    font: .title2.monospacedDigit().weight(.bold)
+                    font: .currencyLarge
                 )
             }
         }
@@ -601,20 +593,20 @@ struct CategoryRow: View {
         VStack(spacing: 8) {
             HStack {
                 Text(category.category)
-                    .font(.subheadline)
-                    .foregroundStyle(.primary)
+                    .font(.body)
+                    .foregroundStyle(Color.charcoal)
 
                 Spacer()
 
                 Text(category.totalAmount.toCurrencyString())
-                    .font(.subheadline)
+                    .font(.body)
                     .fontWeight(.semibold)
-                    .foregroundStyle(category.isOverBudget ? .red : .primary)
+                    .foregroundStyle(category.isOverBudget ? Color.red : Color.charcoal)
 
                 if let budget = category.budget {
                     Text("/ \(budget.toCurrencyString())")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.gray)
                 }
             }
 
@@ -638,11 +630,11 @@ struct CategoryRow: View {
 
     private func budgetColor(_ percentage: Double) -> Color {
         if percentage < 75 {
-            return .green
+            return Color.green
         } else if percentage < 100 {
-            return .orange
+            return Color.orange
         } else {
-            return .red
+            return Color.red
         }
     }
 }
@@ -660,20 +652,20 @@ struct AccountRow: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(account.name)
-                    .font(.subheadline)
-                    .foregroundStyle(.primary)
+                    .font(.body)
+                    .foregroundStyle(Color.charcoal)
 
                 Text(account.owner)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.gray)
             }
 
             Spacer()
 
             Text(account.balance.toCurrencyString())
-                .font(.subheadline)
+                .font(.body)
                 .fontWeight(.semibold)
-                .foregroundStyle(.primary)
+                .foregroundStyle(Color.charcoal)
         }
         .padding(.vertical, 4)
     }

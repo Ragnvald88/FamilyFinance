@@ -184,22 +184,19 @@ struct SimpleRulesView: View {
                 .foregroundStyle(.tertiary)
 
             Text("No Rules Yet")
-                .font(.title2)
-                .fontWeight(.semibold)
+                .font(.headingLarge)
+                .foregroundStyle(Color.charcoal)
 
             Text("Create your first rule to start automating\ntransaction categorization")
                 .font(.body)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.gray)
                 .multilineTextAlignment(.center)
 
-            Button {
+            Button("Create First Rule") {
                 showingCreateRule = true
-            } label: {
-                Label("Create First Rule", systemImage: "plus")
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .padding(.top)
+            .primaryButton()
+            .padding(.top, Spacing.medium)
 
             Spacer()
         }
@@ -349,7 +346,7 @@ struct FilterRow: View {
         switch filter {
         case .active: return .green
         case .inactive: return .orange
-        default: return .secondary
+        default: return .gray
         }
     }
 }
@@ -363,29 +360,29 @@ struct SimpleRuleRow: View {
     @State private var isHovered = false
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: Spacing.small + 4) {
             // Active indicator
             Circle()
                 .fill(rule.isActive ? Color.green : Color.orange)
                 .frame(width: 8, height: 8)
 
             // Rule info
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: Spacing.tiny) {
                 HStack {
                     Text(rule.name)
-                        .font(.headline)
+                        .font(.headingMedium)
 
                     if rule.stopProcessing {
                         Image(systemName: "stop.circle")
                             .font(.caption)
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(Color.orange)
                             .help("Stops processing other rules when matched")
                     }
                 }
 
                 Text(ruleSummary)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.gray)
                     .lineLimit(1)
             }
 
@@ -395,20 +392,20 @@ struct SimpleRuleRow: View {
             if let group = rule.group {
                 Text(group.name)
                     .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.accentColor.opacity(0.1))
+                    .padding(.horizontal, Spacing.small)
+                    .padding(.vertical, Spacing.tiny)
+                    .background(Color.primaryBlue.opacity(0.1))
                     .clipShape(Capsule())
             }
 
             // Stats
             if rule.matchCount > 0 {
-                HStack(spacing: 4) {
+                HStack(spacing: Spacing.tiny) {
                     Image(systemName: "checkmark")
                     Text("\(rule.matchCount)")
                 }
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.gray)
             }
 
             // Edit button (visible on hover)
@@ -827,7 +824,7 @@ struct TriggerEditor: View {
                 .help("Remove condition")
             }
         }
-        .padding(12)
+        .padding(Spacing.small + 4)
         .background(Color(nsColor: .controlBackgroundColor).opacity(0.5))
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
@@ -879,7 +876,7 @@ struct ActionEditor: View {
                 .help("Remove action")
             }
         }
-        .padding(8)
+        .padding(Spacing.small)
         .background(Color(nsColor: .controlBackgroundColor).opacity(0.3))
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }

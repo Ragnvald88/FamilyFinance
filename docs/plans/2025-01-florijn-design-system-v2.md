@@ -1,250 +1,163 @@
-# Florijn Design System v2.0
+# Florijn Design System 2.0 - Professional Trust
 
-*The Ultimate Design Transformation Plan*
+*The Ultimate Professional Finance UI - Clean, Modern, Trustworthy*
 
 ## Executive Summary
 
-Transform FamilyFinance into **Florijn** — a sophisticated, trustworthy personal finance application that embodies the heritage of the historic Florin coin. This comprehensive design system establishes visual hierarchy, interaction patterns, and implementation standards for a cohesive, premium user experience.
+Transform Florijn into a **sophisticated, professional personal finance application** that builds trust through exceptional design quality. This comprehensive design system establishes visual hierarchy, interaction patterns, and implementation standards for a cohesive, premium user experience **without ostentatious colors**, focusing on clean professionalism.
 
 **Key Objectives:**
-- Create distinctive brand identity rooted in Dutch financial history
-- Establish premium aesthetic without sacrificing usability
-- Implement native macOS design patterns with custom branding
+- Create professional brand identity built on trust and reliability
+- Establish clean, modern aesthetic that prioritizes usability
+- Implement native macOS design patterns with refined customization
 - Ensure accessibility and performance across all components
+- Build user confidence through consistent, polished interface
 
 ---
 
-## Brand Foundation
+## Design Philosophy: "Professional Trust through Dutch Minimalism"
 
-### Etymology & Heritage
-**Florijn** derives from the Florin, first minted in Florence (1252), becoming Europe's premier gold standard. This heritage informs our design philosophy:
-
-- **Established Trust** → Consistent, reliable interface patterns
-- **Refined Quality** → Attention to detail without ostentation
-- **Enduring Value** → Timeless design choices over trends
-- **European Heritage** → Sophisticated, understated elegance
+### Core Principles
+- **Trust First**: Every design choice builds financial credibility
+- **Dutch Precision**: Clean, functional, purposeful design
+- **Accessibility**: WCAG 2.1 AA compliance throughout
+- **Native Integration**: Leverages macOS design language
+- **Timeless Quality**: Modern but not trendy, sustainable design choices
 
 ### Brand Attributes
-| Attribute | Expression | Anti-Pattern |
-|-----------|------------|--------------|
-| **Trustworthy** | Consistent spacing, predictable interactions | Flashy animations, inconsistent states |
-| **Sophisticated** | Refined color palette, quality typography | Oversaturated colors, comic fonts |
-| **Approachable** | Clear hierarchy, helpful guidance | Intimidating complexity, hidden features |
-| **Native** | macOS conventions, system integration | Web-like patterns, custom scrollbars |
+| Attribute | Expression | Implementation |
+|-----------|------------|----------------|
+| **Professional** | Clean navy/blue palette, structured layouts | Deep navy headers, professional blue interactions |
+| **Trustworthy** | High contrast, predictable interactions | 7:1 contrast for financial data, consistent spacing |
+| **Modern** | Current design patterns, native materials | SF Pro typography, system blur effects |
+| **Accessible** | Clear hierarchy, keyboard navigation | 44px touch targets, semantic color usage |
 
 ---
 
-## Color System
+## Color System: "Professional Trust"
 
 ### Primary Palette
 
-#### Florijn Gold
-```
-Primary:    #C9A227    ████████    RGB(201, 162, 39)    HSL(43, 67%, 47%)
-Light:      #E5D5A0    ████████    RGB(229, 213, 160)   HSL(43, 53%, 76%)
-Dark:       #9A7B1C    ████████    RGB(154, 123, 28)    HSL(43, 69%, 36%)
-Subtle:     #F9F6EC    ████████    RGB(249, 246, 236)   HSL(43, 54%, 95%)
-```
-**Usage:** Accent color, call-to-action buttons, selection states, progress indicators
-**Contrast Ratios:** ✓ AAA compliant on white/navy backgrounds
-
-#### Florijn Navy
-```
-Primary:    #0D1B2A    ████████    RGB(13, 27, 42)      HSL(210, 53%, 11%)
-Medium:     #1B3A4B    ████████    RGB(27, 58, 75)      HSL(203, 47%, 20%)
-Light:      #2D5066    ████████    RGB(45, 80, 102)     HSL(203, 39%, 29%)
-```
-**Usage:** Primary text, navigation, headers, high-contrast elements
-**Contrast Ratios:** ✓ AAA compliant on light backgrounds
-
-### Semantic Palette
-
-#### Financial Status Colors
-```
-Income:     #059669    ████████    Emerald - Sophisticated positive
-Expense:    #DC2626    ████████    Ruby - Clear but not alarming
-Transfer:   #64748B    ████████    Slate - Neutral, distinct
-Warning:    #F59E0B    ████████    Amber - Attention without panic
-Error:      #DC2626    ████████    Ruby - Same as expense for consistency
-Success:    #059669    ████████    Emerald - Same as income
+#### Navy Foundation (Trust & Authority)
+```swift
+static let primaryNavy = Color(hex: "#1A237E")        // Headers, primary buttons
+static let primaryBlue = Color(hex: "#3949AB")        // Interactive elements, links
+static let stabilityBlue = Color(hex: "#5E72E4")      // Hover states, focus
 ```
 
-### Background System
-```
-Canvas:     #FDFBF7    ████████    Warm white main background
-Surface:    #FFFFFF    ████████    Pure white for cards/elevated content
-Subtle:     #F8F6F1    ████████    Alternating row background
-Overlay:    rgba(13, 27, 42, 0.6)    Semi-transparent navy for modals
+#### Success & Growth (Financial Positivity)
+```swift
+static let successGreen = Color(hex: "#2E7D32")       // Positive transactions, growth
+static let freshMint = Color(hex: "#4CAF50")          // Subtle positive highlights
 ```
 
-### Accessibility Compliance
-| Combination | Contrast Ratio | WCAG Level |
-|-------------|----------------|------------|
-| Gold on Canvas | 7.2:1 | AAA |
-| Navy on Canvas | 15.1:1 | AAA |
-| Gold on Navy | 4.8:1 | AA+ |
-| Income on Canvas | 6.8:1 | AAA |
-| Expense on Canvas | 6.9:1 | AAA |
+#### System Colors (Communication)
+```swift
+static let alertOrange = Color(hex: "#FF6F00")        // Warnings (non-destructive)
+static let errorRed = Color(hex: "#D32F2F")           // Errors, destructive actions
+```
 
-### Dark Mode Considerations
-*Planned for Phase 6 (Post-Launch)*
+#### Neutral System (Foundation)
+```swift
+static let pureWhite = Color(hex: "#FFFFFF")          // Primary backgrounds
+static let lightGray = Color(hex: "#F8F9FA")          // Secondary backgrounds
+static let mediumGray = Color(hex: "#6C757D")         // Supporting text, borders
+static let darkGray = Color(hex: "#495057")           // Body text, icons
+static let charcoal = Color(hex: "#212529")           // Headers, high-emphasis
 ```
-Dark Canvas:   #0D1B2A    Navy becomes background
-Dark Surface:  #1B3A4B    Navy medium for cards
-Dark Gold:     #E5D5A0    Light gold maintains warmth
+
+#### Dark Mode Support
+```swift
+static let darkBackground = Color(hex: "#1A1A1A")     // Dark primary backgrounds
+static let darkSurface = Color(hex: "#2D2D2D")        // Dark card backgrounds
+static let darkBorder = Color(hex: "#404040")         // Dark mode borders
 ```
+
+### Color Usage Guidelines
+
+**Accessibility Standards:**
+- **4.5:1 minimum contrast** for all text combinations
+- **7:1 contrast** for critical financial data
+- **Color + Icon/Pattern** for accessibility (never color alone)
+- **Semantic meaning**: Green = positive, Red = negative, Blue = neutral/action
+
+**Financial Data Colors:**
+- **Positive amounts**: Success Green (#2E7D32)
+- **Negative amounts**: Charcoal (#212529) - not red to avoid alarm
+- **Neutral/transfers**: Medium Gray (#6C757D)
+- **Categories**: Primary Blue (#3949AB)
 
 ---
 
-## Typography System
+## Typography System: "Financial Clarity"
 
-### Font Stack
-**Primary:** SF Pro (System Default)
-- **Display:** SF Pro Rounded - For large numbers and hero content
-- **Monospace:** SF Mono - For financial figures requiring alignment
-- **UI:** SF Pro - All interface text
+### SF Pro Integration (macOS Native)
 
-### Type Scale & Hierarchy
-
-#### Display Typography (Large Values, Heroes)
+#### Display Hierarchy (Hero Content)
 ```swift
-displayLarge:   Font.system(size: 48, weight: .bold, design: .rounded)
-displayMedium:  Font.system(size: 36, weight: .bold, design: .rounded)
-displaySmall:   Font.system(size: 28, weight: .bold, design: .rounded)
+static let displayLarge = Font.system(.largeTitle, design: .default, weight: .medium)     // 34pt - Dashboard totals
+static let displayMedium = Font.system(.title, design: .default, weight: .medium)         // 28pt - Section headers
 ```
-**Usage:** Dashboard totals, primary KPI values, onboarding heroes
 
-#### Currency Typography (Financial Precision)
+#### Content Hierarchy (Standard UI)
 ```swift
-currencyLarge:  Font.system(size: 28, weight: .semibold, design: .monospaced)
-currencyMedium: Font.system(size: 20, weight: .semibold, design: .monospaced)
-currencySmall:  Font.system(size: 16, weight: .medium, design: .monospaced)
-currencyMicro:  Font.system(size: 13, weight: .medium, design: .monospaced)
+static let headingLarge = Font.system(.title2, design: .default, weight: .bold)           // 22pt - Card headers
+static let headingMedium = Font.system(.headline, design: .default, weight: .semibold)    // 18pt - Subheadings
+static let bodyLarge = Font.system(.body, design: .default, weight: .regular)             // 16pt - Primary content
+static let body = Font.system(.callout, design: .default, weight: .regular)               // 14pt - Standard text
+static let bodySmall = Font.system(.caption, design: .default, weight: .regular)          // 12pt - Secondary content
+static let caption = Font.system(.caption2, design: .default, weight: .medium)            // 11pt - Labels, metadata
 ```
-**Usage:** Transaction amounts, account balances, KPI cards, financial calculations
 
-#### Interface Typography (UI Elements)
+#### Financial Data (Monospaced for Precision)
 ```swift
-h1:             Font.system(size: 28, weight: .bold)           // Page titles
-h2:             Font.system(size: 22, weight: .semibold)       // Section headers
-h3:             Font.system(size: 18, weight: .semibold)       // Subsection headers
-h4:             Font.system(size: 16, weight: .medium)         // Component headers
-
-bodyLarge:      Font.system(size: 16, weight: .regular)       // Important text
-body:           Font.system(size: 14, weight: .regular)       // Default body text
-bodySmall:      Font.system(size: 13, weight: .regular)       // Secondary content
-
-label:          Font.system(size: 12, weight: .medium)        // Form labels
-caption:        Font.system(size: 11, weight: .regular)       // Help text, metadata
-overline:       Font.system(size: 10, weight: .semibold)      // Categories, tags
+static let currencyLarge = Font.system(.title2, design: .monospaced, weight: .medium)     // 24pt - Dashboard totals
+static let currency = Font.system(.headline, design: .monospaced, weight: .medium)        // 18pt - Transaction amounts
+static let currencySmall = Font.system(.callout, design: .monospaced, weight: .medium)    // 14pt - List amounts
 ```
 
 ### Typography Implementation
 ```swift
-// Florijn/Theme/FlorijnTypography.swift
-enum FlorijnTypography {
-    // MARK: - Display (Hero content)
-    static let displayLarge = Font.system(size: 48, weight: .bold, design: .rounded)
+extension View {
+    func florijnHeading() -> some View {
+        self.font(.system(.title2, design: .default, weight: .bold))
+            .foregroundStyle(Color(hex: "#212529"))
+    }
 
-    // MARK: - Currency (Precision alignment)
-    static let currencyLarge = Font.system(size: 28, weight: .semibold, design: .monospaced)
-
-    // MARK: - Interface (Standard UI)
-    static let h1 = Font.system(size: 28, weight: .bold)
-    static let body = Font.system(size: 14, weight: .regular)
-
-    // MARK: - Accessibility
-    static func scaledFont(_ font: Font) -> Font {
-        // Respects user's Dynamic Type preferences
-        return font
+    func florijnCurrency() -> some View {
+        self.font(.system(.headline, design: .monospaced, weight: .medium))
+            .foregroundStyle(Color(hex: "#495057"))
     }
 }
 ```
 
 ---
 
-## Spacing System
+## Spacing System: "8pt Grid Precision"
 
-### Base Grid: 4px
+### Base Grid System
 ```swift
-enum FlorijnSpacing {
-    static let xxs: CGFloat = 2     // Micro adjustments, borders
-    static let xs: CGFloat = 4      // Icon gaps, tight spacing
-    static let sm: CGFloat = 8      // Related element spacing
-    static let md: CGFloat = 12     // Component internal padding
-    static let lg: CGFloat = 16     // Section spacing, card padding
-    static let xl: CGFloat = 24     // Major section gaps
-    static let xxl: CGFloat = 32    // Page-level margins
-    static let xxxl: CGFloat = 48   // Hero spacing, modal margins
-    static let xxxxl: CGFloat = 64  // Empty state spacing
+enum Spacing: CGFloat {
+    case tiny = 4        // Icon padding, tight spacing
+    case small = 8       // Component inner spacing
+    case medium = 16     // Standard component spacing
+    case large = 24      // Section spacing
+    case xlarge = 32     // Major section breaks
+    case xxlarge = 48    // Page-level spacing
+    case hero = 64       // Dramatic spacing for emphasis
 }
 ```
 
-### Layout Measurements
+### Layout Constants
 ```swift
-enum FlorijnLayout {
-    static let sidebarWidth: CGFloat = 240      // Navigation sidebar
-    static let minWindowWidth: CGFloat = 800    // Minimum app window
+enum Layout {
+    static let sidebarWidth: CGFloat = 280      // Navigation sidebar
+    static let minWindowWidth: CGFloat = 900    // Minimum app window
     static let minWindowHeight: CGFloat = 600   // Minimum app window
     static let maxContentWidth: CGFloat = 1200  // Content area constraint
     static let cardMinHeight: CGFloat = 120     // Minimum card height
     static let rowHeight: CGFloat = 56          // Standard list row
-    static let buttonHeight: CGFloat = 40       // Standard button
-}
-```
-
-### Corner Radius System
-```swift
-enum FlorijnRadius {
-    static let xs: CGFloat = 4      // Small buttons, badges
-    static let sm: CGFloat = 6      // Input fields
-    static let md: CGFloat = 8      // Standard buttons
-    static let lg: CGFloat = 12     // Cards, panels
-    static let xl: CGFloat = 16     // Large cards, modals
-    static let xxl: CGFloat = 24    // Hero cards, main panels
-    static let full: CGFloat = 9999 // Circular elements, pills
-}
-```
-
----
-
-## Shadow & Elevation
-
-### Elevation Layers
-```swift
-enum FlorijnShadow {
-    // Level 0: Flush with background
-    static let none = (color: Color.clear, radius: 0, x: 0, y: 0)
-
-    // Level 1: Subtle lift (resting cards)
-    static let sm = (color: Color.black.opacity(0.04), radius: 2, x: 0, y: 1)
-
-    // Level 2: Default elevation (active cards)
-    static let md = (color: Color.black.opacity(0.06), radius: 4, x: 0, y: 2)
-
-    // Level 3: Hover state (interactive elevation)
-    static let lg = (color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
-
-    // Level 4: Modal/drawer (overlay elevation)
-    static let xl = (color: Color.black.opacity(0.12), radius: 16, x: 0, y: 8)
-
-    // Level 5: Tooltip/popover (highest elevation)
-    static let xxl = (color: Color.black.opacity(0.16), radius: 24, x: 0, y: 12)
-
-    // Special: Gold glow (selection/focus)
-    static let goldGlow = (color: FlorijnColors.gold.opacity(0.4), radius: 8, x: 0, y: 0)
-}
-
-// SwiftUI Shadow Modifier Extension
-extension View {
-    func florijnShadow(_ level: FlorijnShadow) -> some View {
-        shadow(
-            color: level.color,
-            radius: level.radius,
-            x: level.x,
-            y: level.y
-        )
-    }
+    static let buttonHeight: CGFloat = 44       // Standard button (accessibility)
 }
 ```
 
@@ -252,33 +165,78 @@ extension View {
 
 ## Component Specifications
 
-### 1. Navigation Sidebar
-
-#### Visual Design
-```
-┌─────────────────────────────────────────┐
-│ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ │  Background: Navy (#0D1B2A)
-│                                         │  Width: 240px
-│   ◈  Florijn                           │  Logo: Gold wordmark
-│                                         │
-│  ┌───────────────────────────────────┐ │
-│  │ ▣  Dashboard                      │ │  Selected: Gold subtle bg
-│  └───────────────────────────────────┘ │  Text: White
-│     ◻  Transactions                    │  Icon: Gold
-│     ◻  Categories                      │
-│     ◻  Rules                           │  Unselected: 60% opacity
-│     ◻  Accounts                        │  Hover: 80% opacity
-│                                         │
-│  ─────────────────────────────────     │  Divider: 15% white
-│                                         │
-│     ◻  Import                          │  Bottom section
-│     ◻  Export                          │
-│     ◻  Settings                        │
-│                                         │
-└─────────────────────────────────────────┘
-```
+### 1. Cards & Surfaces
 
 #### Implementation
+```swift
+struct CardStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .background(Color(hex: "#FFFFFF"))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color(hex: "#6C757D").opacity(0.12), lineWidth: 1)
+            )
+            .shadow(color: Color(hex: "#1A237E").opacity(0.08), radius: 4, x: 0, y: 2)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+extension View {
+    func florijnCard() -> some View {
+        modifier(CardStyle())
+    }
+}
+```
+
+### 2. Button System
+
+#### Primary Button (Navy)
+```swift
+struct PrimaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color(hex: "#1A237E"))
+            .foregroundStyle(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
+            .opacity(configuration.isPressed ? 0.9 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.8), value: configuration.isPressed)
+    }
+}
+```
+
+#### Secondary Button (Blue Outline)
+```swift
+struct SecondaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(.clear)
+            .foregroundStyle(Color(hex: "#3949AB"))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color(hex: "#3949AB"), lineWidth: 2)
+            )
+            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.8), value: configuration.isPressed)
+    }
+}
+```
+
+### 3. Navigation Sidebar
+
+#### Visual Design Specification
+- **Background**: Primary Navy (#1A237E)
+- **Width**: 280px
+- **Selected Item**: Professional Blue background (#3949AB)
+- **Text Color**: White
+- **Hover**: 80% opacity
+
+#### Implementation Structure
 ```swift
 struct FlorijnSidebar: View {
     @Binding var selectedTab: NavigationTab
@@ -286,512 +244,149 @@ struct FlorijnSidebar: View {
     var body: some View {
         VStack(spacing: 0) {
             // Logo section
-            VStack(spacing: FlorijnSpacing.lg) {
-                HStack {
-                    Text("Florijn")
-                        .font(FlorijnTypography.h2)
-                        .foregroundStyle(FlorijnColors.gold)
-                    Spacer()
-                }
-                .padding(.horizontal, FlorijnSpacing.lg)
-                .padding(.top, FlorijnSpacing.xl)
-            }
-
-            Spacer().frame(height: FlorijnSpacing.xl)
-
-            // Main navigation
-            LazyVStack(spacing: FlorijnSpacing.xs) {
-                FlorijnSidebarItem(.dashboard, isSelected: selectedTab == .dashboard)
-                FlorijnSidebarItem(.transactions, isSelected: selectedTab == .transactions)
-                // ...additional items
-            }
-            .padding(.horizontal, FlorijnSpacing.md)
-
-            Spacer()
-
-            // Bottom navigation
-            Divider()
-                .overlay(.white.opacity(0.15))
-                .padding(.horizontal, FlorijnSpacing.lg)
-                .padding(.vertical, FlorijnSpacing.md)
-
-            LazyVStack(spacing: FlorijnSpacing.xs) {
-                FlorijnSidebarItem(.import, isSelected: selectedTab == .import)
-                FlorijnSidebarItem(.settings, isSelected: selectedTab == .settings)
-            }
-            .padding(.horizontal, FlorijnSpacing.md)
-            .padding(.bottom, FlorijnSpacing.lg)
-        }
-        .frame(width: FlorijnLayout.sidebarWidth)
-        .background(FlorijnColors.navy)
-    }
-}
-```
-
-### 2. KPI Card Component
-
-#### Visual Design
-```
-┌─────────────────────────────────────────────────────────┐
-│                                                         │
-│  ◈  Total Balance                          ▲ +2.4%     │  Icon: Gold
-│                                                         │  Title: Secondary
-│  € 24,567.89                                           │  Value: Navy, monospace
-│  ▔▔▔▔▔▔▔▔▔▔▔▔                                           │  Accent: Gold bar
-│                                                         │  Trend: Green/Red badge
-└─────────────────────────────────────────────────────────┘
-
-States:
-- Rest: White bg, subtle shadow, 70% gold bar
-- Hover: Scale 1.02, stronger shadow, full gold bar
-- Loading: Skeleton animation
-```
-
-#### Implementation
-```swift
-struct FlorijnKPICard: View {
-    let title: String
-    let value: Decimal?
-    let formatter: NumberFormatter = .currency
-    let trend: Double?
-    let icon: String
-    let index: Int
-
-    @State private var isHovered = false
-    @State private var hasAppeared = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: FlorijnSpacing.md) {
-            // Header row
             HStack {
-                Image(systemName: icon)
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(FlorijnColors.gold)
-
+                Text("Florijn")
+                    .font(.system(.title2, design: .default, weight: .bold))
+                    .foregroundStyle(.white)
                 Spacer()
+            }
+            .padding(.horizontal, 24)
+            .padding(.top, 32)
 
-                if let trend = trend {
-                    FlorijnTrendBadge(value: trend)
+            // Navigation items
+            VStack(spacing: 4) {
+                ForEach(NavigationTab.allCases) { tab in
+                    SidebarItem(tab: tab, isSelected: selectedTab == tab)
+                        .onTapGesture { selectedTab = tab }
                 }
             }
-
-            // Title
-            Text(title.uppercased())
-                .font(FlorijnTypography.overline)
-                .foregroundStyle(FlorijnColors.textSecondary)
-
-            // Value
-            if let value = value {
-                AnimatedNumber(value: value, font: FlorijnTypography.currencyLarge)
-                    .foregroundStyle(FlorijnColors.textPrimary)
-            } else {
-                FlorijnSkeletonLine(width: 120, height: 28)
-            }
-        }
-        .padding(FlorijnSpacing.lg)
-        .background(FlorijnColors.surface)
-        .clipShape(RoundedRectangle(cornerRadius: FlorijnRadius.lg))
-        .florijnShadow(isHovered ? .lg : .md)
-        .overlay(alignment: .bottom) {
-            // Gold accent bar
-            Rectangle()
-                .fill(FlorijnColors.gold.opacity(isHovered ? 1.0 : 0.7))
-                .frame(height: 3)
-                .clipShape(RoundedRectangle(cornerRadius: 2))
-                .padding(.horizontal, FlorijnSpacing.lg)
-        }
-        .scaleEffect(isHovered ? 1.02 : 1.0)
-        .opacity(hasAppeared ? 1.0 : 0.0)
-        .offset(y: hasAppeared ? 0 : 10)
-        .animation(FlorijnAnimation.spring, value: isHovered)
-        .animation(FlorijnAnimation.spring.delay(Double(index) * 0.1), value: hasAppeared)
-        .onHover { isHovered = $0 }
-        .onAppear { hasAppeared = true }
-    }
-}
-```
-
-### 3. Transaction Row Component
-
-#### Implementation
-```swift
-struct FlorijnTransactionRow: View {
-    let transaction: Transaction
-    @State private var isHovered = false
-
-    var body: some View {
-        HStack(spacing: FlorijnSpacing.md) {
-            // Type indicator
-            Circle()
-                .fill(typeIndicatorColor)
-                .frame(width: 8, height: 8)
-
-            // Transaction content
-            VStack(alignment: .leading, spacing: FlorijnSpacing.xs) {
-                Text(transaction.displayName)
-                    .font(FlorijnTypography.body)
-                    .fontWeight(.medium)
-                    .foregroundStyle(FlorijnColors.textPrimary)
-                    .lineLimit(1)
-
-                HStack(spacing: FlorijnSpacing.xs) {
-                    Text(transaction.category?.name ?? "Uncategorized")
-                        .foregroundStyle(FlorijnColors.textSecondary)
-
-                    Text("•")
-                        .foregroundStyle(FlorijnColors.textTertiary)
-
-                    Text(transaction.date.formatted(.dateTime.day().month(.abbreviated)))
-                        .foregroundStyle(FlorijnColors.textSecondary)
-                }
-                .font(FlorijnTypography.caption)
-            }
+            .padding(.horizontal, 16)
+            .padding(.top, 32)
 
             Spacer()
-
-            // Amount
-            Text(transaction.amount.formatted(.currency(code: "EUR")))
-                .font(FlorijnTypography.currencySmall)
-                .foregroundStyle(amountColor)
         }
-        .padding(.horizontal, FlorijnSpacing.lg)
-        .padding(.vertical, FlorijnSpacing.md)
-        .background(isHovered ? FlorijnColors.goldSubtle : .clear)
-        .overlay(
-            Rectangle()
-                .fill(FlorijnColors.gold.opacity(isHovered ? 0.3 : 0))
-                .frame(height: 1),
-            alignment: .bottom
-        )
-        .animation(FlorijnAnimation.fast, value: isHovered)
-        .onHover { isHovered = $0 }
-    }
-
-    private var typeIndicatorColor: Color {
-        switch transaction.transactionType {
-        case .income: return FlorijnColors.income
-        case .expense: return FlorijnColors.expense
-        case .transfer: return FlorijnColors.transfer
-        default: return FlorijnColors.textTertiary
-        }
-    }
-
-    private var amountColor: Color {
-        transaction.amount >= 0 ? FlorijnColors.income : FlorijnColors.textPrimary
-    }
-}
-```
-
-### 4. Button System
-
-#### Hierarchy & States
-```swift
-enum FlorijnButtonStyle {
-    case primary        // Gold fill, navy text
-    case secondary      // Gold outline, gold text
-    case tertiary       // No outline, secondary text
-    case destructive    // Red fill/outline
-}
-
-struct FlorijnButton: View {
-    let title: String
-    let icon: String?
-    let style: FlorijnButtonStyle
-    let size: FlorijnButtonSize
-    let action: () -> Void
-
-    @State private var isHovered = false
-    @State private var isPressed = false
-
-    var body: some View {
-        Button(action: handleAction) {
-            HStack(spacing: FlorijnSpacing.sm) {
-                if let icon = icon {
-                    Image(systemName: icon)
-                        .font(.system(size: iconSize, weight: .medium))
-                }
-
-                Text(title)
-                    .font(titleFont)
-                    .fontWeight(.medium)
-            }
-            .padding(.horizontal, horizontalPadding)
-            .padding(.vertical, verticalPadding)
-            .foregroundStyle(foregroundColor)
-            .background(backgroundColor)
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .strokeBorder(borderColor, lineWidth: borderWidth)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-        }
-        .buttonStyle(.plain)
-        .scaleEffect(isPressed ? 0.96 : (isHovered ? 1.02 : 1.0))
-        .animation(FlorijnAnimation.fast, value: isHovered)
-        .animation(FlorijnAnimation.fast, value: isPressed)
-        .onHover { isHovered = $0 }
-    }
-
-    private func handleAction() {
-        withAnimation(FlorijnAnimation.fast) {
-            isPressed = true
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            withAnimation(FlorijnAnimation.fast) {
-                isPressed = false
-            }
-            action()
-        }
+        .frame(width: 280)
+        .background(Color(hex: "#1A237E"))
     }
 }
 ```
 
 ---
 
-## Animation System
+## Layout Architecture
+
+### Navigation Structure
+- **Sidebar**: 280px fixed width, collapsible on smaller screens
+- **Main Content**: Max width 1200px, centered with responsive padding
+- **Toolbar**: 52px height (macOS standard)
+- **Content Padding**: 24px from edges, responsive
+
+### Content Organization
+```swift
+// Main layout structure
+HStack(spacing: 0) {
+    // Sidebar
+    FlorijnSidebar(selectedTab: $selectedTab)
+
+    // Main content area
+    VStack(spacing: 0) {
+        // Toolbar
+        FlorijnToolbar()
+            .frame(height: 52)
+
+        // Content
+        contentView()
+            .frame(maxWidth: 1200)
+            .padding(.horizontal, 24)
+    }
+    .background(Color(hex: "#F8F9FA"))
+}
+```
+
+---
+
+## Accessibility Standards
+
+### Contrast & Visibility
+- **Text**: 4.5:1 minimum contrast ratio (WCAG AA)
+- **Financial Data**: 7:1 contrast ratio (WCAG AAA)
+- **Interactive Elements**: 3:1 contrast ratio for non-text content
+- **Focus States**: Clear, high-contrast focus indicators
+
+### Motor & Interaction
+- **Touch Targets**: 44x44px minimum for all interactive elements
+- **Hover States**: Clear visual feedback for all interactive elements
+- **Keyboard Navigation**: Full app navigable without mouse/trackpad
+- **Reduced Motion**: Respects system preference with simplified animations
+
+### Screen Reader Support
+```swift
+extension View {
+    func florijnAccessibility(label: String, value: String? = nil, hint: String? = nil) -> some View {
+        self.accessibilityElement(children: .combine)
+            .accessibilityLabel(label)
+            .accessibilityValue(value ?? "")
+            .accessibilityHint(hint ?? "")
+    }
+}
+```
+
+---
+
+## Animation Standards
 
 ### Timing Functions
 ```swift
 enum FlorijnAnimation {
-    // Primary spring for UI interactions
-    static let spring = Animation.spring(response: 0.3, dampingFraction: 0.8)
+    static let standard = Animation.spring(response: 0.3, dampingFraction: 0.8)
+    static let quick = Animation.spring(response: 0.2, dampingFraction: 0.8)
+    static let slow = Animation.spring(response: 0.4, dampingFraction: 0.75)
 
-    // Quick interactions (hovers, selections)
-    static let fast = Animation.spring(response: 0.2, dampingFraction: 0.8)
-
-    // Slow, considered movements (page transitions)
-    static let slow = Animation.spring(response: 0.4, dampingFraction: 0.85)
-
-    // Number counting animations
-    static let number = Animation.spring(response: 0.6, dampingFraction: 0.7)
-
-    // Gentle bounce for attention
-    static let bounce = Animation.spring(response: 0.5, dampingFraction: 0.6)
-
-    // Accessibility: Respects reduced motion
     static func respectingMotion(_ animation: Animation) -> Animation {
-        return UIAccessibility.isReduceMotionEnabled ? .easeInOut(duration: 0.25) : animation
+        return UIAccessibility.isReduceMotionEnabled ?
+            .easeInOut(duration: 0.25) : animation
     }
 }
 ```
 
-### Interaction Choreography
-| Interaction | Animation | Duration | Effect |
-|-------------|-----------|----------|---------|
-| **Card hover** | Scale + shadow | 200ms spring | `scale(1.02)` + `shadow(lg)` |
-| **Row hover** | Background + border | 200ms spring | Gold tint + subtle border |
-| **Button press** | Scale down/up | 100ms + 200ms | `scale(0.96)` → `scale(1.0)` |
-| **Page transition** | Slide + fade | 400ms spring | Native navigation feel |
-| **Number update** | Count animation | 600ms spring | Smooth value interpolation |
-| **Loading state** | Skeleton pulse | 1.2s ease-in-out | Breathing opacity cycle |
-
-### Performance Considerations
-- Animations disabled automatically when `UIAccessibility.isReduceMotionEnabled`
-- Hardware acceleration via `CALayer` for complex animations
-- Skeleton animations use `CABasicAnimation` for efficiency
-- Number animations use interpolation to avoid layout thrashing
+### Interaction Patterns
+| Interaction | Duration | Effect |
+|-------------|----------|---------|
+| **Button Press** | 0.2s | Scale to 0.96, then return |
+| **Card Hover** | 0.3s | Subtle shadow increase |
+| **Navigation** | 0.4s | Smooth slide transition |
+| **Loading** | 1.2s | Breathing opacity pulse |
 
 ---
 
-## Accessibility
+## Implementation Roadmap
 
-### Color & Contrast
-- All color combinations meet WCAG AAA standards (7:1+ contrast ratio)
-- Additional visual indicators beyond color for status (icons, patterns)
-- High contrast mode support via semantic colors
+### Phase 1: Foundation (Day 1)
+- [ ] Create `DesignSystem.swift` with all color constants
+- [ ] Implement typography extensions
+- [ ] Create spacing enum and layout constants
+- [ ] Set up basic view modifiers (.florijnCard, .primaryButton)
 
-### Typography & Legibility
-- Dynamic Type support for all text elements
-- Minimum 16pt touch targets for interactive elements
-- Clear visual hierarchy with size, weight, and color differentiation
+### Phase 2: Core Components (Days 2-3)
+- [ ] Navigation sidebar with new styling
+- [ ] Button system (primary, secondary, destructive)
+- [ ] Card components for dashboard
+- [ ] Input field styling
+- [ ] Loading states and animations
 
-### Motor & Cognitive
-- Large click targets (minimum 44pt on macOS)
-- Hover states provide clear feedback
-- Keyboard navigation support for all interactive elements
-- Reduced motion support maintains functionality
+### Phase 3: View Integration (Days 4-5)
+- [ ] Dashboard view with new KPI cards
+- [ ] Transaction list with updated row styling
+- [ ] Rules interface with consistent components
+- [ ] Import view with polished forms
+- [ ] Settings interface alignment
 
-### Screen Reader Support
-```swift
-// Accessibility Implementation Example
-struct FlorijnKPICard: View {
-    var body: some View {
-        VStack {
-            // Card content
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(title): \(value.formatted())")
-        .accessibilityValue(trend.map { "trending \($0 > 0 ? "up" : "down") \(abs($0))%" } ?? "")
-        .accessibilityHint("Double tap to view details")
-    }
-}
-```
-
----
-
-## App Icon Design
-
-### Concept: The Modern Florijn
-```
-┌─────────────────────────────────────────┐
-│                                         │
-│           ╭─────────────╮               │
-│         ╭─┴─╮         ╭─┴─╮             │  Coin silhouette
-│        │   F           │   │            │  Gold gradient
-│         ╰─┬─╯         ╰─┬─╯             │  Navy background
-│           ╰─────────────╯               │  Geometric "F"
-│                                         │
-└─────────────────────────────────────────┘
-```
-
-### Technical Specifications
-#### Master Icon (1024×1024)
-- **Background:** Navy gradient (#0D1B2A → #1B3A4B)
-- **Coin:** 720×720px centered, gold gradient (#C9A227 → #E5D5A0)
-- **Typography:** 420×420px "F" in navy, geometric, slight radius
-- **Shadow:** Inner shadow on coin for depth (2px, 20% opacity)
-
-#### Size Variations
-| Size | Coin Detail | "F" Weight | Export Format |
-|------|-------------|------------|---------------|
-| 1024×1024 | Full detail + shadow | Medium | PNG (App Store) |
-| 512×512 | Full detail | Medium | PNG |
-| 256×256 | Simplified detail | Bold | PNG |
-| 128×128 | Basic coin shape | Bold | PNG |
-| 64×64 | Solid color coin | Heavy | PNG |
-| 32×32 | Circular gold dot | N/A | PNG |
-| 16×16 | Single gold pixel | N/A | PNG |
-
----
-
-## Implementation Sequence
-
-**PREREQUISITE:** Complete brand transformation first (see `2025-01-florijn-transformation-plan.md`)
-
-### Phase 1: Theme Foundation (One focused session)
-**Goal:** Establish design system infrastructure
-
-**Prerequisites:**
-- [ ] Project is renamed to "Florijn"
-- [ ] App builds successfully as Florijn
-- [ ] Bundle identifier updated to `com.florijn.app`
-
-**Tasks:**
-- [ ] Create `Florijn/Theme/` directory structure
-- [ ] Implement `FlorijnColors.swift` with full palette
-- [ ] Implement `FlorijnTypography.swift` with complete scale
-- [ ] Implement `FlorijnSpacing.swift` with grid system
-- [ ] Implement `FlorijnShadow.swift` with elevation system
-- [ ] Create base view modifiers (`.florijnShadow()`, `.primaryCard()`)
-- [ ] Add color assets to `Assets.xcassets`
-
-**Deliverable:** Complete theme system ready for component usage
-
-**Validation:**
-```swift
-// Verify all imports work
-import FlorijnTheme
-
-// Test color compilation
-let testColor = FlorijnColors.gold
-let testFont = FlorijnTypography.currencyLarge
-let testSpacing = FlorijnSpacing.lg
-```
-
-### Phase 2: Core Components (Day 2 - 4 hours)
-**Goal:** Build essential UI components with new design system
-
-**Tasks:**
-- [ ] `FlorijnButton` with all variants and states
-- [ ] `FlorijnKPICard` with animations and accessibility
-- [ ] `FlorijnTransactionRow` with hover states
-- [ ] `FlorijnSidebarItem` with selection and navigation
-- [ ] `FlorijnTextField` for form inputs
-- [ ] `FlorijnBadge` for categories and status
-- [ ] `FlorijnSkeletonLine` for loading states
-
-**Deliverable:** Reusable component library
-
-**Validation:**
-- All components render correctly
-- Hover states work across all interactive elements
-- Accessibility labels are properly set
-- Animation performance is smooth
-
-### Phase 3: View Integration (Day 3-4 - 6 hours)
-**Goal:** Apply design system to main application views
-
-**Tasks:**
-- [ ] **Sidebar Navigation:** Apply `FlorijnSidebar` styling
-- [ ] **Dashboard View:** Update with `FlorijnKPICard` components
-- [ ] **Transaction List:** Apply `FlorijnTransactionRow` styling
-- [ ] **Rules View:** Update with new button and card styles
-- [ ] **Import View:** Apply form styling and progress indicators
-- [ ] **Settings View:** Apply consistent styling
-
-**Deliverable:** Cohesive application experience
-
-**Validation:**
-- Visual consistency across all views
-- Navigation flows feel natural
-- Performance remains smooth with new styling
-
-### Phase 4: Polish & Microinteractions (Day 5 - 3 hours)
-**Goal:** Add delight and refined interactions
-
-**Tasks:**
-- [ ] Enhanced empty states with illustration style
-- [ ] Refined loading animations
-- [ ] Smooth page transitions
-- [ ] Contextual hover feedback
-- [ ] Sound design consideration (system sounds)
-- [ ] Error state styling
-- [ ] Success confirmation animations
-
-**Deliverable:** Production-ready polish
-
-**Validation:**
-- App feels responsive and delightful
-- Edge cases are handled gracefully
-- Error recovery is clear and helpful
-
-### Phase 5: App Icon Creation (Day 5 - 2 hours)
-**Goal:** Professional app icon aligned with brand
-
-**Tasks:**
-- [ ] Create master 1024×1024 icon in design tool
-- [ ] Generate all required size variants
-- [ ] Test icon in Dock, Spotlight, and App Store
-- [ ] Update `Assets.xcassets` with icon set
-- [ ] Verify icon displays correctly in build
-
-**Deliverable:** Professional app icon
-
-**Validation:**
-- Icon is legible at all sizes
-- Icon matches brand identity
-- Icon looks professional in macOS system contexts
-
-### Phase 6: Quality Assurance (Day 6 - 2 hours)
-**Goal:** Ensure design system is robust and complete
-
-**Tasks:**
-- [ ] Accessibility audit (VoiceOver, keyboard navigation)
+### Phase 4: Polish & Testing (Day 6)
+- [ ] Accessibility audit with VoiceOver
 - [ ] Performance testing with large datasets
-- [ ] Visual regression testing across views
-- [ ] Color contrast verification
-- [ ] Animation performance on older hardware
-- [ ] Documentation review and updates
-
-**Deliverable:** Verified, production-ready design system
-
-**Success Metrics:**
-- [ ] Zero accessibility violations
-- [ ] 60fps performance maintained
-- [ ] All views use design system consistently
-- [ ] Build produces zero warnings
-- [ ] Design system is documented and maintainable
+- [ ] Visual consistency review
+- [ ] Dark mode considerations
+- [ ] Documentation and component guide
 
 ---
 
@@ -799,109 +394,54 @@ let testSpacing = FlorijnSpacing.lg
 
 ```
 Florijn/
-├── Florijn/
-│   ├── Theme/
-│   │   ├── FlorijnColors.swift         // Color palette + semantic colors
-│   │   ├── FlorijnTypography.swift     // Type scale + font definitions
-│   │   ├── FlorijnSpacing.swift        // Spacing scale + layout constants
-│   │   ├── FlorijnShadow.swift         // Elevation system
-│   │   ├── FlorijnAnimation.swift      // Animation timing + accessibility
-│   │   └── FlorijnRadius.swift         // Corner radius system
-│   ├── Components/
-│   │   ├── FlorijnButton.swift         // Button component + variants
-│   │   ├── FlorijnKPICard.swift        // KPI card with animations
-│   │   ├── FlorijnTransactionRow.swift // Transaction list row
-│   │   ├── FlorijnSidebar.swift        // Navigation sidebar
-│   │   ├── FlorijnTextField.swift      // Form input styling
-│   │   ├── FlorijnBadge.swift          // Status and category badges
-│   │   └── FlorijnSkeleton.swift       // Loading state components
-│   └── Extensions/
-│       ├── View+FlorijnModifiers.swift // Custom view modifiers
-│       ├── Color+Accessibility.swift   // Contrast ratio utilities
-│       └── Animation+Motion.swift      // Reduced motion support
-├── Assets.xcassets/
-│   ├── AppIcon.appiconset/            // All app icon sizes
-│   ├── Colors/                        // Color asset definitions
-│   │   ├── FlorijnGold.colorset/
-│   │   ├── FlorijnNavy.colorset/
-│   │   └── [additional color sets]
-│   └── Icons/                         // Custom icons and symbols
-├── Views/                             // Updated with Florijn styling
-│   ├── DashboardView.swift            // Uses FlorijnKPICard
-│   ├── TransactionsView.swift         // Uses FlorijnTransactionRow
-│   ├── SidebarView.swift              // Uses FlorijnSidebar
-│   └── [other views]
-├── FlorijnApp.swift                   // Main app file (renamed from FamilyFinanceApp.swift)
-└── docs/
-    ├── Design-System.md               // This document
-    └── Component-Library.md           // Component usage guide
+├── Theme/
+│   ├── DesignSystem.swift          // Central design system constants
+│   ├── Colors.swift                // Color palette and semantic colors
+│   ├── Typography.swift            // Font scale and text styles
+│   ├── Spacing.swift               // Grid system and layout
+│   └── Animations.swift            // Timing and motion
+├── Components/
+│   ├── FlorijnButton.swift         // Button component system
+│   ├── FlorijnCard.swift           // Card and surface components
+│   ├── FlorijnSidebar.swift        // Navigation components
+│   ├── FlorijnTextField.swift      // Form input components
+│   └── FlorijnLoadingView.swift    // Loading and skeleton states
+├── Extensions/
+│   ├── View+FlorijnModifiers.swift // Custom view modifiers
+│   └── Color+Accessibility.swift   // Contrast utilities
+└── Assets.xcassets/
+    ├── Colors/                     // Color asset definitions
+    └── AppIcon.appiconset/         // Professional app icon
 ```
-
----
-
-## Migration Strategy
-
-### Gradual Rollout Approach
-1. **Foundation First:** Establish theme system without breaking existing functionality
-2. **Component by Component:** Update one component at a time, test thoroughly
-3. **View by View:** Apply new components to views systematically
-4. **Polish Last:** Add final touches and microinteractions
-
-### Rollback Plan
-- Keep existing components available during transition period
-- Use feature flags for design system adoption per view
-- Maintain git tags for stable design system versions
-- Document any breaking changes for team awareness
-
-### Testing Strategy
-- Visual regression testing using screenshot comparisons
-- Accessibility testing at each phase
-- Performance benchmarking with representative data
-- User feedback collection during internal testing
 
 ---
 
 ## Success Metrics
 
-### Brand Recognition
-- [ ] App is immediately recognizable as "Florijn"
-- [ ] Visual consistency across all views and components
-- [ ] Design system assets are reusable and maintainable
+### Visual Quality
+- [ ] Professional appearance that builds trust
+- [ ] Visual consistency across all views
+- [ ] Clean, modern aesthetic without unnecessary decoration
+- [ ] Proper information hierarchy for financial data
 
 ### User Experience
 - [ ] Improved task completion rates
-- [ ] Positive feedback on visual design
-- [ ] Maintained or improved performance metrics
-- [ ] Zero accessibility regressions
+- [ ] Clear, intuitive navigation
+- [ ] Maintained or improved performance
+- [ ] Positive user feedback on design clarity
 
 ### Technical Quality
-- [ ] 100% design system adoption across views
-- [ ] Zero build warnings related to styling
-- [ ] All components properly documented
-- [ ] Design system scales for future features
+- [ ] Zero accessibility violations
+- [ ] 100% design system adoption
+- [ ] Clean, maintainable component architecture
+- [ ] Smooth 60fps performance maintained
 
-### App Store Readiness
-- [ ] Professional app icon at all sizes
-- [ ] Screenshots showcase refined design
-- [ ] App meets all App Store design guidelines
-- [ ] Visual design supports marketing efforts
-
----
-
-## Post-Launch Evolution
-
-### Phase 7: Dark Mode (Q2 2025)
-Complete dark mode implementation with adjusted color palette
-
-### Phase 8: Localization Support
-Design system expansion to support multiple languages
-
-### Phase 9: iOS Companion
-Adapt design system for iOS app consistency
-
-### Phase 10: Advanced Animations
-Enhanced microinteractions and transitions for power users
+### Brand Recognition
+- [ ] Distinctive but professional visual identity
+- [ ] Trustworthy appearance for financial application
+- [ ] Modern design that ages well
+- [ ] App Store ready professional polish
 
 ---
 
-**This design system transforms FamilyFinance into Florijn — a sophisticated, trustworthy finance application that honors its Dutch heritage while embracing modern design excellence.**
+**This design system transforms Florijn into a sophisticated, trustworthy personal finance application that prioritizes user trust through exceptional design quality and professional polish, without relying on decorative elements or attention-grabbing colors.**

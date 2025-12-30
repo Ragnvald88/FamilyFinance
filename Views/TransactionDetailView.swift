@@ -71,7 +71,7 @@ struct TransactionDetailView: View {
                     metadataSection
                 }
             }
-            .padding(24)
+            .padding(Spacing.large)
         }
         .frame(minWidth: 600, minHeight: 700)
         .background(Color(nsColor: .windowBackgroundColor))
@@ -81,6 +81,7 @@ struct TransactionDetailView: View {
                     saveChangesIfNeeded()
                     dismiss()
                 }
+                .secondaryButton()
             }
 
             if hasUnsavedChanges {
@@ -88,7 +89,7 @@ struct TransactionDetailView: View {
                     Button("Save") {
                         saveChanges()
                     }
-                    .buttonStyle(.borderedProminent)
+                    .primaryButton()
                 }
             }
         }
@@ -107,7 +108,7 @@ struct TransactionDetailView: View {
     // MARK: - Header Section
 
     private var headerSection: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: Spacing.medium) {
             HStack(alignment: .top) {
                 // Type indicator
                 Image(systemName: transaction.transactionType.icon)

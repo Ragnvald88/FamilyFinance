@@ -49,6 +49,37 @@ A professional macOS personal finance application built with native Apple framew
 
 ---
 
+## Design System
+
+### Professional Trust UI
+
+**Florijn features a carefully crafted design system** built on Dutch design principles of minimalism and functionality, optimized for financial data clarity and user trust.
+
+**Color Palette:**
+- **Primary Navy** `#1A237E` - Trust, authority, primary actions
+- **Professional Blue** `#3949AB` - Interactive elements, navigation
+- **Success Green** `#2E7D32` - Positive transactions, growth indicators
+- **Clean Neutrals** - Professional grays and whites for clarity
+
+**Typography:**
+- **SF Pro** (macOS native) for perfect system integration
+- **Monospaced financial data** for precise amount alignment
+- **Clear hierarchy** from 11pt captions to 34pt hero numbers
+
+**Component Design:**
+- **Card-based layout** for information grouping
+- **12px corner radius** for modern professionalism
+- **8px grid system** for Dutch precision
+- **44px minimum touch targets** for accessibility
+
+**Accessibility:**
+- **WCAG 2.1 AA compliant** throughout the application
+- **7:1 contrast ratio** for critical financial data
+- **Full keyboard navigation** support
+- **System reduce-motion** respect
+
+---
+
 ## Technical Constraints
 
 ### Threading Model

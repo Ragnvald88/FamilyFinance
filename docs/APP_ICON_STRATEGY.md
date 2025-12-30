@@ -10,21 +10,21 @@
 
 ## Design Concept
 
-### Primary Concept: Florijn Coin
-**Rationale:** The "florijn" was a historical Dutch gold coin, perfect for a Dutch financial app
+### Primary Concept: Professional Finance Symbol
+**Rationale:** Clean, modern financial iconography that builds trust and professionalism
 
 **Visual Elements:**
-- **Gold coin silhouette** - Circular, elegant, premium feel
-- **Subtle financial iconography** - Chart lines, currency symbols
-- **Dutch heritage** - Historical coin design inspiration
-- **Modern execution** - Clean, minimalist macOS-appropriate design
+- **Circular design** - Clean, geometric, professional feel
+- **Financial iconography** - Subtle chart lines, growth symbols
+- **Dutch minimalism** - Clean, functional design inspiration
+- **Modern execution** - Contemporary, trustworthy macOS-appropriate design
 
 ### Color Palette
 ```
-Primary: Gold (#C9A227) - Florijn brand gold
-Secondary: Navy (#0D1B2A) - Professional contrast
+Primary: Navy (#1A237E) - Professional trust and authority
+Secondary: Blue (#3949AB) - Modern financial services
 Accent: White (#FFFFFF) - Clean highlights
-Shadow: Dark gold (#996F1A) - Depth and dimensionality
+Success: Green (#2E7D32) - Growth and positive financials
 ```
 
 ---
@@ -52,52 +52,52 @@ Shadow: Dark gold (#996F1A) - Depth and dimensionality
 
 ## Icon Design Options
 
-### Option A: Classic Coin (Recommended)
+### Option A: Professional Circle (Recommended)
 ```
-Design: Circular gold coin with subtle embossed detail
-- Outer ring: Gold gradient (#C9A227 to #996F1A)
-- Center: Stylized "F" monogram in navy (#0D1B2A)
-- Highlight: White accent line for depth
-- Background: Subtle texture suggesting metal
+Design: Clean circular icon with modern financial symbolism
+- Outer ring: Navy (#1A237E) with subtle gradient
+- Center: Stylized "F" monogram in white
+- Accent: Subtle green (#2E7D32) growth indicator
+- Background: Professional blue (#3949AB) with depth
 
 Pros: ✅ Immediately recognizable as financial
      ✅ Scales well from 1024px to 16px
-     ✅ Unique in finance app category
-     ✅ Connects to Dutch heritage
+     ✅ Modern, trustworthy appearance
+     ✅ Distinctive in finance app category
 
-Cons: ⚠️ May feel traditional vs. modern
+Cons: ⚠️ Less historical reference (more contemporary)
 ```
 
-### Option B: Modern Financial Symbol
+### Option B: Modern Financial Chart
 ```
-Design: Geometric interpretation of coin + chart
-- Shape: Rounded square with gold circle inside
-- Center: Ascending bar chart silhouette
-- Colors: Gold (#C9A227) on navy (#0D1B2A)
-- Style: Flat design with subtle gradient
+Design: Geometric chart symbol with clean styling
+- Shape: Rounded square with navy background
+- Center: Ascending bar chart in white/green
+- Colors: Navy (#1A237E) with green (#2E7D32) accents
+- Style: Flat design with subtle depth
 
-Pros: ✅ Modern app store aesthetic
-     ✅ Clear financial/analytics association
+Pros: ✅ Clear financial/analytics association
+     ✅ Modern app store aesthetic
      ✅ Scalable geometric design
 
-Cons: ⚠️ Less unique (similar to other finance apps)
-     ⚠️ Loses Dutch heritage connection
+Cons: ⚠️ Similar to other finance apps
+     ⚠️ Less brand-specific recognition
 ```
 
-### Option C: Florijn Monogram
+### Option C: Minimalist Monogram
 ```
-Design: Stylized "F" in classic typography
-- Shape: Circular background
-- Letter: Custom serif "F" inspired by historical coins
-- Colors: Gold "F" on navy circle
-- Detail: Subtle flourishes/serifs
+Design: Clean "F" in professional typography
+- Shape: Circular navy background
+- Letter: Modern sans-serif "F" in white
+- Colors: Navy (#1A237E) with blue (#3949AB) accent
+- Detail: Clean, minimal, no flourishes
 
 Pros: ✅ Strong brand recognition
-     ✅ Elegant, premium feel
-     ✅ Historical typography reference
+     ✅ Professional, clean feel
+     ✅ Modern typography approach
 
 Cons: ⚠️ May not immediately suggest "finance"
-     ⚠️ Letter-based icons less distinctive
+     ⚠️ Letter-based icons can be less memorable
 ```
 
 ---
@@ -105,7 +105,7 @@ Cons: ⚠️ May not immediately suggest "finance"
 ## Recommended Implementation
 
 ### Phase 1: Option A Development
-**Target:** Classic coin design with modern execution
+**Target:** Professional circle design with modern, trustworthy execution
 
 **Design Process:**
 1. **Concept sketches** - Multiple coin interpretations
@@ -228,4 +228,4 @@ AppIcon.appiconset/
 
 ---
 
-**RECOMMENDATION:** Proceed with Option A (Classic Coin) design, implement in-house with vector graphics, and plan 2-week timeline for completion.**
+**RECOMMENDATION:** Proceed with Option A (Professional Circle) design, implement in-house with vector graphics, and plan 2-week timeline for completion.**

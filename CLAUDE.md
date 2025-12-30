@@ -4,7 +4,7 @@
 >
 # **Status:** Brand transformation completed → Ready for Xcode project update and App Store publication
 >
-# **Next Step:** Update Xcode project file and implement Florijn design system
+# **Next Step:** Implement the new Florijn Design System 2.0
 
 ## Current Status (December 27, 2025)
 
@@ -149,6 +149,141 @@ All animations use `.spring(response: 0.3, dampingFraction: 0.8)` for consistenc
 - **Integrated with CSV import** via CategorizationEngine
 
 **Result**: Clean codebase, BUILD SUCCEEDED
+
+---
+
+## Florijn Design System 2.0
+
+### Philosophy: "Professional Trust through Dutch Minimalism"
+
+**Core Principles:**
+- **Trust First**: Every design choice builds financial credibility
+- **Dutch Precision**: Clean, functional, purposeful design
+- **Accessibility**: WCAG 2.1 AA compliance throughout
+- **Native Integration**: Leverages macOS design language
+
+### Color System: "Professional Trust"
+
+**Primary Colors**
+```swift
+// Primary
+static let primaryNavy = Color(hex: "#1A237E")        // Headers, primary buttons
+static let primaryBlue = Color(hex: "#3949AB")        // Interactive elements, links
+static let stabilityBlue = Color(hex: "#5E72E4")      // Hover states, focus
+
+// Success & Growth
+static let successGreen = Color(hex: "#2E7D32")       // Positive transactions, growth
+static let freshMint = Color(hex: "#4CAF50")          // Subtle positive highlights
+
+// System Colors
+static let alertOrange = Color(hex: "#FF6F00")        // Warnings (non-destructive)
+static let errorRed = Color(hex: "#D32F2F")           // Errors, destructive actions
+
+// Neutrals
+static let pureWhite = Color(hex: "#FFFFFF")          // Primary backgrounds
+static let lightGray = Color(hex: "#F8F9FA")          // Secondary backgrounds
+static let mediumGray = Color(hex: "#6C757D")         // Supporting text, borders
+static let darkGray = Color(hex: "#495057")           // Body text, icons
+static let charcoal = Color(hex: "#212529")           // Headers, high-emphasis
+
+// Dark Mode
+static let darkBackground = Color(hex: "#1A1A1A")     // Dark primary backgrounds
+static let darkSurface = Color(hex: "#2D2D2D")        // Dark card backgrounds
+static let darkBorder = Color(hex: "#404040")         // Dark mode borders
+```
+
+**Color Usage Guidelines:**
+- **4.5:1 minimum contrast** for all text combinations
+- **7:1 contrast** for critical financial data
+- **Color + Icon/Pattern** for accessibility (never color alone)
+- **Semantic meaning**: Green = positive, Red = negative, Blue = neutral/action
+
+### Typography: "Financial Clarity"
+
+**Font System: SF Pro (Native macOS)**
+```swift
+// Display Hierarchy
+static let displayLarge = Font.system(.largeTitle, design: .default, weight: .medium)     // 34pt - Hero numbers
+static let displayMedium = Font.system(.title, design: .default, weight: .medium)         // 28pt - Section headers
+
+// Content Hierarchy
+static let headingLarge = Font.system(.title2, design: .default, weight: .bold)           // 22pt - Card headers
+static let headingMedium = Font.system(.headline, design: .default, weight: .semibold)    // 18pt - Subheadings
+static let bodyLarge = Font.system(.body, design: .default, weight: .regular)             // 16pt - Primary content
+static let body = Font.system(.callout, design: .default, weight: .regular)               // 14pt - Standard text
+static let bodySmall = Font.system(.caption, design: .default, weight: .regular)          // 12pt - Secondary content
+static let caption = Font.system(.caption2, design: .default, weight: .medium)            // 11pt - Labels, metadata
+
+// Financial Data (Monospaced for alignment)
+static let currencyLarge = Font.system(.title2, design: .monospaced, weight: .medium)     // 24pt - Dashboard totals
+static let currency = Font.system(.headline, design: .monospaced, weight: .medium)        // 18pt - Transaction amounts
+static let currencySmall = Font.system(.callout, design: .monospaced, weight: .medium)    // 14pt - List amounts
+```
+
+### Spacing System: "8pt Grid Precision"
+
+**Base Unit: 8px** (follows Apple's 8pt grid system)
+```swift
+enum Spacing: CGFloat {
+    case tiny = 4        // Icon padding, tight spacing
+    case small = 8       // Component inner spacing
+    case medium = 16     // Standard component spacing
+    case large = 24      // Section spacing
+    case xlarge = 32     // Major section breaks
+    case xxlarge = 48    // Page-level spacing
+    case hero = 64       // Dramatic spacing for emphasis
+}
+```
+
+### Component Specifications
+
+**Cards & Surfaces**
+```swift
+struct CardStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .background(Color.pureWhite)
+            .overlay(RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.mediumGray.opacity(0.12), lineWidth: 1))
+            .shadow(color: Color.primaryNavy.opacity(0.08), radius: 4, x: 0, y: 2)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+```
+
+**Buttons & Interactions**
+- **Primary**: Navy background, white text, 12px corners, 44px height
+- **Secondary**: Blue outline, blue text, 12px corners, 44px height
+- **Input Fields**: 8px corners, 2px border (gray/blue), white background
+- **Minimum Touch Target**: 44x44px for accessibility
+
+### Layout Architecture
+
+**Navigation Structure**
+- **Sidebar**: 280px fixed width, collapsible
+- **Main Content**: Max width 1200px, centered
+- **Toolbar**: 52px height (macOS standard)
+- **Content Padding**: 24px from edges
+
+**Accessibility Standards**
+- **Contrast**: 4.5:1 text, 7:1 financial data, 3:1 interactive
+- **Target Size**: 44x44px minimum for all interactive elements
+- **Motion**: Respects system reduce-motion settings
+- **Navigation**: Full keyboard support throughout
+
+### Animation Standards
+
+**Standard Transitions**
+```swift
+.animation(.spring(response: 0.3, dampingFraction: 0.8), value: someValue)
+```
+
+**Implementation Priority**
+1. **Phase 1**: Color/typography constants, basic component styles
+2. **Phase 2**: Navigation redesign, transaction list styling, dashboard cards
+3. **Phase 3**: Dark mode, animation refinement, accessibility audit
+
+**Create `DesignSystem.swift` file** with all color constants, typography styles, and component modifiers for consistent implementation across the app.
 
 ---
 

@@ -1,6 +1,6 @@
 //
 //  FamilyAccountsConfig.swift
-//  Family Finance
+//  Florijn
 //
 //  Centralized configuration for family account information.
 //

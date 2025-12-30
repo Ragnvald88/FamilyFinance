@@ -1,6 +1,6 @@
 //
 //  FamilyFinanceTests.swift
-//  Family Finance Tests
+//  Florijn Tests
 //
 //  Comprehensive unit tests for critical business logic
 //  Focus: CSV parsing, categorization, Dutch number format
@@ -10,10 +10,10 @@
 
 import XCTest
 @preconcurrency import SwiftData
-@testable import FamilyFinance
+@testable import Florijn
 
 @MainActor
-final class FamilyFinanceTests: XCTestCase {
+final class FlorijnTests: XCTestCase {
 
     // MARK: - Test Fixtures
 

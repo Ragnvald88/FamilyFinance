@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- App Sandbox (Required for Mac App Store) -->
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+
+	<!-- File Access: User Selected Files -->
+	<!-- Allows CSV import/export through file picker -->
+	<key>com.apple.security.files.user-selected.read-write</key>
+	<true/>
+
+	<!-- Hardened Runtime (Recommended) -->
+	<key>com.apple.security.get-task-allow</key>
+	<false/>
+
+	<!-- Disable dangerous entitlements -->
+	<key>com.apple.security.network.client</key>
+	<false/>
+	<key>com.apple.security.network.server</key>
+	<false/>
+</dict>
+</plist>

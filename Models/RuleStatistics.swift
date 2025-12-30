@@ -1,6 +1,6 @@
 //
 //  RuleStatistics.swift
-//  Family Finance
+//  Florijn
 //
 //  Separate statistics model to prevent write contention during rule processing
 //  Data Engineering Lead recommendation for preventing performance issues

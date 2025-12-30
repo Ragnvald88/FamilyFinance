@@ -1,6 +1,6 @@
 //
 //  TransactionQueryService.swift
-//  Family Finance
+//  Florijn
 //
 //  High-performance query service for transaction aggregations
 //  Optimized for 15,430+ transactions with smart filtering

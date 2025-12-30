@@ -1,6 +1,6 @@
 //
 //  DashboardView.swift
-//  Family Finance
+//  Florijn
 //
 //  Dashboard with KPIs, charts, and insights
 //

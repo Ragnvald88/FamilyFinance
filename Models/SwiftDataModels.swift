@@ -1,6 +1,6 @@
 //
 //  SwiftDataModels.swift
-//  Family Finance
+//  Florijn
 //
 //  Production-grade SwiftData models for Dutch banking CSV import
 //  Designed for 15,430+ transactions with optimal query performance

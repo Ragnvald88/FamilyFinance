@@ -1,6 +1,6 @@
 //
 //  ActionExecutorTests.swift
-//  FamilyFinanceTests
+//  FlorijnTests
 //
 //  Integration tests for ActionExecutor component
 //  Tests all 16 action types and ACID transaction safety
@@ -10,7 +10,7 @@
 
 import XCTest
 import SwiftData
-@testable import FamilyFinance
+@testable import Florijn
 
 @MainActor
 final class ActionExecutorTests: XCTestCase {

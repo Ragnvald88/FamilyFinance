@@ -1,6 +1,6 @@
 //
 //  RuleProgressPublisher.swift
-//  Family Finance
+//  Florijn
 //
 //  Real-time progress reporting for rule processing
 //

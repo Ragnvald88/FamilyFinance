@@ -1,6 +1,6 @@
 //
 //  SimpleRulesView.swift
-//  Family Finance
+//  Florijn
 //
 //  Firefly III-inspired rules interface - Rules First, Groups Optional
 //
@@ -17,7 +17,7 @@ import SwiftUI
 import SwiftData
 import OSLog
 
-private let logger = Logger(subsystem: "FamilyFinance", category: "SimpleRulesView")
+private let logger = Logger(subsystem: "Florijn", category: "SimpleRulesView")
 
 // MARK: - Main View
 

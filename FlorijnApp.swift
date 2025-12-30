@@ -1,6 +1,6 @@
 //
-//  FamilyFinanceApp.swift
-//  Family Finance
+//  FlorijnApp.swift
+//  Florijn
 //
 //  Main application entry point for macOS
 //  SwiftData + SwiftUI with modern architecture
@@ -12,95 +12,8 @@ import SwiftUI
 import Charts
 @preconcurrency import SwiftData
 
-// MARK: - View Modifiers (Native Apple APIs)
-
-extension View {
-    /// Standard card style using native macOS appearance
-    func primaryCard() -> some View {
-        self
-            .background(Color(nsColor: .controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
-    }
-
-    /// Staggered appearance animation for list items
-    func staggeredAppearance(index: Int, totalItems: Int) -> some View {
-        self
-            .opacity(1)
-            .offset(y: 0)
-            .animation(
-                .spring(response: 0.3, dampingFraction: 0.8).delay(Double(index) * 0.05),
-                value: true
-            )
-    }
-}
-
-/// Animated currency display with spring animation
-struct AnimatedNumber: View {
-    let value: Decimal
-    let font: Font
-
-    @State private var displayValue: Decimal = 0
-
-    var body: some View {
-        Text(displayValue.toCurrencyString())
-            .font(font)
-            .monospacedDigit()
-            .onChange(of: value) { _, newValue in
-                withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
-                    displayValue = newValue
-                }
-            }
-            .onAppear {
-                withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.3)) {
-                    displayValue = value
-                }
-            }
-    }
-}
-
-/// Skeleton loading placeholder for cards
-struct SkeletonCard: View {
-    @State private var isAnimating = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.gray.opacity(isAnimating ? 0.3 : 0.2))
-                    .frame(width: 24, height: 24)
-
-                Spacer()
-
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.gray.opacity(isAnimating ? 0.2 : 0.1))
-                    .frame(width: 60, height: 16)
-            }
-
-            RoundedRectangle(cornerRadius: 4)
-                .fill(Color.gray.opacity(isAnimating ? 0.4 : 0.3))
-                .frame(height: 24)
-                .frame(maxWidth: 120, alignment: .leading)
-
-            RoundedRectangle(cornerRadius: 4)
-                .fill(Color.gray.opacity(isAnimating ? 0.2 : 0.1))
-                .frame(height: 12)
-                .frame(maxWidth: 80, alignment: .leading)
-        }
-        .padding(16)
-        .primaryCard()
-        .onAppear {
-            withAnimation(
-                Animation.easeInOut(duration: 1.2).repeatForever(autoreverses: true)
-            ) {
-                isAnimating.toggle()
-            }
-        }
-    }
-}
-
 @main
-struct FamilyFinanceApp: App {
+struct FlorijnApp: App {
 
     // MARK: - Environment Detection
 
@@ -184,6 +97,30 @@ struct FamilyFinanceApp: App {
         }
     }()
 
+    // MARK: - Data Migration
+
+    /// Migrate user data from "Family Finance" to "Florijn" on first launch
+    private func migrateUserDataIfNeeded() {
+        let fileManager = FileManager.default
+        let oldPath = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)
+            .first?.appendingPathComponent("Family Finance")
+        let newPath = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)
+            .first?.appendingPathComponent("Florijn")
+
+        guard let oldURL = oldPath, let newURL = newPath,
+              fileManager.fileExists(atPath: oldURL.path),
+              !fileManager.fileExists(atPath: newURL.path) else { return }
+
+        do {
+            try fileManager.moveItem(at: oldURL, to: newURL)
+            print("✅ Successfully migrated user data from Family Finance to Florijn")
+        } catch {
+            print("⚠️ Failed to migrate user data: \(error)")
+            // Fallback: copy instead of move
+            try? fileManager.copyItem(at: oldURL, to: newURL)
+        }
+    }
+
     // MARK: - Scene
 
     var body: some Scene {
@@ -191,6 +128,9 @@ struct FamilyFinanceApp: App {
             ContentView()
                 .modelContainer(sharedModelContainer)
                 .frame(minWidth: 1200, minHeight: 800)
+                .onAppear {
+                    migrateUserDataIfNeeded()
+                }
         }
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified)
@@ -546,7 +486,7 @@ struct SidebarView: View {
             }
         }
         .listStyle(.sidebar)
-        .navigationTitle("Family Finance")
+        .navigationTitle("Florijn")
     }
 }
 
@@ -3031,7 +2971,7 @@ struct DataSettingsView: View {
         Form {
             Section("Database") {
                 LabeledContent("Location") {
-                    Text("~/Library/Application Support/Family Finance")
+                    Text("~/Library/Application Support/Florijn")
                         .foregroundStyle(.secondary)
                 }
                 Button("Open Database Folder") {
@@ -3080,7 +3020,7 @@ struct DataSettingsView: View {
 
     private func openDatabaseFolder() {
         let path = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
-            .appendingPathComponent("Family Finance")
+            .appendingPathComponent("Florijn")
         if let path = path {
             NSWorkspace.shared.open(path)
         }

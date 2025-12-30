@@ -1,6 +1,6 @@
 //
 //  TransactionDetailViewTests.swift
-//  Family Finance Tests
+//  Florijn Tests
 //
 //  TDD tests for TransactionDetailView
 //  Tests: field display, category editing, audit log, notes, splits, recurring
@@ -10,7 +10,7 @@
 
 import XCTest
 @preconcurrency import SwiftData
-@testable import FamilyFinance
+@testable import Florijn
 
 /// Unit tests for TransactionDetailView following TDD approach.
 /// These tests verify the view model logic and data transformations.
@@ -147,8 +147,8 @@ final class TransactionDetailViewTests: XCTestCase {
     func testCategoriesCanBeFetched() throws {
         try createTestCategories()
 
-        let descriptor = FetchDescriptor<FamilyFinance.Category>(
-            sortBy: [SortDescriptor(\FamilyFinance.Category.sortOrder)]
+        let descriptor = FetchDescriptor<Category>(
+            sortBy: [SortDescriptor(\Category.sortOrder)]
         )
         let categories = try modelContext.fetch(descriptor)
 
@@ -163,8 +163,8 @@ final class TransactionDetailViewTests: XCTestCase {
 
         // Fetch all categories and filter in memory
         // (SwiftData predicates don't support enum comparisons directly)
-        let descriptor = FetchDescriptor<FamilyFinance.Category>(
-            sortBy: [SortDescriptor(\FamilyFinance.Category.sortOrder)]
+        let descriptor = FetchDescriptor<Category>(
+            sortBy: [SortDescriptor(\Category.sortOrder)]
         )
         let allCategories = try modelContext.fetch(descriptor)
 

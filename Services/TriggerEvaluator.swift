@@ -1,6 +1,6 @@
 //
 //  TriggerEvaluator.swift
-//  Family Finance
+//  Florijn
 //
 //  Trigger evaluation system with adaptive parallelization
 //
@@ -19,7 +19,7 @@ import SwiftData
 import Foundation
 import OSLog
 
-private let logger = Logger(subsystem: "FamilyFinance", category: "TriggerEvaluator")
+private let logger = Logger(subsystem: "Florijn", category: "TriggerEvaluator")
 
 @ModelActor
 actor TriggerEvaluator {

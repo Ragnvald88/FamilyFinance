@@ -1,6 +1,6 @@
 import XCTest
 @preconcurrency import SwiftData
-@testable import FamilyFinance
+@testable import Florijn
 
 /// Unit tests for the core data models following TDD approach.
 /// Covers: Transaction, Account, Category models and Dutch number parsing.
@@ -308,7 +308,7 @@ final class TransactionModelTests: XCTestCase {
         modelContext.insert(category)
         try modelContext.save()
 
-        let descriptor = FetchDescriptor<FamilyFinance.Category>()
+        let descriptor = FetchDescriptor<Category>()
         let fetched = try modelContext.fetch(descriptor)
 
         XCTAssertEqual(fetched.count, 1)

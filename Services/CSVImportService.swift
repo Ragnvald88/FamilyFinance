@@ -1,6 +1,6 @@
 //
 //  CSVImportService.swift
-//  Family Finance
+//  Florijn
 //
 //  Production-grade CSV import service for Rabobank statements
 //  Handles encoding detection, Dutch number parsing, duplicate detection

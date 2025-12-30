@@ -2,7 +2,7 @@
 
 A macOS personal finance application built with SwiftUI and SwiftData.
 
-**Note:** Currently transitioning from FamilyFinance to Florijn branding. See `docs/plans/2025-01-florijn-transformation-plan.md` for implementation details.
+A professional macOS personal finance application built with native Apple frameworks.
 
 ![macOS](https://img.shields.io/badge/macOS-13.0+-blue.svg)
 ![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)
@@ -85,8 +85,8 @@ The CSV importer tries encodings in order:
 ### Build
 ```bash
 git clone [repository-url]
-cd FamilyFinance
-open FamilyFinance.xcodeproj
+cd Florijn
+open Florijn.xcodeproj
 # ⌘+R to build and run
 ```
 

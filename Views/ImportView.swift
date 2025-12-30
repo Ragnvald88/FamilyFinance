@@ -1,6 +1,6 @@
 //
 //  ImportView.swift
-//  Family Finance
+//  Florijn
 //
 //  Beautiful CSV import interface with drag-and-drop support
 //  Real-time progress tracking and detailed results

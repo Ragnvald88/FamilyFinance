@@ -1,6 +1,6 @@
 //
 //  ActionExecutor.swift
-//  Family Finance
+//  Florijn
 //
 //  Phase 2 Component 6/8: Action Execution Engine
 //  Expert-approved architecture for ACID-compliant action execution

@@ -1,10 +1,10 @@
-# Florijn (formerly Family Finance)
+# Florijn
 
 > macOS Personal Finance App | SwiftUI + SwiftData
 >
-> **Status:** Ready for brand transformation → App Store publication
+# **Status:** Brand transformation completed → Ready for Xcode project update and App Store publication
 >
-> **Next Step:** Execute Florijn transformation (see `docs/plans/2025-01-florijn-transformation-plan.md`)
+# **Next Step:** Update Xcode project file and implement Florijn design system
 
 ## Current Status (December 27, 2025)
 
@@ -38,7 +38,7 @@
 ### File Structure
 
 ```
-FamilyFinanceApp.swift           — Main app entry point
+FlorijnApp.swift                 — Main app entry point
 
 Models/
 ├── SwiftDataModels.swift        — Transaction/Account/Category
@@ -114,7 +114,7 @@ All animations use `.spring(response: 0.3, dampingFraction: 0.8)` for consistenc
 
 ## Development
 
-1. **Verify build**: `xcodebuild -scheme FamilyFinance build`
+1. **Verify build**: `xcodebuild -scheme Florijn build`
 2. **Use native Apple APIs** for spacing and fonts
 3. **Test with real data** - 15k+ transactions
 

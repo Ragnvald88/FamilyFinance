@@ -1,6 +1,6 @@
 //
 //  ExportService.swift
-//  Family Finance
+//  Florijn
 //
 //  Export service for CSV and Excel exports with Dutch formatting
 //  Mirror of Python export functionality

@@ -1,6 +1,6 @@
 //
 //  RulesModels.swift
-//  Family Finance
+//  Florijn
 //
 //  New rule system models based on Firefly III architecture
 //  Provides trigger-action rule engine with rule groups and advanced features

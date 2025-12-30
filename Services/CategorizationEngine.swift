@@ -1,6 +1,6 @@
 //
 //  CategorizationEngine.swift
-//  Family Finance
+//  Florijn
 //
 //  Priority-based pattern matching engine for automatic categorization
 //  Supports 150+ rules optimized for Dutch banking patterns

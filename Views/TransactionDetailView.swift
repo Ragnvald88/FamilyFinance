@@ -1,6 +1,6 @@
 //
 //  TransactionDetailView.swift
-//  Family Finance
+//  Florijn
 //
 //  Transaction detail sheet with editing capabilities
 //  Displays: all fields, category picker, notes, splits, recurring, audit log

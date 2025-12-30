@@ -1,6 +1,6 @@
 //
 //  RuleEngine.swift
-//  Family Finance
+//  Florijn
 //
 //  Phase 2: Core rule evaluation engine with TriggerEvaluator/ActionExecutor integration
 //

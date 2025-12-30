@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Privacy Tracking -->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+
+	<!-- Data Collection -->
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+
+	<!-- Privacy-Sensitive APIs Used -->
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>C617.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
+<!--
+Privacy Manifest for Florijn Personal Finance App
+
+This app:
+✅ Does NOT track users
+✅ Does NOT collect personal data
+✅ Does NOT connect to external services
+✅ Uses file timestamps only for SwiftData database operations (C617.1)
+
+File timestamp access (C617.1): Accessing the timestamps, size, or other
+metadata of files inside the app container, app group container, or the
+app's CloudKit container.
+-->

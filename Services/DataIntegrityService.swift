@@ -1,6 +1,6 @@
 //
 //  DataIntegrityService.swift
-//  Family Finance
+//  Florijn
 //
 //  Ensures data integrity across the application.
 //  - Validates denormalized fields on app launch

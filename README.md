@@ -1,6 +1,8 @@
-# FamilyFinance
+# Florijn
 
 A macOS personal finance application built with SwiftUI and SwiftData.
+
+**Note:** Currently transitioning from FamilyFinance to Florijn branding. See `docs/plans/2025-01-florijn-transformation-plan.md` for implementation details.
 
 ![macOS](https://img.shields.io/badge/macOS-13.0+-blue.svg)
 ![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)

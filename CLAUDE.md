@@ -1,8 +1,10 @@
-# Family Finance
+# Florijn (formerly Family Finance)
 
-> macOS Finance App | SwiftUI + SwiftData
+> macOS Personal Finance App | SwiftUI + SwiftData
 >
-> **Status:** Core app production-ready, rules system complete
+> **Status:** Ready for brand transformation → App Store publication
+>
+> **Next Step:** Execute Florijn transformation (see `docs/plans/2025-01-florijn-transformation-plan.md`)
 
 ## Current Status (December 27, 2025)
 

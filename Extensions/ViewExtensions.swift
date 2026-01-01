@@ -415,6 +415,7 @@ struct PremiumPrimaryButtonStyle: ButtonStyle {
             }
             .foregroundStyle(.white)
             .font(.bodyLarge)
+            .fontWeight(.semibold)
             .clipShape(RoundedRectangle(cornerRadius: PremiumSpacing.buttonCornerRadius))
             .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
             .opacity(configuration.isPressed ? 0.9 : 1.0)

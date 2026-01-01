@@ -307,8 +307,7 @@ actor TriggerEvaluator {
     /// Evaluate regex pattern with caching
     private func evaluateRegex(pattern: String, against text: String) async -> Bool {
         do {
-            let regex = try await Self.regexCache.getRegex(for: pattern)
-            return text.contains(regex)
+            return try await Self.regexCache.evaluate(pattern: pattern, against: text)
         } catch {
             logger.warning("Invalid regex pattern '\(pattern)': \(error.localizedDescription)")
             return false
@@ -394,7 +393,7 @@ actor TriggerEvaluator {
             let batchResults = await withTaskGroup(of: (Int, Bool).self) { group in
                 // Add tasks for each trigger in the batch
                 for (index, trigger) in batch.enumerated() {
-                    group.addTask {
+                    group.addTask { @Sendable in
                         let result = await self.evaluate(trigger, against: transaction)
                         return (index, result)
                     }
@@ -453,7 +452,14 @@ actor RegexCache {
     private var cache: [String: Regex<AnyRegexOutput>] = [:]
     private let maxSize = 1000
 
-    func getRegex(for pattern: String) throws -> Regex<AnyRegexOutput> {
+    /// Evaluate pattern against text (Swift 6 Sendable-compliant)
+    func evaluate(pattern: String, against text: String) throws -> Bool {
+        let regex = try getRegexInternal(for: pattern)
+        return text.contains(regex)
+    }
+
+    /// Internal method to get regex (keeps non-Sendable Regex within actor boundary)
+    private func getRegexInternal(for pattern: String) throws -> Regex<AnyRegexOutput> {
         if let cached = cache[pattern] {
             return cached
         }
@@ -467,6 +473,11 @@ actor RegexCache {
 
         cache[pattern] = regex
         return regex
+    }
+
+    /// Legacy method for backward compatibility (still not Sendable-compliant)
+    func getRegex(for pattern: String) throws -> Regex<AnyRegexOutput> {
+        return try getRegexInternal(for: pattern)
     }
 }
 

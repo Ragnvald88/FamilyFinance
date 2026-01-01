@@ -448,7 +448,7 @@ actor BackgroundDataHandler {
     private func detectFrequency(from intervals: [Int]) -> RecurrenceFrequency? {
         guard !intervals.isEmpty else { return nil }
 
-        let average = intervals.reduce(0, +) / intervals.count
+        let _ = intervals.reduce(0, +) / intervals.count  // Average for potential future pattern analysis
         let tolerance = 5
 
         // Check for common patterns

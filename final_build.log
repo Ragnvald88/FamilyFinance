@@ -1,0 +1,1637 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -scheme FamilyFinance -configuration Debug build
+
+2026-01-01 22:30:03.387 xcodebuild[83648:8981409] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, id:00006040-000A71160EA0801C, name:My Mac }
+{ platform:macOS, arch:x86_64, id:00006040-000A71160EA0801C, name:My Mac }
+{ platform:macOS, name:Any Mac }
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (1 target)
+    Target 'FamilyFinance' in project 'Florijn' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: 6521a68c7925158b597788a6b259978d
+Build description path: /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/XCBuildData/6521a68c7925158b597788a6b259978d.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx26.2-25C57-00fa09913b459cbbc988d1f6730289ae.sdkstatcache
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Florijn.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -o /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx26.2-25C57-00fa09913b459cbbc988d1f6730289ae.sdkstatcache
+
+CreateBuildDirectory /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Florijn.xcodeproj
+    builtin-create-build-directory /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex
+
+CreateBuildDirectory /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Florijn.xcodeproj
+    builtin-create-build-directory /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products
+
+CreateBuildDirectory /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/ExplicitPrecompiledModules
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Florijn.xcodeproj
+    builtin-create-build-directory /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/ExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Florijn.xcodeproj
+    builtin-create-build-directory /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/EagerLinkingTBDs/Debug
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Florijn.xcodeproj
+    builtin-create-build-directory /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/EagerLinkingTBDs/Debug
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/Florijn-1bbf57cc837f89cca72e64df409d3607-VFS/all-product-headers.yaml
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Florijn.xcodeproj
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/Florijn-1bbf57cc837f89cca72e64df409d3607-VFS/all-product-headers.yaml
+
+CreateBuildDirectory /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Florijn.xcodeproj
+    builtin-create-build-directory /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-own-target-headers.hmap (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-own-target-headers.hmap
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-generated-files.hmap (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-generated-files.hmap
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-all-target-headers.hmap (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-all-target-headers.hmap
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-all-non-framework-target-headers.hmap (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-all-non-framework-target-headers.hmap
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/empty-FamilyFinance.plist (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/empty-FamilyFinance.plist
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.DependencyStaticMetadataFileList (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.DependencyStaticMetadataFileList
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.hmap (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.hmap
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-project-headers.hmap (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-project-headers.hmap
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.SwiftFileList (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.SwiftFileList
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance_const_extract_protocols.json (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance_const_extract_protocols.json
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.LinkFileList (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.LinkFileList
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance-OutputFileMap.json (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance-OutputFileMap.json
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.SwiftConstValuesFileList (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-DebugDylibPath-normal-arm64.txt (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-DebugDylibPath-normal-arm64.txt
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-DebugDylibInstallName-normal-arm64.txt (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-DebugDylibInstallName-normal-arm64.txt
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.DependencyMetadataFileList (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.DependencyMetadataFileList
+
+MkDir /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    /bin/mkdir -p /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents
+
+WriteAuxiliaryFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/DerivedSources/Entitlements.plist (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    write-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/DerivedSources/Entitlements.plist
+
+MkDir /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    /bin/mkdir -p /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app
+
+MkDir /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    /bin/mkdir -p /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS
+
+ProcessProductPackaging "" /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.app.xcent (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+    Entitlements:
+    
+    {
+    "com.apple.security.get-task-allow" = 1;
+}
+    
+    builtin-productPackagingUtility -entitlements -format xml -o /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.app.xcent
+
+ProcessProductPackagingDER /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.app.xcent /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.app.xcent.der (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    /usr/bin/derq query -f xml -i /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.app.xcent -o /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.app.xcent.der --raw
+
+Ld /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS/__preview.dylib normal (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-macos14.0 -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -O0 -L/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug -F/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug -install_name @rpath/FamilyFinance.debug.dylib -dead_strip -rdynamic -Xlinker -no_deduplicate -Xlinker -dependency_info -Xlinker /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance_dependency_info.dat -Xlinker -no_adhoc_codesign -o /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS/__preview.dylib
+
+ProcessInfoPlistFile /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/Info.plist /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/empty-FamilyFinance.plist (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    builtin-infoPlistUtility /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/empty-FamilyFinance.plist -producttype com.apple.product-type.application -genpkginfo /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/PkgInfo -expandbuildsettings -platform macosx -o /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/Info.plist
+
+SwiftDriver FamilyFinance normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name FamilyFinance -Onone -enforce-exclusivity\=checked @/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.SwiftFileList -DDEBUG -enable-upcoming-feature StrictConcurrency -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-macos14.0 -g -module-cache-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug -F /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug -emit-localized-strings -emit-localized-strings-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64 -c -j14 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx26.2-25C57-00fa09913b459cbbc988d1f6730289ae.sdkstatcache -output-file-map /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance_const_extract_protocols.json -Xcc -iquote -Xcc /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-generated-files.hmap -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-own-target-headers.hmap -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-all-target-headers.hmap -Xcc -iquote -Xcc /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-project-headers.hmap -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/include -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/DerivedSources-normal/arm64 -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/DerivedSources/arm64 -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance-Swift.h -working-directory /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn -experimental-emit-module-separately -disable-cmo
+
+SwiftCompile normal arm64 Compiling\ FlorijnApp.swift,\ SwiftDataModels.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/FlorijnApp.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Models/SwiftDataModels.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/FlorijnApp.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Models/SwiftDataModels.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+
+SwiftCompile normal arm64 Compiling\ CSVImportService.swift,\ CategorizationEngine.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/CSVImportService.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/CategorizationEngine.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/CSVImportService.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+@__swiftmacro_13FamilyFinance0031CategorizationEngineswift_yFFIifMX237_27_33_8208643C4631809334F9DB462197B35CLl9PredicatefMf_.swift:4:18: warning: type 'ReferenceWritableKeyPath<Rule, Bool>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+        keyPath: \.isActive
+                 ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/CategorizationEngine.swift:238:28: note: in expansion of macro 'Predicate' here
+                predicate: #Predicate { $0.isActive },
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/CategorizationEngine.swift:238:28: note: in expansion of macro 'Predicate' here
+                predicate: #Predicate { $0.isActive },
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/CategorizationEngine.swift:239:41: warning: type 'ReferenceWritableKeyPath<Rule, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                sortBy: [SortDescriptor(\.groupExecutionOrder)]
+                                        ^
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/CategorizationEngine.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+@__swiftmacro_13FamilyFinance0031CategorizationEngineswift_yFFIifMX237_27_33_8208643C4631809334F9DB462197B35CLl9PredicatefMf_.swift:4:18: warning: type 'ReferenceWritableKeyPath<Rule, Bool>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+        keyPath: \.isActive
+                 ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/CategorizationEngine.swift:238:28: note: in expansion of macro 'Predicate' here
+                predicate: #Predicate { $0.isActive },
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/CategorizationEngine.swift:238:28: note: in expansion of macro 'Predicate' here
+                predicate: #Predicate { $0.isActive },
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/CategorizationEngine.swift:239:41: warning: type 'ReferenceWritableKeyPath<Rule, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                sortBy: [SortDescriptor(\.groupExecutionOrder)]
+                                        ^
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+
+SwiftCompile normal arm64 Compiling\ FamilyAccountsConfig.swift,\ BackgroundDataHandler.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Configuration/FamilyAccountsConfig.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Configuration/FamilyAccountsConfig.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+@__swiftmacro_13FamilyFinance0032BackgroundDataHandlerswift_jIADjfMX219_24_33_82D45BE384D226F8634A1C46969D3EC7Ll9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Account, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.iban
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:220:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Account> { $0.iban == iban }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:220:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Account> { $0.iban == iban }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0032BackgroundDataHandlerswift_jIADjfMX247_24_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.uniqueKey
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:248:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Transaction> { $0.uniqueKey == uniqueKey }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:248:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Transaction> { $0.uniqueKey == uniqueKey }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0032BackgroundDataHandlerswift_jIADjfMX283_24_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Account, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.iban
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:284:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Account> { $0.iban == iban }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:284:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Account> { $0.iban == iban }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0032BackgroundDataHandlerswift_jIADjfMX392_24_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, Optional<UUID>>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.importBatchID
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:393:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Transaction> { $0.importBatchID == batchID }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:393:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Transaction> { $0.importBatchID == batchID }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+@__swiftmacro_13FamilyFinance0032BackgroundDataHandlerswift_jIADjfMX219_24_33_82D45BE384D226F8634A1C46969D3EC7Ll9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Account, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.iban
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:220:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Account> { $0.iban == iban }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:220:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Account> { $0.iban == iban }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0032BackgroundDataHandlerswift_jIADjfMX247_24_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.uniqueKey
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:248:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Transaction> { $0.uniqueKey == uniqueKey }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:248:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Transaction> { $0.uniqueKey == uniqueKey }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0032BackgroundDataHandlerswift_jIADjfMX283_24_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Account, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.iban
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:284:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Account> { $0.iban == iban }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:284:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Account> { $0.iban == iban }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0032BackgroundDataHandlerswift_jIADjfMX392_24_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, Optional<UUID>>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.importBatchID
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:393:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Transaction> { $0.importBatchID == batchID }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:393:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Transaction> { $0.importBatchID == batchID }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/BackgroundDataHandler.swift:405:37: warning: type 'KeyPath<Transaction, Date>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            sortBy: [SortDescriptor(\Transaction.date)]
+                                    ^
+Swift.KeyPath:1:14: note: generic class 'KeyPath' does not conform to the 'Sendable' protocol
+public class KeyPath<Root, Value> : PartialKeyPath<Root> {
+             ^
+
+SwiftCompile normal arm64 Compiling\ ExportService.swift,\ DashboardView.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Views/DashboardView.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:81:37: warning: type 'ReferenceWritableKeyPath<Rule, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            sortBy: [SortDescriptor(\.groupExecutionOrder)]
+                                    ^
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0024ExportServiceswift_ynAHffMX148_24_33_A00D6FB52D0C006309B5D8736FAE501BLl9PredicatefMf_.swift:6:26: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.year
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:149:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.year == year && $0.month == month }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:149:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.year == year && $0.month == month }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0024ExportServiceswift_ynAHffMX148_24_33_A00D6FB52D0C006309B5D8736FAE501BLl9PredicatefMf_.swift:13:26: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.month
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:149:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.year == year && $0.month == month }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:149:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.year == year && $0.month == month }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0024ExportServiceswift_ynAHffMX150_24_33_A00D6FB52D0C006309B5D8736FAE501BLl9PredicatefMf0_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.year
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:151:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.year == year }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:151:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.year == year }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0024ExportServiceswift_ynAHffMX152_24_33_A00D6FB52D0C006309B5D8736FAE501BLl9PredicatefMf1_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.month
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:153:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.month == month }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:153:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.month == month }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:160:37: warning: type 'KeyPath<Transaction, Date>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            sortBy: [SortDescriptor(\Transaction.date)]
+                                    ^
+Swift.KeyPath:1:14: note: generic class 'KeyPath' does not conform to the 'Sendable' protocol
+public class KeyPath<Root, Value> : PartialKeyPath<Root> {
+             ^
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Views/DashboardView.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+@__swiftmacro_13FamilyFinance0024ExportServiceswift_ynAHffMX148_24_33_A00D6FB52D0C006309B5D8736FAE501BLl9PredicatefMf_.swift:6:26: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.year
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:149:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.year == year && $0.month == month }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:149:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.year == year && $0.month == month }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0024ExportServiceswift_ynAHffMX148_24_33_A00D6FB52D0C006309B5D8736FAE501BLl9PredicatefMf_.swift:13:26: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.month
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:149:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.year == year && $0.month == month }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:149:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.year == year && $0.month == month }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0024ExportServiceswift_ynAHffMX150_24_33_A00D6FB52D0C006309B5D8736FAE501BLl9PredicatefMf0_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.year
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:151:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.year == year }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:151:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.year == year }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0024ExportServiceswift_ynAHffMX152_24_33_A00D6FB52D0C006309B5D8736FAE501BLl9PredicatefMf1_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.month
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:153:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.month == month }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ExportService.swift:153:25: note: in expansion of macro 'Predicate' here
+            predicate = #Predicate<Transaction> { $0.month == month }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+
+SwiftCompile normal arm64 Compiling\ TransactionQueryService.swift,\ DataIntegrityService.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/DataIntegrityService.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX221_23_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.year
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:222:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<Transaction> { $0.year == year }
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:222:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<Transaction> { $0.year == year }
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX256_23_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, Optional<Contributor>>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.contributor
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:257:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<Transaction> { transaction in
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:257:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<Transaction> { transaction in
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:316:37: warning: type 'ReferenceWritableKeyPath<Account, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            sortBy: [SortDescriptor(\Account.sortOrder)]
+                                    ^
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX337_23_9PredicatefMf_.swift:4:18: warning: type 'ReferenceWritableKeyPath<Liability, Bool>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+        keyPath: \.isActive
+                 ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:338:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<Liability> { $0.isActive }
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:338:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<Liability> { $0.isActive }
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX354_23_9PredicatefMf_.swift:4:18: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Bool>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+        keyPath: \.isActive
+                 ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:355:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> { $0.isActive },
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:355:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> { $0.isActive },
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:356:37: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Date>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            sortBy: [SortDescriptor(\RecurringTransaction.nextDueDate)]
+                                    ^
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX364_23_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Bool>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.isActive
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:365:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> { $0.isActive && $0.nextDueDate < now },
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:365:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> { $0.isActive && $0.nextDueDate < now },
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX364_23_9PredicatefMf_.swift:10:26: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Date>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.nextDueDate
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:365:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> { $0.isActive && $0.nextDueDate < now },
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:365:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> { $0.isActive && $0.nextDueDate < now },
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:366:37: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Date>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            sortBy: [SortDescriptor(\RecurringTransaction.nextDueDate)]
+                                    ^
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX375_23_9PredicatefMf_.swift:6:26: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Bool>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.isActive
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:376:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> {
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:376:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> {
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX375_23_9PredicatefMf_.swift:11:30: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Date>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                    keyPath: \.nextDueDate
+                             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:376:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> {
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:376:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> {
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX375_23_9PredicatefMf_.swift:20:26: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Date>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.nextDueDate
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:376:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> {
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:376:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> {
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:379:37: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Date>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            sortBy: [SortDescriptor(\RecurringTransaction.nextDueDate)]
+                                    ^
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:488:37: warning: type 'KeyPath<Transaction, Date>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            sortBy: [SortDescriptor(\Transaction.date, order: .reverse)]
+                                    ^
+Swift.KeyPath:1:14: note: generic class 'KeyPath' does not conform to the 'Sendable' protocol
+public class KeyPath<Root, Value> : PartialKeyPath<Root> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX508_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf_.swift:8:34: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                        keyPath: \.year
+                                 ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX508_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf_.swift:15:34: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                        keyPath: \.month
+                                 ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX508_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf_.swift:23:30: warning: type 'ReferenceWritableKeyPath<Transaction, TransactionType>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                    keyPath: \.transactionType
+                             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX508_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf_.swift:31:26: warning: type 'ReferenceWritableKeyPath<Transaction, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.iban
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX514_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf0_.swift:7:30: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                    keyPath: \.year
+                             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:515:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:515:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX514_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf0_.swift:14:30: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                    keyPath: \.month
+                             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:515:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:515:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX514_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf0_.swift:22:26: warning: type 'ReferenceWritableKeyPath<Transaction, TransactionType>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.transactionType
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:515:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:515:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX520_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf1_.swift:7:30: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                    keyPath: \.year
+                             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:521:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:521:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX520_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf1_.swift:14:30: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                    keyPath: \.month
+                             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:521:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:521:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX520_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf1_.swift:22:26: warning: type 'ReferenceWritableKeyPath<Transaction, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.iban
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:521:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:521:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX526_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf2_.swift:6:26: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.year
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:527:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:527:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX526_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf2_.swift:13:26: warning: type 'ReferenceWritableKeyPath<Transaction, TransactionType>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.transactionType
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:527:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:527:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX532_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf3_.swift:6:26: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.year
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:533:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:533:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX532_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf3_.swift:13:26: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.month
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:533:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:533:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX538_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf4_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.year
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:539:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:539:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX544_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf5_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.month
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:545:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:545:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX550_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf6_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, TransactionType>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.transactionType
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:551:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:551:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX556_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf7_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.iban
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:557:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:557:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:820:37: warning: type 'KeyPath<Transaction, Date>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            sortBy: [SortDescriptor(\Transaction.date, order: .reverse)]
+                                    ^
+Swift.KeyPath:1:14: note: generic class 'KeyPath' does not conform to the 'Sendable' protocol
+public class KeyPath<Root, Value> : PartialKeyPath<Root> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX922_27_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf_.swift:6:26: warning: type 'ReferenceWritableKeyPath<BudgetPeriod, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.year
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:923:28: note: in expansion of macro 'Predicate' here
+                predicate: #Predicate<BudgetPeriod> { budget in
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:923:28: note: in expansion of macro 'Predicate' here
+                predicate: #Predicate<BudgetPeriod> { budget in
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX922_27_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf_.swift:13:26: warning: type 'ReferenceWritableKeyPath<BudgetPeriod, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.month
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:923:28: note: in expansion of macro 'Predicate' here
+                predicate: #Predicate<BudgetPeriod> { budget in
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:923:28: note: in expansion of macro 'Predicate' here
+                predicate: #Predicate<BudgetPeriod> { budget in
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0031DataIntegrityServiceswift_yFFIifMX145_24_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Account, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.iban
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/DataIntegrityService.swift:146:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Account> { $0.iban == iban }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/DataIntegrityService.swift:146:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Account> { $0.iban == iban }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/DataIntegrityService.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX221_23_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.year
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:222:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<Transaction> { $0.year == year }
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:222:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<Transaction> { $0.year == year }
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX256_23_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, Optional<Contributor>>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.contributor
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:257:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<Transaction> { transaction in
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:257:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<Transaction> { transaction in
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX337_23_9PredicatefMf_.swift:4:18: warning: type 'ReferenceWritableKeyPath<Liability, Bool>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+        keyPath: \.isActive
+                 ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:338:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<Liability> { $0.isActive }
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:338:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<Liability> { $0.isActive }
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX354_23_9PredicatefMf_.swift:4:18: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Bool>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+        keyPath: \.isActive
+                 ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:355:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> { $0.isActive },
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:355:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> { $0.isActive },
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX364_23_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Bool>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.isActive
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:365:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> { $0.isActive && $0.nextDueDate < now },
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:365:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> { $0.isActive && $0.nextDueDate < now },
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX364_23_9PredicatefMf_.swift:10:26: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Date>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.nextDueDate
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:365:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> { $0.isActive && $0.nextDueDate < now },
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:365:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> { $0.isActive && $0.nextDueDate < now },
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX375_23_9PredicatefMf_.swift:6:26: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Bool>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.isActive
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:376:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> {
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:376:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> {
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX375_23_9PredicatefMf_.swift:11:30: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Date>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                    keyPath: \.nextDueDate
+                             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:376:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> {
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:376:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> {
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX375_23_9PredicatefMf_.swift:20:26: warning: type 'ReferenceWritableKeyPath<RecurringTransaction, Date>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.nextDueDate
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:376:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> {
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:376:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RecurringTransaction> {
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX508_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf_.swift:8:34: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                        keyPath: \.year
+                                 ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX508_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf_.swift:15:34: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                        keyPath: \.month
+                                 ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX508_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf_.swift:23:30: warning: type 'ReferenceWritableKeyPath<Transaction, TransactionType>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                    keyPath: \.transactionType
+                             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX508_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf_.swift:31:26: warning: type 'ReferenceWritableKeyPath<Transaction, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.iban
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:509:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX514_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf0_.swift:7:30: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                    keyPath: \.year
+                             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:515:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:515:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX514_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf0_.swift:14:30: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                    keyPath: \.month
+                             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:515:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:515:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX514_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf0_.swift:22:26: warning: type 'ReferenceWritableKeyPath<Transaction, TransactionType>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.transactionType
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:515:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:515:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX520_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf1_.swift:7:30: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                    keyPath: \.year
+                             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:521:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:521:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX520_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf1_.swift:14:30: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                    keyPath: \.month
+                             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:521:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:521:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX520_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf1_.swift:22:26: warning: type 'ReferenceWritableKeyPath<Transaction, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.iban
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:521:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:521:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX526_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf2_.swift:6:26: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.year
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:527:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:527:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX526_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf2_.swift:13:26: warning: type 'ReferenceWritableKeyPath<Transaction, TransactionType>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.transactionType
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:527:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:527:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX532_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf3_.swift:6:26: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.year
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:533:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:533:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX532_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf3_.swift:13:26: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.month
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:533:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:533:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX538_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf4_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.year
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:539:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:539:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX544_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf5_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.month
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:545:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:545:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX550_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf6_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, TransactionType>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.transactionType
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:551:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:551:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX556_19_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf7_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Transaction, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.iban
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:557:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:557:20: note: in expansion of macro 'Predicate' here
+            return #Predicate<Transaction> {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX922_27_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf_.swift:6:26: warning: type 'ReferenceWritableKeyPath<BudgetPeriod, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.year
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:923:28: note: in expansion of macro 'Predicate' here
+                predicate: #Predicate<BudgetPeriod> { budget in
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:923:28: note: in expansion of macro 'Predicate' here
+                predicate: #Predicate<BudgetPeriod> { budget in
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0034TransactionQueryServiceswift_oeBCkfMX922_27_33_EAE4952BF3CB8D8D1A5F45B24223E768Ll9PredicatefMf_.swift:13:26: warning: type 'ReferenceWritableKeyPath<BudgetPeriod, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.month
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:923:28: note: in expansion of macro 'Predicate' here
+                predicate: #Predicate<BudgetPeriod> { budget in
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TransactionQueryService.swift:923:28: note: in expansion of macro 'Predicate' here
+                predicate: #Predicate<BudgetPeriod> { budget in
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0031DataIntegrityServiceswift_yFFIifMX145_24_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Account, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.iban
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/DataIntegrityService.swift:146:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Account> { $0.iban == iban }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/DataIntegrityService.swift:146:25: note: in expansion of macro 'Predicate' here
+        let predicate = #Predicate<Account> { $0.iban == iban }
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+
+SwiftCompile normal arm64 Compiling\ ImportView.swift,\ TransactionDetailView.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Views/ImportView.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Views/TransactionDetailView.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Views/ImportView.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Views/TransactionDetailView.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+
+SwiftCompile normal arm64 Compiling\ ViewExtensions.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Extensions/ViewExtensions.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Extensions/ViewExtensions.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+
+SwiftCompile normal arm64 Compiling\ SimpleRulesView.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Views/SimpleRulesView.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Views/SimpleRulesView.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ FamilyFinance (in target 'FamilyFinance' from project 'Florijn')
+
+EmitSwiftModule normal arm64 (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+
+SwiftCompile normal arm64 Compiling\ RuleProgressPublisher.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleProgressPublisher.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleProgressPublisher.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+
+SwiftCompile normal arm64 Compiling\ RuleStatistics.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Models/RuleStatistics.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Models/RuleStatistics.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+
+SwiftCompile normal arm64 Compiling\ RuleEngine.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+@__swiftmacro_13FamilyFinance0021RuleEngineswift_IfFDefMX242_23_33_A71337B31BAA378825AA050309314434Ll9PredicatefMf_.swift:4:18: warning: type 'ReferenceWritableKeyPath<RuleGroup, Bool>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+        keyPath: \.isActive
+                 ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:243:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RuleGroup> { $0.isActive },
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:243:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate<RuleGroup> { $0.isActive },
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:244:37: warning: type 'ReferenceWritableKeyPath<RuleGroup, Int>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            sortBy: [SortDescriptor(\.executionOrder)]
+                                    ^
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0021RuleEngineswift_IfFDefMX504_27_33_A71337B31BAA378825AA050309314434Ll9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<RuleStatistics, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.ruleIdentifier
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:505:28: note: in expansion of macro 'Predicate' here
+                predicate: #Predicate<RuleStatistics> { $0.ruleIdentifier == ruleIdString }
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:505:28: note: in expansion of macro 'Predicate' here
+                predicate: #Predicate<RuleStatistics> { $0.ruleIdentifier == ruleIdString }
+                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:461:52: warning: sending 'self.errorClassifier' risks causing data races; this is an error in the Swift 6 language mode
+        let classification = await errorClassifier.classify(error)
+                                   ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:461:52: note: sending 'self'-isolated 'self.errorClassifier' to nonisolated instance method 'classify' risks causing data races between nonisolated and 'self'-isolated uses
+        let classification = await errorClassifier.classify(error)
+                                                   ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:323:61: warning: sending 'rule.triggers' risks causing data races; this is an error in the Swift 6 language mode
+                let triggerResults = await triggerEvaluator.evaluateParallel(
+                                           ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:323:61: note: sending 'self'-isolated 'rule.triggers' to actor-isolated instance method 'evaluateParallel(_:against:progressHandler:)' risks causing data races between actor-isolated and 'self'-isolated uses
+                let triggerResults = await triggerEvaluator.evaluateParallel(
+                                                            ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:323:61: warning: sending 'transaction' risks causing data races; this is an error in the Swift 6 language mode
+                let triggerResults = await triggerEvaluator.evaluateParallel(
+                                           ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:323:61: note: sending 'self'-isolated 'transaction' to actor-isolated instance method 'evaluateParallel(_:against:progressHandler:)' risks causing data races between actor-isolated and 'self'-isolated uses
+                let triggerResults = await triggerEvaluator.evaluateParallel(
+                                                            ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:336:65: warning: sending 'rule.actions' risks causing data races; this is an error in the Swift 6 language mode
+                    let actionResult = try await actionExecutor.executeActions(rule.actions, on: transaction)
+                                                 ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:336:65: note: sending 'self'-isolated 'rule.actions' to actor-isolated instance method 'executeActions(_:on:)' risks causing data races between actor-isolated and 'self'-isolated uses
+                    let actionResult = try await actionExecutor.executeActions(rule.actions, on: transaction)
+                                                                ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:336:65: warning: sending 'transaction' risks causing data races; this is an error in the Swift 6 language mode
+                    let actionResult = try await actionExecutor.executeActions(rule.actions, on: transaction)
+                                                 ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:336:65: note: sending 'self'-isolated 'transaction' to actor-isolated instance method 'executeActions(_:on:)' risks causing data races between actor-isolated and 'self'-isolated uses
+                    let actionResult = try await actionExecutor.executeActions(rule.actions, on: transaction)
+                                                                ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:336:65: warning: non-Sendable 'ActionExecutionResult'-typed result can not be returned from actor-isolated instance method 'executeActions(_:on:)' to actor-isolated context; this is an error in the Swift 6 language mode
+                    let actionResult = try await actionExecutor.executeActions(rule.actions, on: transaction)
+                                                                ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:685:8: note: consider making struct 'ActionExecutionResult' conform to the 'Sendable' protocol
+struct ActionExecutionResult {
+       ^
+                             : Sendable
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:284:60: warning: sending 'self.errorClassifier' risks causing data races; this is an error in the Swift 6 language mode
+                let classification = await errorClassifier.classify(error)
+                                           ~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:284:60: note: sending 'self'-isolated 'self.errorClassifier' to nonisolated instance method 'classify' risks causing data races between nonisolated and 'self'-isolated uses
+                let classification = await errorClassifier.classify(error)
+                                                           ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:119:35: warning: sending 'batches' risks causing data races; this is an error in the Swift 6 language mode
+            for (index, batch) in batches.enumerated() {
+                                  ^~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:119:35: note: 'self'-isolated 'batches' is captured by a actor-isolated closure. actor-isolated uses in closure may race against later actor-isolated uses
+            for (index, batch) in batches.enumerated() {
+                                  ^~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:147:42: note: access can happen concurrently
+            totalProcessed: transactions.count,
+                            ~~~~~~~~~~~~~^~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:120:23: warning: passing closure as a 'sending' parameter risks causing data races between 'self'-isolated code and concurrent execution of the closure; this is an error in the Swift 6 language mode
+                group.addTask { [weak self] in
+                ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:121:21: note: closure captures non-Sendable 'self'
+                    guard let self = self else {
+                    ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:124:43: note: closure captures non-Sendable 'batch'
+                    return try await self.processBatch(batch, batchIndex: index, totalBatches: batches.count)
+                                          ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:124:104: note: closure captures non-Sendable 'batches'
+                    return try await self.processBatch(batch, batchIndex: index, totalBatches: batches.count)
+                                                                                                       ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:124:43: warning: sending 'batch' risks causing data races; this is an error in the Swift 6 language mode
+                    return try await self.processBatch(batch, batchIndex: index, totalBatches: batches.count)
+                                     ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/RuleEngine.swift:124:43: note: sending task-isolated 'batch' to actor-isolated instance method 'processBatch(_:batchIndex:totalBatches:)' risks causing data races between actor-isolated and task-isolated uses
+                    return try await self.processBatch(batch, batchIndex: index, totalBatches: batches.count)
+                                          ^
+
+SwiftCompile normal arm64 Compiling\ ActionExecutor.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+@__swiftmacro_13FamilyFinance0025ActionExecutorswift_jqFBgfMX830_23_9PredicatefMf_.swift:5:22: warning: type 'ReferenceWritableKeyPath<Category, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+            keyPath: \.name
+                     ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:831:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate { $0.name == name }
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:831:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate { $0.name == name }
+                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0025ActionExecutorswift_jqFBgfMX859_23_9PredicatefMf_.swift:6:26: warning: type 'ReferenceWritableKeyPath<Account, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.name
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:860:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate { account in
+                       ^~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:860:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate { account in
+                       ^~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+@__swiftmacro_13FamilyFinance0025ActionExecutorswift_jqFBgfMX859_23_9PredicatefMf_.swift:13:26: warning: type 'ReferenceWritableKeyPath<Account, String>' does not conform to the 'Sendable' protocol; this is an error in the Swift 6 language mode
+                keyPath: \.iban
+                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:860:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate { account in
+                       ^~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:860:24: note: in expansion of macro 'Predicate' here
+            predicate: #Predicate { account in
+                       ^~~~~~~~~~~~~~~~~~~~~~~
+Swift.ReferenceWritableKeyPath:1:14: note: generic class 'ReferenceWritableKeyPath' does not conform to the 'Sendable' protocol
+public class ReferenceWritableKeyPath<Root, Value> : WritableKeyPath<Root, Value> {
+             ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:40:34: warning: sending 'self.modelContext' risks causing data races; this is an error in the Swift 6 language mode
+            _relationshipCache = RelationshipCache(modelContext: modelContext)
+                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:40:34: note: sending 'self'-isolated 'self.modelContext' to actor-isolated initializer 'init(modelContext:)' risks causing data races between actor-isolated and 'self'-isolated uses
+            _relationshipCache = RelationshipCache(modelContext: modelContext)
+                                 ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:258:52: warning: non-Sendable 'Category'-typed result can not be returned from actor-isolated instance method 'findOrCreateCategory' to actor-isolated context; this is an error in the Swift 6 language mode
+        let category = try await relationshipCache.findOrCreateCategory(action.value)
+                                                   ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Models/SwiftDataModels.swift:522:13: note: class 'Category' does not conform to the 'Sendable' protocol
+final class Category {
+            ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:441:57: warning: non-Sendable 'Account?'-typed result can not be returned from actor-isolated instance method 'findAccount' to actor-isolated context; this is an error in the Swift 6 language mode
+        guard let account = try await relationshipCache.findAccount(action.value) else {
+                                                        ^
+Swift.Optional:1:21: note: generic enum 'Optional' does not conform to the 'Sendable' protocol
+@frozen public enum Optional<Wrapped> : ~Copyable, ~Escapable where Wrapped : ~Copyable, Wrapped : ~Escapable {
+                    ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:456:57: warning: non-Sendable 'Account?'-typed result can not be returned from actor-isolated instance method 'findAccount' to actor-isolated context; this is an error in the Swift 6 language mode
+        guard let account = try await relationshipCache.findAccount(action.value) else {
+                                                        ^
+Swift.Optional:1:21: note: generic enum 'Optional' does not conform to the 'Sendable' protocol
+@frozen public enum Optional<Wrapped> : ~Copyable, ~Escapable where Wrapped : ~Copyable, Wrapped : ~Escapable {
+                    ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:483:68: warning: non-Sendable 'Account?'-typed result can not be returned from actor-isolated instance method 'findAccount' to actor-isolated context; this is an error in the Swift 6 language mode
+        guard let destinationAccount = try await relationshipCache.findAccount(destinationName) else {
+                                                                   ^
+Swift.Optional:1:21: note: generic enum 'Optional' does not conform to the 'Sendable' protocol
+@frozen public enum Optional<Wrapped> : ~Copyable, ~Escapable where Wrapped : ~Copyable, Wrapped : ~Escapable {
+                    ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:541:72: warning: non-Sendable 'Account?'-typed result can not be returned from actor-isolated instance method 'findAccount' to actor-isolated context; this is an error in the Swift 6 language mode
+            guard let destinationAccount = try await relationshipCache.findAccount(action.value) else {
+                                                                       ^
+Swift.Optional:1:21: note: generic enum 'Optional' does not conform to the 'Sendable' protocol
+@frozen public enum Optional<Wrapped> : ~Copyable, ~Escapable where Wrapped : ~Copyable, Wrapped : ~Escapable {
+                    ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:110:54: warning: sending 'transactions' risks causing data races; this is an error in the Swift 6 language mode
+                let totalTransactions = transactions.count
+                                        ~~~~~~~~~~~~~^~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:110:54: note: 'self'-isolated 'transactions' is captured by a actor-isolated closure. actor-isolated uses in closure may race against later actor-isolated uses
+                let totalTransactions = transactions.count
+                                        ~~~~~~~~~~~~~^~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:108:36: note: access can happen concurrently
+        return AsyncThrowingStream { continuation in
+                                   ^~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:127:54: warning: sending 'actions' risks causing data races; this is an error in the Swift 6 language mode
+                        let chunkResults = try await processTransactionChunk(
+                                                     ^~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:127:54: note: 'self'-isolated 'actions' is captured by a actor-isolated closure. actor-isolated uses in closure may race against later actor-isolated uses
+                        let chunkResults = try await processTransactionChunk(
+                                                     ^~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:108:16: note: access can happen concurrently
+        return AsyncThrowingStream { continuation in
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:144:42: warning: sending 'result.item' risks causing data races; this is an error in the Swift 6 language mode
+                            continuation.yield(.item(result))
+                            ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/ActionExecutor.swift:144:42: note: 'self'-isolated 'result.item' is passed as a 'sending' parameter; Uses in callee may race with later 'self'-isolated uses
+                            continuation.yield(.item(result))
+                                         ^
+
+SwiftCompile normal arm64 Compiling\ TriggerEvaluator.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TriggerEvaluator.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TriggerEvaluator.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TriggerEvaluator.swift:397:58: warning: capture of 'trigger' with non-Sendable type 'RuleTrigger' in a '@Sendable' closure; this is an error in the Swift 6 language mode
+                        let result = await self.evaluate(trigger, against: transaction)
+                                                         ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Models/RulesModels.swift:230:13: note: class 'RuleTrigger' does not conform to the 'Sendable' protocol
+final class RuleTrigger {
+            ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TriggerEvaluator.swift:397:76: warning: capture of 'transaction' with non-Sendable type 'Transaction' in a '@Sendable' closure; this is an error in the Swift 6 language mode
+                        let result = await self.evaluate(trigger, against: transaction)
+                                                                           ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Models/SwiftDataModels.swift:24:13: note: class 'Transaction' does not conform to the 'Sendable' protocol
+final class Transaction {
+            ^
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TriggerEvaluator.swift:395:41: warning: sending 'batch' risks causing data races; this is an error in the Swift 6 language mode
+                for (index, trigger) in batch.enumerated() {
+                                        ^~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TriggerEvaluator.swift:395:41: note: 'self'-isolated 'batch' is captured by a actor-isolated closure. actor-isolated uses in closure may race against later actor-isolated uses
+                for (index, trigger) in batch.enumerated() {
+                                        ^~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TriggerEvaluator.swift:393:74: note: access can happen concurrently
+            let batchResults = await withTaskGroup(of: (Int, Bool).self) { group in
+                                                                         ^~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TriggerEvaluator.swift:397:49: warning: sending 'transaction' risks causing data races; this is an error in the Swift 6 language mode
+                        let result = await self.evaluate(trigger, against: transaction)
+                                           ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TriggerEvaluator.swift:397:49: note: 'self'-isolated 'transaction' is captured by a nonisolated closure. nonisolated uses in closure may race against later actor-isolated uses
+                        let result = await self.evaluate(trigger, against: transaction)
+                                           ~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Services/TriggerEvaluator.swift:393:74: note: access can happen concurrently
+            let batchResults = await withTaskGroup(of: (Int, Bool).self) { group in
+                                                                         ^~~~~~~~~~
+
+SwiftCompile normal arm64 Compiling\ RulesModels.swift /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Models/RulesModels.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftCompile normal arm64 /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn/Models/RulesModels.swift (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+
+SwiftDriverJobDiscovery normal arm64 Compiling RuleStatistics.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriverJobDiscovery normal arm64 Compiling RuleProgressPublisher.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriverJobDiscovery normal arm64 Compiling FamilyAccountsConfig.swift, BackgroundDataHandler.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriverJobDiscovery normal arm64 Compiling TriggerEvaluator.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriverJobDiscovery normal arm64 Compiling ViewExtensions.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriverJobDiscovery normal arm64 Compiling RuleEngine.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriverJobDiscovery normal arm64 Compiling CSVImportService.swift, CategorizationEngine.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriverJobDiscovery normal arm64 Compiling ActionExecutor.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriverJobDiscovery normal arm64 Compiling RulesModels.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for FamilyFinance (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriver\ Compilation\ Requirements FamilyFinance normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name FamilyFinance -Onone -enforce-exclusivity\=checked @/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.SwiftFileList -DDEBUG -enable-upcoming-feature StrictConcurrency -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-macos14.0 -g -module-cache-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug -F /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug -emit-localized-strings -emit-localized-strings-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64 -c -j14 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx26.2-25C57-00fa09913b459cbbc988d1f6730289ae.sdkstatcache -output-file-map /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance_const_extract_protocols.json -Xcc -iquote -Xcc /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-generated-files.hmap -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-own-target-headers.hmap -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-all-target-headers.hmap -Xcc -iquote -Xcc /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-project-headers.hmap -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/include -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/DerivedSources-normal/arm64 -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/DerivedSources/arm64 -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance-Swift.h -working-directory /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn -experimental-emit-module-separately -disable-cmo
+
+SwiftMergeGeneratedHeaders /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/DerivedSources/FamilyFinance-Swift.h /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance-Swift.h (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    builtin-swiftHeaderTool -arch arm64 /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance-Swift.h -o /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/DerivedSources/FamilyFinance-Swift.h
+
+Copy /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.swiftmodule/arm64-apple-macos.abi.json /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.abi.json (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.abi.json /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.swiftmodule/arm64-apple-macos.abi.json
+
+Copy /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.swiftmodule/arm64-apple-macos.swiftdoc /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.swiftdoc (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.swiftdoc /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.swiftmodule/arm64-apple-macos.swiftdoc
+
+Copy /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.swiftmodule/arm64-apple-macos.swiftmodule /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.swiftmodule (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.swiftmodule /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.swiftmodule/arm64-apple-macos.swiftmodule
+
+Copy /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.swiftsourceinfo (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.swiftsourceinfo /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo
+
+SwiftDriverJobDiscovery normal arm64 Compiling TransactionQueryService.swift, DataIntegrityService.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriverJobDiscovery normal arm64 Compiling ExportService.swift, DashboardView.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriverJobDiscovery normal arm64 Compiling SimpleRulesView.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriverJobDiscovery normal arm64 Compiling ImportView.swift, TransactionDetailView.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriverJobDiscovery normal arm64 Compiling FlorijnApp.swift, SwiftDataModels.swift (in target 'FamilyFinance' from project 'Florijn')
+
+SwiftDriver\ Compilation FamilyFinance normal arm64 com.apple.xcode.tools.swift.compiler (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    builtin-Swift-Compilation -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name FamilyFinance -Onone -enforce-exclusivity\=checked @/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.SwiftFileList -DDEBUG -enable-upcoming-feature StrictConcurrency -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-macos14.0 -g -module-cache-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug -F /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug -emit-localized-strings -emit-localized-strings-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64 -c -j14 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx26.2-25C57-00fa09913b459cbbc988d1f6730289ae.sdkstatcache -output-file-map /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance_const_extract_protocols.json -Xcc -iquote -Xcc /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-generated-files.hmap -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-own-target-headers.hmap -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-all-target-headers.hmap -Xcc -iquote -Xcc /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-project-headers.hmap -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/include -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/DerivedSources-normal/arm64 -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/DerivedSources/arm64 -Xcc -I/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance-Swift.h -working-directory /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn -experimental-emit-module-separately -disable-cmo
+
+Ld /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS/FamilyFinance.debug.dylib normal (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-macos14.0 -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -O0 -L/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/EagerLinkingTBDs/Debug -L/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug -F/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/EagerLinkingTBDs/Debug -F/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug -filelist /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.LinkFileList -install_name @rpath/FamilyFinance.debug.dylib -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @executable_path/../Frameworks -dead_strip -Xlinker -object_path_lto -Xlinker /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -dependency_info -Xlinker /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.swiftmodule @/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance-linker-args.resp -Xlinker -alias -Xlinker _main -Xlinker ___debug_main_executable_dylib_entry_point -Xlinker -no_adhoc_codesign -o /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS/FamilyFinance.debug.dylib
+
+ConstructStubExecutorLinkFileList /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-ExecutorLinkFileList-normal-arm64.txt (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    construct-stub-executor-link-file-list /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS/FamilyFinance.debug.dylib /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libPreviewsJITStubExecutor_no_swift_entry_point.a /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/libPreviewsJITStubExecutor.a --output /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-ExecutorLinkFileList-normal-arm64.txt
+note: Using stub executor library with Swift entry point. (in target 'FamilyFinance' from project 'Florijn')
+
+Ld /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS/FamilyFinance normal (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-macos14.0 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -O0 -L/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug -F/Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug -Xlinker -rpath -Xlinker @executable_path -Xlinker -rpath -Xlinker @executable_path/../Frameworks -rdynamic -Xlinker -no_deduplicate -e ___debug_blank_executor_main -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_dylib -Xlinker /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-DebugDylibPath-normal-arm64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_instlnm -Xlinker /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-DebugDylibInstallName-normal-arm64.txt -Xlinker -filelist -Xlinker /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance-ExecutorLinkFileList-normal-arm64.txt /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS/FamilyFinance.debug.dylib -Xlinker -no_adhoc_codesign -o /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS/FamilyFinance
+
+CopySwiftLibs /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    builtin-swiftStdLibTool --copy --verbose --sign - --scan-executable /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS/FamilyFinance.debug.dylib --scan-folder /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/Frameworks --scan-folder /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/PlugIns --scan-folder /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/Library/SystemExtensions --scan-folder /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/Extensions --platform macosx --toolchain /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os --back-deploy-swift-span
+
+ExtractAppIntentsMetadata (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name FamilyFinance --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk --xcode-version 17C52 --platform-family macOS --deployment-target 14.0 --bundle-identifier com.florijn.app --output /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/Resources --target-triple arm64-apple-macos14.0 --binary-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS/FamilyFinance --dependency-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance_dependency_info.dat --stringsdata-file /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.SwiftFileList --metadata-file-list /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.DependencyMetadataFileList --static-metadata-file-list /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.DependencyStaticMetadataFileList --swift-const-vals-list /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/Objects-normal/arm64/FamilyFinance.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-01-01 22:30:08.416 appintentsmetadataprocessor[83749:8981877] Starting appintentsmetadataprocessor export
+2026-01-01 22:30:08.417 appintentsmetadataprocessor[83749:8981877] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+CodeSign /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS/FamilyFinance.debug.dylib (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS/FamilyFinance.debug.dylib
+
+CodeSign /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS/__preview.dylib (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --timestamp\=none --generate-entitlement-der /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app/Contents/MacOS/__preview.dylib
+
+CodeSign /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    
+    Signing Identity:     "Sign to Run Locally"
+    
+    /usr/bin/codesign --force --sign - --entitlements /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Intermediates.noindex/Florijn.build/Debug/FamilyFinance.build/FamilyFinance.app.xcent --timestamp\=none --generate-entitlement-der /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app
+
+RegisterExecutionPolicyException /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    builtin-RegisterExecutionPolicyException /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app
+
+Validate /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    builtin-validationUtility /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app -no-validate-extension -infoplist-subpath Contents/Info.plist
+
+Touch /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    /usr/bin/touch -c /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app
+
+RegisterWithLaunchServices /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app (in target 'FamilyFinance' from project 'Florijn')
+    cd /Users/macbookpro_ronald/Library/CloudStorage/SynologyDrive-Main/06_Development/Florijn
+    /System/Library/Frameworks/CoreServices.framework/Versions/Current/Frameworks/LaunchServices.framework/Versions/Current/Support/lsregister -f -R -trusted /Users/macbookpro_ronald/Library/Developer/Xcode/DerivedData/Florijn-flxupkkfavaoahfztjkocggooyfr/Build/Products/Debug/FamilyFinance.app
+
+note: Disabling hardened runtime with ad-hoc codesigning. (in target 'FamilyFinance' from project 'Florijn')
+** BUILD SUCCEEDED **
+

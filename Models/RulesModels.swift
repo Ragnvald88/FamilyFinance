@@ -16,13 +16,13 @@
 //  Created: 2025-12-26
 //
 
-@preconcurrency import SwiftData
+import SwiftData
 import Foundation
 
 // MARK: - Rule Group Model
 
 @Model
-final class RuleGroup: @unchecked Sendable {
+final class RuleGroup {
     /// Stable UUID for UI identification (SwiftData's PersistentIdentifier changes)
     @Attribute(.unique) var uuid: UUID
 
@@ -68,7 +68,7 @@ final class RuleGroup: @unchecked Sendable {
 // MARK: - Rule Model
 
 @Model
-final class Rule: @unchecked Sendable {
+final class Rule {
     /// Stable UUID for UI identification
     @Attribute(.unique) var uuid: UUID
 
@@ -227,7 +227,7 @@ final class Rule: @unchecked Sendable {
 // MARK: - Rule Trigger Model
 
 @Model
-final class RuleTrigger: @unchecked Sendable {
+final class RuleTrigger {
     /// Stable UUID for UI identification
     var uuid: UUID
 
@@ -280,7 +280,7 @@ final class RuleTrigger: @unchecked Sendable {
 /// - Group 2 (matchMode: .all): [counterParty equals "Netflix"]
 /// - Rule.groupMatchMode: .any → matches if EITHER group matches
 @Model
-final class TriggerGroup: @unchecked Sendable {
+final class TriggerGroup {
     /// Stable UUID for UI identification
     var uuid: UUID
 
@@ -325,7 +325,7 @@ final class TriggerGroup: @unchecked Sendable {
 // MARK: - Rule Action Model
 
 @Model
-final class RuleAction: @unchecked Sendable {
+final class RuleAction {
     /// Stable UUID for UI identification
     var uuid: UUID
 

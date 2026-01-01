@@ -312,7 +312,7 @@ actor RuleEngine {
         var results: [RuleActionResult] = []
         var matchedRules: Set<Int> = []
         var errors: [RuleExecutionError] = []
-        var warnings: [RuleExecutionWarning] = []
+        let warnings: [RuleExecutionWarning] = []
 
         let activeRules = group.rules.filter(\.isActive)
         logger.debug("Processing \(activeRules.count) active rules in group '\(group.name)'")

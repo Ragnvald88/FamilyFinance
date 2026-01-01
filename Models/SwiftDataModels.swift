@@ -11,7 +11,7 @@
 //
 
 import Foundation
-@preconcurrency import SwiftData
+import SwiftData
 
 // MARK: - Transaction Model
 
@@ -519,7 +519,7 @@ final class Account {
 
 /// Category for transaction classification with budget
 @Model
-final class Category: @unchecked Sendable {
+final class Category {
 
     /// Category name (unique)
     @Attribute(.unique) var name: String
@@ -677,7 +677,7 @@ enum LogicalOperator: String, CaseIterable, Codable, Sendable {
 
 /// Debt/liability for net worth calculation
 @Model
-final class Liability: @unchecked Sendable {
+final class Liability {
 
     /// Liability name
     var name: String
@@ -768,7 +768,7 @@ final class Liability: @unchecked Sendable {
 
 /// Merchant/counter party statistics for analysis
 @Model
-final class Merchant: @unchecked Sendable {
+final class Merchant {
 
     /// Merchant name (unique)
     @Attribute(.unique) var name: String
@@ -845,7 +845,7 @@ final class Merchant: @unchecked Sendable {
 
 /// Budget for a specific period and category
 @Model
-final class BudgetPeriod: @unchecked Sendable {
+final class BudgetPeriod {
 
     /// Year
     var year: Int
@@ -908,7 +908,7 @@ final class BudgetPeriod: @unchecked Sendable {
 /// Represents one category portion of a split transaction.
 /// Example: A €45 grocery receipt split into €20 produce + €15 toiletries + €10 pet food.
 @Model
-final class TransactionSplit: @unchecked Sendable {
+final class TransactionSplit {
 
     /// The category this split portion belongs to
     var category: String
@@ -965,7 +965,7 @@ final class TransactionSplit: @unchecked Sendable {
 /// Represents a recurring transaction pattern (subscription, salary, regular bill).
 /// Links to actual bank transactions when they occur.
 @Model
-final class RecurringTransaction: @unchecked Sendable {
+final class RecurringTransaction {
 
     /// Display name for this recurring transaction
     var name: String
@@ -1107,7 +1107,7 @@ final class RecurringTransaction: @unchecked Sendable {
 
 /// Audit trail for transaction changes. Enables undo and tracks who changed what.
 @Model
-final class TransactionAuditLog: @unchecked Sendable {
+final class TransactionAuditLog {
 
     /// Type of action performed
     var action: AuditAction

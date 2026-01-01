@@ -114,12 +114,12 @@ actor ActionExecutor {
                 var completedCount = 0
                 var successCount = 0
                 var failureCount = 0
-                var startTime = Date()
+                let startTime = Date()
 
                 logger.info("Starting bulk action execution: \(totalTransactions) transactions, \(chunks.count) chunks")
 
                 do {
-                    for (chunkIndex, chunk) in chunks.enumerated() {
+                    for (_, chunk) in chunks.enumerated() {
                         // Check for cancellation via Task
                         try Task.checkCancellation()
 
@@ -675,7 +675,7 @@ enum ActionResult {
 /// Detailed action failure information
 struct ActionFailure {
     let action: RuleAction
-    let error: Error
+    let error: Error  // Back to original Error type - simpler
     let recoveryOptions: [RecoveryOption]
     let userMessage: String
     let technicalDetails: String

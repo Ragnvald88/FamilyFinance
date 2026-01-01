@@ -519,7 +519,7 @@ final class Account {
 
 /// Category for transaction classification with budget
 @Model
-final class Category {
+final class Category: @unchecked Sendable {
 
     /// Category name (unique)
     @Attribute(.unique) var name: String
@@ -677,7 +677,7 @@ enum LogicalOperator: String, CaseIterable, Codable, Sendable {
 
 /// Debt/liability for net worth calculation
 @Model
-final class Liability {
+final class Liability: @unchecked Sendable {
 
     /// Liability name
     var name: String
@@ -768,7 +768,7 @@ final class Liability {
 
 /// Merchant/counter party statistics for analysis
 @Model
-final class Merchant {
+final class Merchant: @unchecked Sendable {
 
     /// Merchant name (unique)
     @Attribute(.unique) var name: String
@@ -845,7 +845,7 @@ final class Merchant {
 
 /// Budget for a specific period and category
 @Model
-final class BudgetPeriod {
+final class BudgetPeriod: @unchecked Sendable {
 
     /// Year
     var year: Int
@@ -908,7 +908,7 @@ final class BudgetPeriod {
 /// Represents one category portion of a split transaction.
 /// Example: A €45 grocery receipt split into €20 produce + €15 toiletries + €10 pet food.
 @Model
-final class TransactionSplit {
+final class TransactionSplit: @unchecked Sendable {
 
     /// The category this split portion belongs to
     var category: String
@@ -965,7 +965,7 @@ final class TransactionSplit {
 /// Represents a recurring transaction pattern (subscription, salary, regular bill).
 /// Links to actual bank transactions when they occur.
 @Model
-final class RecurringTransaction {
+final class RecurringTransaction: @unchecked Sendable {
 
     /// Display name for this recurring transaction
     var name: String
@@ -1107,7 +1107,7 @@ final class RecurringTransaction {
 
 /// Audit trail for transaction changes. Enables undo and tracks who changed what.
 @Model
-final class TransactionAuditLog {
+final class TransactionAuditLog: @unchecked Sendable {
 
     /// Type of action performed
     var action: AuditAction

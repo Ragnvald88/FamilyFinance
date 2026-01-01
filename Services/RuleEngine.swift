@@ -21,7 +21,7 @@
 //  Updated: 2025-12-27 (Component 7/8: Integration complete)
 //
 
-import SwiftData
+@preconcurrency import SwiftData
 import Foundation
 import OSLog
 

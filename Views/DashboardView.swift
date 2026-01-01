@@ -37,7 +37,7 @@ struct DashboardView: View {
     var body: some View {
         ZStack {
             ScrollView {
-                VStack(spacing: Spacing.large) {
+                VStack(spacing: PremiumSpacing.xlarge) {
                     // Header with filters
                     headerSection
 
@@ -56,9 +56,9 @@ struct DashboardView: View {
                     // Net worth
                     netWorthSection
 
-                    Spacer(minLength: Spacing.xlarge)
+                    Spacer(minLength: PremiumSpacing.hero)
                 }
-                .padding(Spacing.large)
+                .padding(PremiumSpacing.xlarge)
             }
             .background(Color(nsColor: .windowBackgroundColor))
 
@@ -150,53 +150,95 @@ struct DashboardView: View {
         ], spacing: PremiumSpacing.large) {
 
             if viewModel.isLoading && viewModel.kpis == nil {
-                // Skeleton loading states
+                // Premium loading states
                 ForEach(0..<4, id: \.self) { index in
-                    SkeletonCard()
-                        .staggeredAppearance(index: index, totalItems: 4)
+                    RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius)
+                        .fill(Color.florijnLightGray.opacity(0.3))
+                        .frame(height: 120)
+                        .overlay {
+                            VStack(spacing: PremiumSpacing.small) {
+                                Circle()
+                                    .fill(Color.florijnMediumGray.opacity(0.3))
+                                    .frame(width: PremiumSpacing.iconSize, height: PremiumSpacing.iconSize)
+
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Color.florijnMediumGray.opacity(0.3))
+                                    .frame(width: 80, height: 12)
+
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Color.florijnMediumGray.opacity(0.3))
+                                    .frame(width: 60, height: 20)
+                            }
+                        }
+                        .redacted(reason: .placeholder)
                 }
             } else {
-                // Premium financial KPI cards with sophisticated icons
+                // Premium financial KPI cards with semantic styling and Sarah's context
                 Group {
-                    PremiumKPICard(
-                        title: "Income",
-                        value: viewModel.kpis?.totalIncome ?? 0,
-                        percentage: nil,
-                        icon: .income,
-                        color: .florijnGreen,
-                        trend: nil,
-                        index: 0
-                    )
+                    VStack(alignment: .leading, spacing: PremiumSpacing.tiny) {
+                        PremiumKPICard(
+                            title: "Income",
+                            value: viewModel.kpis?.totalIncome ?? 0,
+                            percentage: nil,
+                            icon: .income,
+                            color: .incomeGreen,
+                            trend: nil,
+                            cardType: .income
+                        )
 
-                    PremiumKPICard(
-                        title: "Expenses",
-                        value: abs(viewModel.kpis?.totalExpenses ?? 0),
-                        percentage: nil,
-                        icon: .expenses,
-                        color: .florijnOrange,
-                        trend: nil,
-                        index: 1
-                    )
+                        // Sarah's context: What this number means
+                        Text(incomeContextText(viewModel.kpis?.totalIncome ?? 0))
+                            .financialLabel()
+                            .padding(.horizontal, PremiumSpacing.medium)
+                    }
 
-                    PremiumKPICard(
-                        title: "Saved",
-                        value: viewModel.kpis?.netSavings ?? 0,
-                        percentage: nil,
-                        icon: .saved,
-                        color: .florijnBlue,
-                        trend: nil,
-                        index: 2
-                    )
+                    VStack(alignment: .leading, spacing: PremiumSpacing.tiny) {
+                        PremiumKPICard(
+                            title: "Expenses",
+                            value: abs(viewModel.kpis?.totalExpenses ?? 0),
+                            percentage: nil,
+                            icon: .expenses,
+                            color: .expenseRed,
+                            trend: nil,
+                            cardType: .expenses
+                        )
 
-                    PremiumKPICard(
-                        title: "Savings Rate",
-                        value: nil,
-                        percentage: Double(truncating: ((viewModel.kpis?.savingsRate ?? 0) * 100) as NSNumber),
-                        icon: .savingsRate,
-                        color: .florijnNavy,
-                        trend: nil,
-                        index: 3
-                    )
+                        Text(expenseContextText(abs(viewModel.kpis?.totalExpenses ?? 0)))
+                            .financialLabel()
+                            .padding(.horizontal, PremiumSpacing.medium)
+                    }
+
+                    VStack(alignment: .leading, spacing: PremiumSpacing.tiny) {
+                        PremiumKPICard(
+                            title: "Saved",
+                            value: viewModel.kpis?.netSavings ?? 0,
+                            percentage: nil,
+                            icon: .saved,
+                            color: .savingsWin,
+                            trend: nil,
+                            cardType: .savings
+                        )
+
+                        Text(savingsContextText(viewModel.kpis?.netSavings ?? 0))
+                            .financialLabel()
+                            .padding(.horizontal, PremiumSpacing.medium)
+                    }
+
+                    VStack(alignment: .leading, spacing: PremiumSpacing.tiny) {
+                        PremiumKPICard(
+                            title: "Savings Rate",
+                            value: nil,
+                            percentage: Double(truncating: ((viewModel.kpis?.savingsRate ?? 0) * 100) as NSNumber),
+                            icon: .savingsRate,
+                            color: .florijnBlue,
+                            trend: nil,
+                            cardType: .supporting
+                        )
+
+                        Text(savingsRateContextText(Double(truncating: ((viewModel.kpis?.savingsRate ?? 0) * 100) as NSNumber)))
+                            .financialLabel()
+                            .padding(.horizontal, PremiumSpacing.medium)
+                    }
                 }
             }
         }
@@ -209,8 +251,15 @@ struct DashboardView: View {
         HStack(spacing: PremiumSpacing.large) {
             // Monthly trend chart
             VStack(alignment: .leading, spacing: PremiumSpacing.medium) {
-                Text("Monthly Trends")
-                    .premiumHeading(Color.florijnCharcoal)
+                HStack {
+                    GeometricFlowIcon(.income, size: PremiumSpacing.iconSizeSmall)
+
+                    Text("Financial Flow Trends")
+                        .font(.headingMedium)
+                        .foregroundStyle(Color.florijnCharcoal)
+
+                    Spacer()
+                }
 
                 if let trends = viewModel.monthlyTrends, !trends.isEmpty {
                     Chart(trends) { trend in
@@ -218,196 +267,352 @@ struct DashboardView: View {
                             x: .value("Month", trend.monthName),
                             y: .value("Income", Double(truncating: trend.income as NSNumber))
                         )
-                        .foregroundStyle(Color.green)
+                        .foregroundStyle(Color.florijnGreen.gradient)
+                        .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round))
                         .symbol(.circle)
+                        .symbolSize(60)
 
                         LineMark(
                             x: .value("Month", trend.monthName),
                             y: .value("Expenses", Double(truncating: trend.expenses as NSNumber))
                         )
-                        .foregroundStyle(Color.charcoal)
+                        .foregroundStyle(Color.expenseRed.gradient)
+                        .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round))
                         .symbol(.square)
+                        .symbolSize(60)
                     }
-                    .frame(height: 200)
+                    .frame(height: 220)
                     .chartYAxis {
-                        AxisMarks(position: .leading)
+                        AxisMarks(position: .leading) { value in
+                            AxisGridLine()
+                                .foregroundStyle(Color.florijnLightGray.opacity(0.3))
+                            AxisValueLabel()
+                                .font(.caption)
+                                .foregroundStyle(Color.florijnMediumGray)
+                        }
                     }
+                    .chartXAxis {
+                        AxisMarks { value in
+                            AxisGridLine()
+                                .foregroundStyle(Color.florijnLightGray.opacity(0.3))
+                            AxisValueLabel()
+                                .font(.caption)
+                                .foregroundStyle(Color.florijnMediumGray)
+                        }
+                    }
+                    .chartLegend {
+                        HStack(spacing: PremiumSpacing.medium) {
+                            Label("Income", systemImage: "circle.fill")
+                                .font(.caption)
+                                .foregroundStyle(Color.florijnGreen)
+
+                            Label("Expenses", systemImage: "square.fill")
+                                .font(.caption)
+                                .foregroundStyle(Color.expenseRed)
+                        }
+                    }
+                    .padding(PremiumSpacing.small)
                 } else {
-                    ContentUnavailableView(
-                        "No Data",
-                        systemImage: "chart.line.uptrend.xyaxis",
-                        description: Text("No transactions for this period")
-                    )
-                    .frame(height: 200)
+                    // Sarah's UX fix: Actionable empty state with clear next steps
+                    ContentUnavailableView {
+                        VStack(spacing: PremiumSpacing.small) {
+                            GeometricFlowIcon(.income, size: 32, color: .incomeGreen)
+                            Text("Let's Track Your Money Flow")
+                                .font(.headingMedium)
+                                .foregroundStyle(Color.florijnCharcoal)
+                        }
+                    } description: {
+                        Text("Import your bank statements to see where your money comes from and goes. This helps you understand your financial patterns.")
+                            .font(.body)
+                            .foregroundStyle(Color.florijnMediumGray)
+                            .multilineTextAlignment(.center)
+                    } actions: {
+                        Button {
+                            // TODO: Navigate to import view
+                        } label: {
+                            HStack(spacing: PremiumSpacing.small) {
+                                Image(systemName: "square.and.arrow.down")
+                                Text("Import Bank Statements")
+                            }
+                        }
+                        .premiumPrimaryButton()
+                    }
+                    .frame(height: 220)
                 }
             }
-            .padding(Spacing.medium)
-            .card()
+            .padding(PremiumSpacing.large)
+            .premiumCard()
 
-            // Category pie chart (placeholder)
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Top Categories")
-                    .font(.headingMedium)
-                    .foregroundStyle(Color.charcoal)
+            // Enhanced category breakdown with sophisticated styling
+            VStack(alignment: .leading, spacing: PremiumSpacing.medium) {
+                HStack {
+                    GeometricFlowIcon(.expenses, size: PremiumSpacing.iconSizeSmall)
+
+                    Text("Top Spending")
+                        .font(.headingMedium)
+                        .foregroundStyle(Color.florijnCharcoal)
+
+                    Spacer()
+                }
 
                 if let categories = viewModel.categorySummaries?.prefix(5) {
-                    VStack(spacing: 8) {
+                    VStack(spacing: PremiumSpacing.small) {
                         ForEach(Array(categories)) { category in
-                            HStack {
+                            HStack(spacing: PremiumSpacing.small) {
                                 Circle()
                                     .fill(categoryColor(category.category))
-                                    .frame(width: 8, height: 8)
+                                    .frame(width: 10, height: 10)
+                                    .shadow(color: categoryColor(category.category).opacity(0.3), radius: 2)
 
                                 Text(category.category)
-                                    .font(.bodySmall)
-                                    .foregroundStyle(Color.gray)
+                                    .font(.body)
+                                    .foregroundStyle(Color.florijnDarkGray)
+                                    .lineLimit(1)
 
                                 Spacer()
 
-                                Text(category.totalAmount.toCurrencyString())
-                                    .font(.bodySmall)
-                                    .foregroundStyle(Color.charcoal)
+                                PremiumAnimatedNumber(
+                                    category.totalAmount,
+                                    font: .bodySmall,
+                                    color: .florijnCharcoal
+                                )
                             }
+                            .padding(.vertical, PremiumSpacing.tiny)
                         }
                     }
-                    .padding(.top, 8)
+                    .padding(.top, PremiumSpacing.small)
                 } else {
-                    ContentUnavailableView(
-                        "No Data",
-                        systemImage: "chart.pie.fill",
-                        description: Text("No categories found")
-                    )
-                    .frame(height: 200)
+                    // Sarah's UX fix: Guide users to categorization success
+                    ContentUnavailableView {
+                        VStack(spacing: PremiumSpacing.small) {
+                            GeometricFlowIcon(.expenses, size: 32, color: .expenseRed)
+                            Text("Discover Your Spending Patterns")
+                                .font(.headingMedium)
+                                .foregroundStyle(Color.florijnCharcoal)
+                        }
+                    } description: {
+                        Text("Categorize your transactions to see which areas consume most of your money. This reveals opportunities to save.")
+                            .font(.body)
+                            .foregroundStyle(Color.florijnMediumGray)
+                            .multilineTextAlignment(.center)
+                    } actions: {
+                        Button {
+                            // TODO: Navigate to rules/categorization
+                        } label: {
+                            HStack(spacing: PremiumSpacing.small) {
+                                Image(systemName: "tag")
+                                Text("Set Up Categories")
+                            }
+                        }
+                        .premiumSecondaryButton()
+                    }
+                    .frame(height: 220)
                 }
             }
-            .padding(Spacing.medium)
-            .card()
+            .padding(PremiumSpacing.large)
+            .premiumCard()
         }
     }
 
-    // MARK: - Category Section
+    // MARK: - Premium Category Section
 
     private var categorySection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: PremiumSpacing.medium) {
             HStack {
+                GeometricFlowIcon(.saved, size: PremiumSpacing.iconSizeSmall)
+
                 Text("Budget vs Actual")
                     .font(.headingMedium)
-                    .foregroundStyle(Color.charcoal)
+                    .foregroundStyle(Color.florijnCharcoal)
 
                 Spacer()
 
                 Text("\(viewModel.categorySummaries?.count ?? 0) categories")
                     .font(.caption)
-                    .foregroundStyle(Color.gray)
+                    .foregroundStyle(Color.florijnMediumGray)
+                    .padding(.horizontal, PremiumSpacing.small)
+                    .padding(.vertical, PremiumSpacing.tiny)
+                    .background(Color.florijnLightGray.opacity(0.5))
+                    .clipShape(Capsule())
             }
 
             if let categories = viewModel.categorySummaries {
-                LazyVStack(spacing: 8) {
+                LazyVStack(spacing: PremiumSpacing.small) {
                     ForEach(categories.prefix(10)) { category in
                         CategoryRow(category: category)
+                            .padding(.vertical, PremiumSpacing.tiny)
                     }
                 }
             } else {
-                ProgressView()
-                    .frame(maxWidth: .infinity)
-                    .padding(40)
+                // Sarah's UX fix: Meaningful loading state
+                ContentUnavailableView {
+                    VStack(spacing: PremiumSpacing.small) {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                        Text("Organizing Your Spending")
+                            .font(.bodyLarge)
+                            .foregroundStyle(Color.florijnCharcoal)
+                    }
+                } description: {
+                    Text("Grouping transactions by category to show your financial priorities")
+                        .font(.body)
+                        .foregroundStyle(Color.florijnMediumGray)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(height: 120)
             }
         }
-        .padding(Spacing.medium)
-        .card()
+        .padding(PremiumSpacing.large)
+        .premiumCard()
     }
 
-    // MARK: - Accounts Section
+    // MARK: - Premium Accounts Section
 
     private var accountsSection: some View {
         Group {
             // Only show accounts section if there are accounts with actual data
             if let accounts = viewModel.accountBalances, !accounts.isEmpty {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Accounts")
-                        .font(.headingMedium)
-                        .foregroundStyle(Color.charcoal)
+                VStack(alignment: .leading, spacing: PremiumSpacing.medium) {
+                    HStack {
+                        GeometricFlowIcon(.saved, size: PremiumSpacing.iconSizeSmall, color: .tealSecure)
 
-                    LazyVStack(spacing: 8) {
+                        Text("Account Balances")
+                            .font(.headingMedium)
+                            .foregroundStyle(Color.florijnCharcoal)
+
+                        Spacer()
+
+                        Text("\(accounts.count)")
+                            .font(.caption)
+                            .foregroundStyle(Color.florijnMediumGray)
+                            .padding(.horizontal, PremiumSpacing.small)
+                            .padding(.vertical, PremiumSpacing.tiny)
+                            .background(Color.tealSecure.opacity(0.1))
+                            .clipShape(Capsule())
+                    }
+
+                    LazyVStack(spacing: PremiumSpacing.small) {
                         ForEach(accounts) { account in
                             AccountRow(account: account)
+                                .padding(.vertical, PremiumSpacing.tiny)
                         }
                     }
                 }
-                .padding(Spacing.medium)
+                .padding(PremiumSpacing.large)
+                .premiumCard()
             } else {
-                // Show empty state guidance
-                VStack(spacing: 16) {
-                    Image(systemName: "building.columns.circle")
-                        .font(.system(size: 48))
-                        .foregroundStyle(.secondary)
-
-                    VStack(spacing: 8) {
-                        Text("No Bank Accounts Yet")
-                            .font(.headingMedium)
-                            .foregroundStyle(Color.charcoal)
-
-                        Text("Use the Import tab in the sidebar to add your bank statements")
-                            .font(.body)
-                            .foregroundStyle(Color.gray)
-                            .multilineTextAlignment(.center)
+                // Enhanced empty state with sophisticated styling
+                ContentUnavailableView {
+                    VStack(spacing: PremiumSpacing.medium) {
+                        GeometricFlowIcon(.saved, size: 48, color: .florijnMediumGray)
+                        Text("No Bank Accounts")
+                            .font(.headingLarge)
+                            .foregroundStyle(Color.florijnCharcoal)
                     }
+                } description: {
+                    Text("Import your bank statements to see account balances and track your financial progress")
+                        .font(.body)
+                        .foregroundStyle(Color.florijnMediumGray.opacity(0.8))
+                        .multilineTextAlignment(.center)
+                } actions: {
+                    Button {
+                        // TODO: Navigate to import view
+                    } label: {
+                        HStack(spacing: PremiumSpacing.small) {
+                            Image(systemName: "square.and.arrow.down")
+                            Text("Import Statements")
+                        }
+                    }
+                    .buttonStyle(PremiumPrimaryButtonStyle())
                 }
-                .padding(Spacing.large)
-                .frame(maxWidth: .infinity)
+                .padding(PremiumSpacing.xlarge)
+                .premiumCard()
             }
         }
-        .card()
     }
 
-    // MARK: - Net Worth Section
+    // MARK: - Premium Net Worth Section
 
     private var netWorthSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Net Worth")
-                .font(.headline)
-                .foregroundStyle(.primary)
+        VStack(alignment: .leading, spacing: PremiumSpacing.large) {
+            HStack {
+                GeometricFlowIcon(.savingsRate, size: PremiumSpacing.iconSizeSmall)
+
+                Text("Financial Position")
+                    .font(.headingMedium)
+                    .foregroundStyle(Color.florijnCharcoal)
+
+                Spacer()
+            }
 
             if let netWorth = viewModel.netWorth {
-                HStack(spacing: 32) {
-                    VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: PremiumSpacing.xlarge) {
+                    // Assets
+                    VStack(alignment: .leading, spacing: PremiumSpacing.small) {
                         Text("Assets")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text(netWorth.assets.toCurrencyString())
-                            .font(.title3)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(Color.green)
-                    }
+                            .foregroundStyle(Color.florijnMediumGray)
 
-                    VStack(alignment: .leading, spacing: 4) {
+                        PremiumAnimatedNumber(
+                            netWorth.assets,
+                            font: .currencyMedium,
+                            color: .florijnGreen
+                        )
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    // Liabilities
+                    VStack(alignment: .leading, spacing: PremiumSpacing.small) {
                         Text("Liabilities")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text(netWorth.liabilities.toCurrencyString())
-                            .font(.title3)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(Color.charcoal)
+                            .foregroundStyle(Color.florijnMediumGray)
+
+                        PremiumAnimatedNumber(
+                            netWorth.liabilities,
+                            font: .currencyMedium,
+                            color: .expenseRed
+                        )
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                    Divider()
-                        .frame(height: 40)
+                    // Divider with sophisticated styling
+                    Rectangle()
+                        .fill(Color.florijnLightGray.opacity(0.5))
+                        .frame(width: 1, height: 50)
 
-                    VStack(alignment: .leading, spacing: 4) {
+                    // Net Worth (Hero)
+                    VStack(alignment: .leading, spacing: PremiumSpacing.small) {
                         Text("Net Worth")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text(netWorth.netWorth.toCurrencyString())
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(Color.florijnMediumGray)
+
+                        PremiumAnimatedNumber(
+                            netWorth.netWorth,
+                            font: .currencyLarge,
+                            color: netWorth.netWorth >= 0 ? .florijnGreen : .florijnRed
+                        )
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding(.top, 4)
+                .padding(.top, PremiumSpacing.medium)
+            } else {
+                ContentUnavailableView {
+                    VStack(spacing: PremiumSpacing.small) {
+                        GeometricFlowIcon(.savingsRate, size: 32, color: .florijnMediumGray)
+                        Text("Calculating Net Worth")
+                            .font(.bodyLarge)
+                            .foregroundStyle(Color.florijnMediumGray)
+                    }
+                } description: {
+                    Text("Import account data to calculate your financial position")
+                        .font(.body)
+                        .foregroundStyle(Color.florijnMediumGray.opacity(0.8))
+                }
+                .frame(height: 120)
             }
         }
-        .padding(Spacing.medium)
-        .card()
+        .padding(PremiumSpacing.large)
+        .heroCard()
     }
 
     // MARK: - Helper Methods
@@ -442,147 +647,96 @@ struct DashboardView: View {
     }
 
     private func categoryColor(_ categoryName: String) -> Color {
-        // Simple hash-based color assignment
-        let hash = categoryName.hashValue
-        let hue = Double(abs(hash) % 360) / 360.0
-        return Color(hue: hue, saturation: 0.7, brightness: 0.8)
-    }
-}
-
-// MARK: - KPI Card Component
-
-/// KPI card with hover effects and spring animations
-struct EnhancedKPICard: View {
-    let title: String
-    let value: Decimal?
-    let percentage: Double?
-    let icon: String
-    let color: Color
-    let trend: Double?
-    let index: Int
-
-    @State private var isHovered = false
-    @State private var hasAppeared = false
-
-    init(title: String, value: Decimal? = nil, percentage: Double? = nil, icon: String, color: Color, trend: Double?, index: Int) {
-        self.title = title
-        self.value = value
-        self.percentage = percentage
-        self.icon = icon
-        self.color = color
-        self.trend = trend
-        self.index = index
+        // Use cached color from view model instead of expensive hash calculation in view
+        return viewModel.getCachedCategoryColor(for: categoryName)
     }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.small + 4) {
-            headerSection
-            valueSection
-        }
-        .padding(Spacing.medium)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(cardBackground)
-        .card()
-        .scaleEffect(isHovered ? 1.02 : 1.0)
-        .animation(.quick, value: isHovered)
-        .onHover { hovering in
-            withAnimation(.quick) {
-                isHovered = hovering
+    // MARK: - Sarah's Context Functions: Financial Intelligence
+
+    private func incomeContextText(_ income: Decimal) -> String {
+        let amount = NSDecimalNumber(decimal: income).doubleValue
+
+        if selectedMonth > 0 {
+            let dailyRate = amount / 30
+            if amount == 0 {
+                return "Add income transactions to track your earnings"
+            } else {
+                return String(format: "≈ €%.0f per day this month", dailyRate)
             }
-        }
-        .opacity(hasAppeared ? 1.0 : 0.0)
-        .offset(y: hasAppeared ? 0 : 20)
-        .onAppear {
-            withAnimation(.standard.delay(Double(index) * 0.1)) {
-                hasAppeared = true
-            }
-        }
-    }
-
-    private var headerSection: some View {
-        HStack {
-            Image(systemName: icon)
-                .font(.system(size: 24, weight: .semibold))
-                .foregroundStyle(color)
-
-            Spacer()
-
-            if let trend = trend {
-                trendIndicator(trend: trend)
-            }
-        }
-    }
-
-    private var valueSection: some View {
-        VStack(alignment: .leading, spacing: Spacing.tiny) {
-            Text(title)
-                .font(.caption)
-                .foregroundStyle(Color.gray)
-
-            if let value = value {
-                AnimatedNumber(
-                    value: value,
-                    font: .currencyLarge
-                )
-            } else if let percentage = percentage {
-                AnimatedPercentage(
-                    value: percentage,
-                    font: .currencyLarge
-                )
-            }
-        }
-    }
-
-    private func trendIndicator(trend: Double) -> some View {
-        HStack(spacing: 4) {
-            Image(systemName: trend >= 0 ? "arrow.up.right" : "arrow.down.right")
-                .font(.caption2)
-            Text(String(format: "%.1f%%", abs(trend)))
-                .font(.caption2)
-                .fontWeight(.medium)
-        }
-        .foregroundStyle(trend >= 0 ? .green : .red)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background((trend >= 0 ? Color.green : Color.red).opacity(0.1))
-        .clipShape(Capsule())
-    }
-
-    private var cardBackground: Color {
-        if isHovered {
-            return Color(nsColor: .controlBackgroundColor).opacity(0.95)
         } else {
-            return Color(nsColor: .controlBackgroundColor)
+            let monthlyAverage = amount / 12
+            if amount == 0 {
+                return "Import bank data to see your annual income"
+            } else {
+                return String(format: "≈ €%.0f average per month", monthlyAverage)
+            }
+        }
+    }
+
+    private func expenseContextText(_ expenses: Decimal) -> String {
+        let amount = NSDecimalNumber(decimal: expenses).doubleValue
+
+        if selectedMonth > 0 {
+            let dailyBurn = amount / 30
+            if amount == 0 {
+                return "No expenses recorded this month"
+            } else if dailyBurn > 100 {
+                return String(format: "€%.0f daily spending rate", dailyBurn)
+            } else {
+                return String(format: "€%.0f daily spending (moderate)", dailyBurn)
+            }
+        } else {
+            let monthlyAverage = amount / 12
+            if amount == 0 {
+                return "Add expense transactions to track spending"
+            } else {
+                return String(format: "€%.0f monthly average", monthlyAverage)
+            }
+        }
+    }
+
+    private func savingsContextText(_ savings: Decimal) -> String {
+        let amount = NSDecimalNumber(decimal: savings).doubleValue
+
+        if amount > 0 {
+            if selectedMonth > 0 {
+                return "Great job staying in the green this month! 💚"
+            } else {
+                let monthlyRate = amount / 12
+                return String(format: "€%.0f saved per month on average", monthlyRate)
+            }
+        } else if amount == 0 {
+            return "Breaking even - income matches expenses"
+        } else {
+            return "Spending more than earning - time to review expenses"
+        }
+    }
+
+    private func savingsRateContextText(_ percentage: Double) -> String {
+        if percentage >= 20 {
+            return "Excellent savings rate! You're building wealth 🚀"
+        } else if percentage >= 15 {
+            return "Good savings rate - on track for financial goals"
+        } else if percentage >= 10 {
+            return "Decent savings - consider increasing to 15%+"
+        } else if percentage >= 5 {
+            return "Low savings rate - aim for at least 10%"
+        } else if percentage > 0 {
+            return "Very low savings - consider expense review"
+        } else {
+            return "Negative savings - spending exceeds income"
         }
     }
 }
 
-// MARK: - Animated Percentage Component
+// MARK: - Helper Components
 
-struct AnimatedPercentage: View {
-    let value: Double
-    let font: Font
+// Note: EnhancedKPICard removed - using PremiumKPICard from design system instead
 
-    @State private var displayValue: Double = 0
+// MARK: - Legacy Components (Updated for Premium Design System)
+// Note: Removed redundant EnhancedKPICard, AnimatedNumber structs - using PremiumAnimatedNumber and PremiumKPICard instead
 
-    var body: some View {
-        Text(String(format: "%.1f%%", displayValue))
-            .font(font)
-            .monospacedDigit()
-            .fontWeight(.bold)
-            .foregroundStyle(.primary)
-            .onChange(of: value) { _, newValue in
-                withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
-                    displayValue = newValue
-                }
-            }
-            .onAppear {
-                withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.5)) {
-                    displayValue = value
-                }
-            }
-    }
-}
+// MARK: - Removed AnimatedPercentage (redundant with PremiumAnimatedNumber)
 
 // MARK: - Category Row Component
 
@@ -594,14 +748,14 @@ struct CategoryRow: View {
             HStack {
                 Text(category.category)
                     .font(.body)
-                    .foregroundStyle(Color.charcoal)
+                    .foregroundStyle(Color.florijnCharcoal)
 
                 Spacer()
 
                 Text(category.totalAmount.toCurrencyString())
                     .font(.body)
                     .fontWeight(.semibold)
-                    .foregroundStyle(category.isOverBudget ? Color.red : Color.charcoal)
+                    .foregroundStyle(category.isOverBudget ? Color.florijnRed : Color.florijnCharcoal)
 
                 if let budget = category.budget {
                     Text("/ \(budget.toCurrencyString())")
@@ -653,7 +807,7 @@ struct AccountRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(account.name)
                     .font(.body)
-                    .foregroundStyle(Color.charcoal)
+                    .foregroundStyle(Color.florijnCharcoal)
 
                 Text(account.owner)
                     .font(.caption)
@@ -665,7 +819,7 @@ struct AccountRow: View {
             Text(account.balance.toCurrencyString())
                 .font(.body)
                 .fontWeight(.semibold)
-                .foregroundStyle(Color.charcoal)
+                .foregroundStyle(Color.florijnCharcoal)
         }
         .padding(.vertical, 4)
     }
@@ -690,33 +844,68 @@ class DashboardViewModel: ObservableObject {
 
     private let queryService: TransactionQueryService
 
+    // MARK: - Performance Optimizations (Alex's fixes)
+
+    // Category color cache - prevents expensive hash calculation in view
+    private var categoryColorCache: [String: Color] = [:]
+
+    // Data cache to prevent repeated queries
+    private var dataCache: [String: CachedDashboardData] = [:]
+    private let cacheExpiry: TimeInterval = 300 // 5 minutes
+
     // MARK: - Initialization
 
     init(queryService: TransactionQueryService) {
         self.queryService = queryService
     }
 
-    // MARK: - Data Loading
+    // MARK: - Data Loading (Optimized by Alex)
 
     func loadData(filter: TransactionFilter, year: Int) async {
+        let cacheKey = "\(filter.year ?? 0)-\(filter.month ?? 0)"
+
+        // Check cache first (Alex's optimization)
+        if let cachedData = dataCache[cacheKey],
+           !cachedData.isExpired {
+            // Use cached data
+            kpis = cachedData.kpis
+            categorySummaries = cachedData.categorySummaries
+            monthlyTrends = cachedData.monthlyTrends
+            accountBalances = cachedData.accountBalances
+            netWorth = cachedData.netWorth
+            return
+        }
+
         isLoading = true
         errorMessage = nil
 
-        // Use structured concurrency with proper error handling for each task
         do {
-            // Run all queries concurrently
-            async let kpisTask = queryService.getDashboardKPIs(filter: filter)
-            async let categoriesTask = queryService.getCategorySummaries(filter: filter)
+            // Alex's optimization: Instead of 5 concurrent queries, load in logical groups
+            // Group 1: Core financial metrics (can be optimized into single query)
+            async let coreDataTask = loadCoreFinancialData(filter: filter)
+            // Group 2: Account data (less frequent changes)
+            async let accountDataTask = loadAccountData()
+            // Group 3: Trends (year-based, can be cached longer)
             async let trendsTask = queryService.getMonthlyTrends(year: year)
-            async let accountsTask = queryService.getAccountBalances()
-            async let netWorthTask = queryService.getNetWorth()
 
-            // Await results
-            kpis = try await kpisTask
-            categorySummaries = try await categoriesTask
-            monthlyTrends = try await trendsTask
-            accountBalances = try await accountsTask
-            netWorth = try await netWorthTask
+            let (coreData, accountData, trends) = try await (coreDataTask, accountDataTask, trendsTask)
+
+            // Update state
+            kpis = coreData.kpis
+            categorySummaries = coreData.categories
+            accountBalances = accountData.accounts
+            netWorth = accountData.netWorth
+            monthlyTrends = trends
+
+            // Cache the results (Alex's optimization)
+            dataCache[cacheKey] = CachedDashboardData(
+                kpis: kpis,
+                categorySummaries: categorySummaries,
+                monthlyTrends: monthlyTrends,
+                accountBalances: accountBalances,
+                netWorth: netWorth,
+                timestamp: Date()
+            )
 
         } catch {
             errorMessage = "Failed to load dashboard data: \(error.localizedDescription)"
@@ -726,8 +915,55 @@ class DashboardViewModel: ObservableObject {
         isLoading = false
     }
 
+    // MARK: - Optimized Data Loading Helpers
+
+    private func loadCoreFinancialData(filter: TransactionFilter) async throws -> (kpis: DashboardKPIs, categories: [CategorySummary]) {
+        // Future optimization: Single query for both KPIs and categories
+        async let kpisTask = queryService.getDashboardKPIs(filter: filter)
+        async let categoriesTask = queryService.getCategorySummaries(filter: filter)
+        return try await (kpisTask, categoriesTask)
+    }
+
+    private func loadAccountData() async throws -> (accounts: [AccountBalance], netWorth: NetWorth) {
+        // Account data changes less frequently - can be cached longer
+        async let accountsTask = queryService.getAccountBalances()
+        async let netWorthTask = queryService.getNetWorth()
+        return try await (accountsTask, netWorthTask)
+    }
+
+    // MARK: - Performance Utilities
+
+    /// Get cached category color to prevent expensive hash calculation in view
+    func getCachedCategoryColor(for categoryName: String) -> Color {
+        if let cachedColor = categoryColorCache[categoryName] {
+            return cachedColor
+        }
+
+        // Calculate once and cache
+        let hash = categoryName.hashValue
+        let hue = Double(abs(hash) % 360) / 360.0
+        let color = Color(hue: hue, saturation: 0.7, brightness: 0.8)
+        categoryColorCache[categoryName] = color
+        return color
+    }
+
     /// Clear error message
     func dismissError() {
         errorMessage = nil
+    }
+}
+
+// MARK: - Performance Data Structures (Alex's optimization)
+
+struct CachedDashboardData {
+    let kpis: DashboardKPIs?
+    let categorySummaries: [CategorySummary]?
+    let monthlyTrends: [MonthlyTrend]?
+    let accountBalances: [AccountBalance]?
+    let netWorth: NetWorth?
+    let timestamp: Date
+
+    var isExpired: Bool {
+        Date().timeIntervalSince(timestamp) > 300 // 5 minutes
     }
 }

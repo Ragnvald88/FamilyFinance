@@ -185,7 +185,7 @@ struct SimpleRulesView: View {
 
             Text("No Rules Yet")
                 .font(.headingLarge)
-                .foregroundStyle(Color.charcoal)
+                .foregroundStyle(Color.florijnCharcoal)
 
             Text("Create your first rule to start automating\ntransaction categorization")
                 .font(.body)
@@ -195,8 +195,8 @@ struct SimpleRulesView: View {
             Button("Create First Rule") {
                 showingCreateRule = true
             }
-            .primaryButton()
-            .padding(.top, Spacing.medium)
+            .buttonStyle(PremiumPrimaryButtonStyle())
+            .padding(.top, PremiumSpacing.medium)
 
             Spacer()
         }
@@ -360,14 +360,14 @@ struct SimpleRuleRow: View {
     @State private var isHovered = false
 
     var body: some View {
-        HStack(spacing: Spacing.small + 4) {
+        HStack(spacing: PremiumSpacing.small + 4) {
             // Active indicator
             Circle()
                 .fill(rule.isActive ? Color.green : Color.orange)
                 .frame(width: 8, height: 8)
 
             // Rule info
-            VStack(alignment: .leading, spacing: Spacing.tiny) {
+            VStack(alignment: .leading, spacing: PremiumSpacing.tiny) {
                 HStack {
                     Text(rule.name)
                         .font(.headingMedium)
@@ -392,15 +392,15 @@ struct SimpleRuleRow: View {
             if let group = rule.group {
                 Text(group.name)
                     .font(.caption)
-                    .padding(.horizontal, Spacing.small)
-                    .padding(.vertical, Spacing.tiny)
-                    .background(Color.primaryBlue.opacity(0.1))
+                    .padding(.horizontal, PremiumSpacing.small)
+                    .padding(.vertical, PremiumSpacing.tiny)
+                    .background(Color.florijnBlue.opacity(0.1))
                     .clipShape(Capsule())
             }
 
             // Stats
             if rule.matchCount > 0 {
-                HStack(spacing: Spacing.tiny) {
+                HStack(spacing: PremiumSpacing.tiny) {
                     Image(systemName: "checkmark")
                     Text("\(rule.matchCount)")
                 }
@@ -824,7 +824,7 @@ struct TriggerEditor: View {
                 .help("Remove condition")
             }
         }
-        .padding(Spacing.small + 4)
+        .padding(PremiumSpacing.small + 4)
         .background(Color(nsColor: .controlBackgroundColor).opacity(0.5))
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
@@ -876,7 +876,7 @@ struct ActionEditor: View {
                 .help("Remove action")
             }
         }
-        .padding(Spacing.small)
+        .padding(PremiumSpacing.small)
         .background(Color(nsColor: .controlBackgroundColor).opacity(0.3))
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }

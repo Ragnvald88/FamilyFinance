@@ -22,7 +22,7 @@
 //  Created: 2025-12-27
 //
 
-import SwiftData
+@preconcurrency import SwiftData
 import Foundation
 import OSLog
 

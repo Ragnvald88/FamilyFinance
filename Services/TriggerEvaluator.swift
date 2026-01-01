@@ -15,7 +15,7 @@
 //  • 100+ triggers in parallel: <10ms
 //
 
-import SwiftData
+@preconcurrency import SwiftData
 import Foundation
 import OSLog
 

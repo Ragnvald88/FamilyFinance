@@ -97,22 +97,22 @@ struct CSVImportView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Image(systemName: "info.circle.fill")
-                        .foregroundStyle(Color.primaryBlue)
+                        .foregroundStyle(Color.florijnBlue)
                     Text("Import Information")
                         .font(.headingMedium)
                 }
 
-                VStack(alignment: .leading, spacing: Spacing.tiny + 2) {
+                VStack(alignment: .leading, spacing: PremiumSpacing.tiny + 2) {
                     InfoRow(icon: "checkmark.circle.fill", text: "Supports latin-1, cp1252, and UTF-8 encoding")
                     InfoRow(icon: "checkmark.circle.fill", text: "Automatic duplicate detection")
                     InfoRow(icon: "checkmark.circle.fill", text: "95%+ automatic categorization")
                     InfoRow(icon: "checkmark.circle.fill", text: "Dutch number format support")
                 }
             }
-            .padding(Spacing.medium)
+            .padding(PremiumSpacing.medium)
             .frame(maxWidth: 500)
             .background(Color(nsColor: .controlBackgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: Spacing.cardCornerRadius))
+            .clipShape(RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius))
 
             Spacer()
         }
@@ -126,27 +126,27 @@ struct CSVImportView: View {
     // MARK: - Importing View
 
     private var importingView: some View {
-        VStack(spacing: Spacing.xlarge) {
+        VStack(spacing: PremiumSpacing.xlarge) {
             Spacer()
 
             // Animated icon
             ZStack {
                 Circle()
-                    .stroke(Color.primaryBlue.opacity(0.3), lineWidth: 4)
+                    .stroke(Color.florijnBlue.opacity(0.3), lineWidth: 4)
                     .frame(width: 80, height: 80)
 
                 Circle()
                     .trim(from: 0, to: (viewModel.progress?.percentage ?? 0) / 100)
-                    .stroke(Color.primaryBlue, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                    .stroke(Color.florijnBlue, style: StrokeStyle(lineWidth: 4, lineCap: .round))
                     .frame(width: 80, height: 80)
                     .rotationEffect(.degrees(-90))
 
                 Image(systemName: "arrow.down.doc.fill")
                     .font(.system(size: 32))
-                    .foregroundStyle(Color.primaryBlue)
+                    .foregroundStyle(Color.florijnBlue)
             }
 
-            VStack(spacing: Spacing.small) {
+            VStack(spacing: PremiumSpacing.small) {
                 Text(viewModel.progress?.stage.displayName ?? "Importing...")
                     .font(.headingLarge)
 

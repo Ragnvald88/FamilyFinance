@@ -338,13 +338,18 @@ final class Transaction {
 
     // MARK: - Static Helpers
 
+    /// Static date formatter for generateUniqueKey (performance: avoid creating on every call)
+    private static let uniqueKeyDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
+
     /// Generates a unique key for duplicate detection.
     /// Format: "IBAN-YYYYMMDD-sequence" (e.g., "NL00BANK0123456001-20251223-42")
     static func generateUniqueKey(iban: String, date: Date, sequenceNumber: Int) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyyMMdd"
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        let dateStr = dateFormatter.string(from: date)
+        let dateStr = uniqueKeyDateFormatter.string(from: date)
         return "\(iban)-\(dateStr)-\(sequenceNumber)"
     }
 

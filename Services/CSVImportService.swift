@@ -84,10 +84,10 @@ enum CSVImportStage: String, Sendable {
     }
 }
 
-// MARK: - Parsed Transaction (Public - shared with CategorizationEngine)
+// MARK: - Parsed Transaction
 
 /// Intermediate parsed transaction before categorization.
-/// Public to allow CategorizationEngine access.
+/// Public to allow RuleService access for categorization.
 struct ParsedTransaction: Sendable {
     let iban: String
     let sequenceNumber: Int
@@ -171,7 +171,7 @@ class CSVImportService: ObservableObject {
     // MARK: - Dependencies
 
     private let modelContainer: ModelContainer
-    private let categorizationEngine: CategorizationEngine
+    private let ruleService: RuleService
 
     // MARK: - Configuration
     // NOTE: IBANs are centralized in FamilyAccountsConfig.swift for privacy
@@ -231,9 +231,9 @@ class CSVImportService: ObservableObject {
 
     // MARK: - Initialization
 
-    init(modelContainer: ModelContainer, categorizationEngine: CategorizationEngine) {
+    init(modelContainer: ModelContainer, ruleService: RuleService) {
         self.modelContainer = modelContainer
-        self.categorizationEngine = categorizationEngine
+        self.ruleService = ruleService
     }
 
     // MARK: - Public Import Methods
@@ -289,7 +289,7 @@ class CSVImportService: ObservableObject {
             stage: .categorizing
         )
 
-        // The new CategorizationEngine handles caching internally
+        // RuleService handles rule caching internally
         // No external cache building needed
 
         // Phase 3: Delegate to BackgroundDataHandler for categorization + import
@@ -300,8 +300,8 @@ class CSVImportService: ObservableObject {
             stage: .saving
         )
 
-        // Use the new high-performance categorization engine for bulk processing
-        let categorizationResults = await categorizationEngine.categorizeBulk(allParsedTransactions)
+        // Use unified RuleService for categorization
+        let categorizationResults = ruleService.categorizeParsedTransactions(allParsedTransactions)
 
         // Create import data with categorization results
         let transactionData = zip(allParsedTransactions, categorizationResults).map { parsed, result in
@@ -325,7 +325,7 @@ class CSVImportService: ObservableObject {
                 transactionType: parsed.transactionType,
                 contributor: parsed.contributor,
                 sourceFile: parsed.sourceFile,
-                importBatchID: UUID() // Generate unique batch ID for this import
+                importBatchID: batchID // Use batch ID from start of import
             )
         }
 

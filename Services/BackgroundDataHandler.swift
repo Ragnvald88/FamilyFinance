@@ -42,27 +42,6 @@ actor BackgroundDataHandler {
         }
     }
 
-    /// Extended result including categorization statistics.
-    /// Returned by importWithCategorization().
-    struct ImportResultWithCategorization: Sendable {
-        let imported: Int
-        let duplicates: Int
-        let errors: Int
-        let totalProcessed: Int
-        let categorized: Int
-        let uncategorized: Int
-
-        var successRate: Double {
-            guard totalProcessed > 0 else { return 0 }
-            return Double(imported) / Double(totalProcessed) * 100
-        }
-
-        var categorizationRate: Double {
-            guard totalProcessed > 0 else { return 0 }
-            return Double(categorized) / Double(totalProcessed) * 100
-        }
-    }
-
     // MARK: - Duplicate Detection Cache
 
     /// Pre-loaded unique keys for O(1) duplicate detection.
@@ -394,73 +373,6 @@ actor BackgroundDataHandler {
         try modelContext.delete(model: Transaction.self, where: predicate)
         try modelContext.save()
     }
-
-    // MARK: - Recurring Transaction Detection
-
-    /// Attempts to detect recurring transaction patterns from existing data.
-    /// - Parameter minimumOccurrences: Minimum number of occurrences to consider recurring
-    /// - Returns: Array of detected recurring patterns
-    func detectRecurringPatterns(minimumOccurrences: Int = 3) async throws -> [RecurringTransactionCandidate] {
-        let descriptor = FetchDescriptor<Transaction>(
-            sortBy: [SortDescriptor(\Transaction.date)]
-        )
-        let transactions = try modelContext.fetch(descriptor)
-
-        // Group by counter party
-        let grouped = Dictionary(grouping: transactions) { tx -> String in
-            tx.standardizedName ?? tx.counterName ?? "Unknown"
-        }
-
-        var candidates: [RecurringTransactionCandidate] = []
-
-        for (name, txList) in grouped {
-            guard txList.count >= minimumOccurrences else { continue }
-
-            // Calculate intervals between transactions
-            let sortedDates = txList.map { $0.date }.sorted()
-            var intervals: [Int] = []
-
-            for i in 1..<sortedDates.count {
-                let days = Calendar.current.dateComponents([.day], from: sortedDates[i-1], to: sortedDates[i]).day ?? 0
-                intervals.append(days)
-            }
-
-            // Check if intervals are consistent (within 5 days tolerance)
-            if let frequency = detectFrequency(from: intervals) {
-                let amounts = txList.map { $0.amount }
-                let avgAmount = amounts.reduce(Decimal.zero, +) / Decimal(amounts.count)
-
-                candidates.append(RecurringTransactionCandidate(
-                    name: name,
-                    category: txList.first?.effectiveCategory ?? "Niet Gecategoriseerd",
-                    averageAmount: avgAmount,
-                    frequency: frequency,
-                    occurrenceCount: txList.count,
-                    counterIBAN: txList.first?.counterIBAN
-                ))
-            }
-        }
-
-        return candidates.sorted { $0.occurrenceCount > $1.occurrenceCount }
-    }
-
-    /// Detects the most likely frequency from a set of day intervals.
-    private func detectFrequency(from intervals: [Int]) -> RecurrenceFrequency? {
-        guard !intervals.isEmpty else { return nil }
-
-        let _ = intervals.reduce(0, +) / intervals.count  // Average for potential future pattern analysis
-        let tolerance = 5
-
-        // Check for common patterns
-        if intervals.allSatisfy({ abs($0 - 1) <= 1 }) { return .daily }
-        if intervals.allSatisfy({ abs($0 - 7) <= tolerance }) { return .weekly }
-        if intervals.allSatisfy({ abs($0 - 14) <= tolerance }) { return .biweekly }
-        if intervals.allSatisfy({ abs($0 - 30) <= tolerance }) { return .monthly }
-        if intervals.allSatisfy({ abs($0 - 91) <= tolerance * 2 }) { return .quarterly }
-        if intervals.allSatisfy({ abs($0 - 365) <= tolerance * 3 }) { return .yearly }
-
-        return nil
-    }
 }
 
 // MARK: - Import Data Transfer Object
@@ -488,16 +400,6 @@ struct TransactionImportData: Sendable {
     let contributor: Contributor?
     let sourceFile: String?
     let importBatchID: UUID?
-}
-
-/// Candidate for a recurring transaction pattern.
-struct RecurringTransactionCandidate: Sendable {
-    let name: String
-    let category: String
-    let averageAmount: Decimal
-    let frequency: RecurrenceFrequency
-    let occurrenceCount: Int
-    let counterIBAN: String?
 }
 
 // MARK: - Array Extension for Chunking

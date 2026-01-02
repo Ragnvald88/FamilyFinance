@@ -1,6 +1,9 @@
 import XCTest
 @preconcurrency import SwiftData
-@testable import Florijn
+@testable import FamilyFinance
+
+// Disambiguate Category from Foundation
+typealias Category = FamilyFinance.Category
 
 /// Unit tests for the core data models following TDD approach.
 /// Covers: Transaction, Account, Category models and Dutch number parsing.
@@ -147,7 +150,7 @@ final class TransactionModelTests: XCTestCase {
             transactionType: .expense
         )
 
-        XCTAssertEqual(transaction.effectiveCategory, "Niet Gecategoriseerd")
+        XCTAssertEqual(transaction.effectiveCategory, "Uncategorized")
     }
 
     /// Test unique constraint on uniqueKey prevents duplicates

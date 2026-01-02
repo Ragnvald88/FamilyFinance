@@ -10,7 +10,7 @@
 
 import XCTest
 @preconcurrency import SwiftData
-@testable import Florijn
+@testable import FamilyFinance
 
 @MainActor
 final class FlorijnTests: XCTestCase {

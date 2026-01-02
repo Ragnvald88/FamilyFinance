@@ -10,7 +10,7 @@
 
 import XCTest
 @preconcurrency import SwiftData
-@testable import Florijn
+@testable import FamilyFinance
 
 /// Unit tests for TransactionDetailView following TDD approach.
 /// These tests verify the view model logic and data transformations.

@@ -12,7 +12,6 @@
 		A1000001232312340003 /* FamilyAccountsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340103 /* FamilyAccountsConfig.swift */; };
 		A1000001232312340004 /* BackgroundDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340104 /* BackgroundDataHandler.swift */; };
 		A1000001232312340005 /* CSVImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340105 /* CSVImportService.swift */; };
-		A1000001232312340006 /* CategorizationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340106 /* CategorizationEngine.swift */; };
 		A1000001232312340007 /* TransactionQueryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340107 /* TransactionQueryService.swift */; };
 		A1000001232312340008 /* DataIntegrityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340108 /* DataIntegrityService.swift */; };
 		A1000001232312340009 /* ExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340109 /* ExportService.swift */; };
@@ -23,13 +22,12 @@
 		A1000001232312340051 /* FamilyFinanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340151 /* FamilyFinanceTests.swift */; };
 		A1000001232312340052 /* TransactionModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340152 /* TransactionModelTests.swift */; };
 		A1000001232312340053 /* TransactionDetailViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340153 /* TransactionDetailViewTests.swift */; };
+		A1000001232312340054 /* RuleServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340154 /* RuleServiceTests.swift */; };
 		A1000001232312340015 /* RulesModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340115 /* RulesModels.swift */; };
-		A1000001232312340016 /* RuleStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340116 /* RuleStatistics.swift */; };
-		A1000001232312340017 /* ActionExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340117 /* ActionExecutor.swift */; };
-		A1000001232312340018 /* RuleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340118 /* RuleEngine.swift */; };
-		A1000001232312340019 /* RuleProgressPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340119 /* RuleProgressPublisher.swift */; };
-		A1000001232312340020 /* TriggerEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340120 /* TriggerEvaluator.swift */; };
 		A1000001232312340022 /* SimpleRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340122 /* SimpleRulesView.swift */; };
+		A1000001232312340023 /* RuleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340123 /* RuleService.swift */; };
+		A1000001232312340024 /* TransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340124 /* TransactionsView.swift */; };
+		A1000001232312340025 /* AccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340125 /* AccountsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,7 +46,6 @@
 		A1000001232312340103 /* FamilyAccountsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyAccountsConfig.swift; sourceTree = "<group>"; };
 		A1000001232312340104 /* BackgroundDataHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundDataHandler.swift; sourceTree = "<group>"; };
 		A1000001232312340105 /* CSVImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVImportService.swift; sourceTree = "<group>"; };
-		A1000001232312340106 /* CategorizationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorizationEngine.swift; sourceTree = "<group>"; };
 		A1000001232312340107 /* TransactionQueryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionQueryService.swift; sourceTree = "<group>"; };
 		A1000001232312340108 /* DataIntegrityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataIntegrityService.swift; sourceTree = "<group>"; };
 		A1000001232312340109 /* ExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportService.swift; sourceTree = "<group>"; };
@@ -59,13 +56,12 @@
 		A1000001232312340151 /* FamilyFinanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyFinanceTests.swift; sourceTree = "<group>"; };
 		A1000001232312340152 /* TransactionModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionModelTests.swift; sourceTree = "<group>"; };
 		A1000001232312340153 /* TransactionDetailViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionDetailViewTests.swift; sourceTree = "<group>"; };
+		A1000001232312340154 /* RuleServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleServiceTests.swift; sourceTree = "<group>"; };
 		A1000001232312340115 /* RulesModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesModels.swift; sourceTree = "<group>"; };
-		A1000001232312340116 /* RuleStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleStatistics.swift; sourceTree = "<group>"; };
-		A1000001232312340117 /* ActionExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionExecutor.swift; sourceTree = "<group>"; };
-		A1000001232312340118 /* RuleEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleEngine.swift; sourceTree = "<group>"; };
-		A1000001232312340119 /* RuleProgressPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleProgressPublisher.swift; sourceTree = "<group>"; };
-		A1000001232312340120 /* TriggerEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriggerEvaluator.swift; sourceTree = "<group>"; };
 		A1000001232312340122 /* SimpleRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleRulesView.swift; sourceTree = "<group>"; };
+		A1000001232312340123 /* RuleService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleService.swift; sourceTree = "<group>"; };
+		A1000001232312340124 /* TransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsView.swift; sourceTree = "<group>"; };
+		A1000001232312340125 /* AccountsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsView.swift; sourceTree = "<group>"; };
 		A1000001232312340401 /* Florijn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Florijn.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000001232312340402 /* FlorijnTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlorijnTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -107,7 +103,6 @@
 			children = (
 				A1000001232312340102 /* SwiftDataModels.swift */,
 				A1000001232312340115 /* RulesModels.swift */,
-				A1000001232312340116 /* RuleStatistics.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -119,6 +114,8 @@
 				A1000001232312340113 /* ImportView.swift */,
 				A1000001232312340114 /* TransactionDetailView.swift */,
 				A1000001232312340122 /* SimpleRulesView.swift */,
+				A1000001232312340124 /* TransactionsView.swift */,
+				A1000001232312340125 /* AccountsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -128,14 +125,10 @@
 			children = (
 				A1000001232312340104 /* BackgroundDataHandler.swift */,
 				A1000001232312340105 /* CSVImportService.swift */,
-				A1000001232312340106 /* CategorizationEngine.swift */,
 				A1000001232312340107 /* TransactionQueryService.swift */,
 				A1000001232312340108 /* DataIntegrityService.swift */,
 				A1000001232312340109 /* ExportService.swift */,
-				A1000001232312340117 /* ActionExecutor.swift */,
-				A1000001232312340118 /* RuleEngine.swift */,
-				A1000001232312340119 /* RuleProgressPublisher.swift */,
-				A1000001232312340120 /* TriggerEvaluator.swift */,
+				A1000001232312340123 /* RuleService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -162,6 +155,7 @@
 				A1000001232312340151 /* FamilyFinanceTests.swift */,
 				A1000001232312340152 /* TransactionModelTests.swift */,
 				A1000001232312340153 /* TransactionDetailViewTests.swift */,
+				A1000001232312340154 /* RuleServiceTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -279,7 +273,6 @@
 				A1000001232312340003 /* FamilyAccountsConfig.swift in Sources */,
 				A1000001232312340004 /* BackgroundDataHandler.swift in Sources */,
 				A1000001232312340005 /* CSVImportService.swift in Sources */,
-				A1000001232312340006 /* CategorizationEngine.swift in Sources */,
 				A1000001232312340007 /* TransactionQueryService.swift in Sources */,
 				A1000001232312340008 /* DataIntegrityService.swift in Sources */,
 				A1000001232312340009 /* ExportService.swift in Sources */,
@@ -289,11 +282,10 @@
 				A1000001232312340050 /* ViewExtensions.swift in Sources */,
 				A1000001232312340015 /* RulesModels.swift in Sources */,
 				A1000001232312340016 /* RuleStatistics.swift in Sources */,
-				A1000001232312340017 /* ActionExecutor.swift in Sources */,
-				A1000001232312340018 /* RuleEngine.swift in Sources */,
-				A1000001232312340019 /* RuleProgressPublisher.swift in Sources */,
-				A1000001232312340020 /* TriggerEvaluator.swift in Sources */,
 				A1000001232312340022 /* SimpleRulesView.swift in Sources */,
+				A1000001232312340023 /* RuleService.swift in Sources */,
+				A1000001232312340024 /* TransactionsView.swift in Sources */,
+				A1000001232312340025 /* AccountsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,6 +296,7 @@
 				A1000001232312340051 /* FamilyFinanceTests.swift in Sources */,
 				A1000001232312340052 /* TransactionModelTests.swift in Sources */,
 				A1000001232312340053 /* TransactionDetailViewTests.swift in Sources */,
+				A1000001232312340054 /* RuleServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -381,7 +374,7 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_STRICT_CONCURRENCY = targeted;
 			};
 			name = Debug;
 		};
@@ -427,7 +420,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Florijn.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Florijn";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FamilyFinance.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FamilyFinance";
 			};
 			name = Debug;
 		};
@@ -486,7 +479,7 @@
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_STRICT_CONCURRENCY = targeted;
 			};
 			name = Release;
 		};
@@ -532,7 +525,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Florijn.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Florijn";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FamilyFinance.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FamilyFinance";
 			};
 			name = Release;
 		};

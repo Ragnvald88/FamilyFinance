@@ -638,5 +638,273 @@ struct PremiumKPICard: View {
     }
 }
 
+// MARK: - Professional Trust Components
+
+/// Premium app header with security indicators and professional branding
+struct ProfessionalAppHeader: View {
+    let title: String
+    let subtitle: String?
+    let showSecurityBadge: Bool
+
+    init(_ title: String, subtitle: String? = nil, showSecurityBadge: Bool = true) {
+        self.title = title
+        self.subtitle = subtitle
+        self.showSecurityBadge = showSecurityBadge
+    }
+
+    var body: some View {
+        HStack(spacing: PremiumSpacing.medium) {
+            // Professional app branding
+            VStack(alignment: .leading, spacing: PremiumSpacing.tiny) {
+                HStack(spacing: PremiumSpacing.small) {
+                    // Sophisticated app icon representation
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(LinearGradient(
+                            colors: [Color.florijnBlue, Color.florijnNavy],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ))
+                        .frame(width: 32, height: 32)
+                        .overlay {
+                            Text("F")
+                                .font(.system(.title3, weight: .bold))
+                                .foregroundStyle(.white)
+                        }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title)
+                            .font(.system(.title2, weight: .semibold))
+                            .foregroundStyle(Color.florijnCharcoal)
+
+                        if let subtitle = subtitle {
+                            Text(subtitle)
+                                .font(.caption)
+                                .foregroundStyle(Color.florijnMediumGray)
+                        }
+                    }
+                }
+            }
+
+            Spacer()
+
+            if showSecurityBadge {
+                securityIndicators
+            }
+        }
+        .padding(.horizontal, PremiumSpacing.large)
+        .padding(.vertical, PremiumSpacing.medium)
+        .background(.ultraThinMaterial)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(Color.florijnLightGray.opacity(0.3))
+                .frame(height: 0.5)
+        }
+    }
+
+    private var securityIndicators: some View {
+        HStack(spacing: PremiumSpacing.small) {
+            // Data security indicator
+            HStack(spacing: 6) {
+                Image(systemName: "lock.shield.fill")
+                    .font(.caption)
+                    .foregroundStyle(Color.florijnGreen)
+                Text("Secure")
+                    .font(.caption2)
+                    .fontWeight(.medium)
+                    .foregroundStyle(Color.florijnDarkGray)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Color.florijnGreen.opacity(0.08))
+            .clipShape(Capsule())
+
+            // Local data indicator
+            HStack(spacing: 6) {
+                Image(systemName: "internaldrive.fill")
+                    .font(.caption)
+                    .foregroundStyle(Color.florijnBlue)
+                Text("Local")
+                    .font(.caption2)
+                    .fontWeight(.medium)
+                    .foregroundStyle(Color.florijnDarkGray)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Color.florijnBlue.opacity(0.08))
+            .clipShape(Capsule())
+        }
+    }
+}
+
+/// Premium sidebar styling with professional polish
+extension View {
+    func professionalSidebar() -> some View {
+        self
+            .listStyle(SidebarListStyle())
+            .background(.ultraThinMaterial)
+            .overlay(alignment: .trailing) {
+                Rectangle()
+                    .fill(Color.florijnLightGray.opacity(0.3))
+                    .frame(width: 0.5)
+            }
+    }
+
+    func professionalSidebarSection() -> some View {
+        self
+            .font(.caption)
+            .fontWeight(.semibold)
+            .foregroundStyle(Color.florijnMediumGray)
+            .textCase(.uppercase)
+            .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 8, trailing: 16))
+    }
+
+    func professionalSidebarItem(isSelected: Bool = false) -> some View {
+        self
+            .font(.body)
+            .fontWeight(isSelected ? .semibold : .medium)
+            .foregroundStyle(isSelected ? Color.florijnBlue : Color.florijnCharcoal)
+            .listRowBackground(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isSelected ? Color.florijnBlue.opacity(0.08) : Color.clear)
+                    .padding(.horizontal, 8)
+            )
+            .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+    }
+}
+
+// MARK: - Enhanced KPI Card with Trust Elements
+
+struct TrustEnhancedKPICard: View {
+    let title: String
+    let value: Decimal?
+    let percentage: Double?
+    let icon: GeometricFlowIcon.IconType
+    let color: Color
+    let trend: Double?
+    let cardType: FinancialCardType
+    let isVerified: Bool
+
+    @State private var isHovered = false
+
+    init(
+        title: String,
+        value: Decimal? = nil,
+        percentage: Double? = nil,
+        icon: GeometricFlowIcon.IconType,
+        color: Color,
+        trend: Double? = nil,
+        cardType: FinancialCardType = .primary,
+        isVerified: Bool = true
+    ) {
+        self.title = title
+        self.value = value
+        self.percentage = percentage
+        self.icon = icon
+        self.color = color
+        self.trend = trend
+        self.cardType = cardType
+        self.isVerified = isVerified
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: PremiumSpacing.medium) {
+            // Enhanced header with trust indicators
+            HStack {
+                GeometricFlowIcon(icon, size: PremiumSpacing.iconSize, color: color)
+
+                Spacer()
+
+                HStack(spacing: 8) {
+                    if isVerified {
+                        Image(systemName: "checkmark.shield.fill")
+                            .font(.caption2)
+                            .foregroundStyle(Color.florijnGreen.opacity(0.6))
+                    }
+
+                    if let trend = trend {
+                        trendIndicator(trend)
+                    }
+                }
+            }
+
+            // Enhanced value section
+            VStack(alignment: .leading, spacing: PremiumSpacing.small) {
+                Text(title)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundStyle(Color.florijnMediumGray.opacity(0.8))
+                    .textCase(.uppercase)
+                    .tracking(0.5)
+
+                if let value = value {
+                    Text(value.toCurrencyString())
+                        .font(.system(.title2, design: .monospaced, weight: .bold))
+                        .foregroundStyle(color)
+                        .monospacedDigit()
+                } else if let percentage = percentage {
+                    Text("\(percentage, specifier: "%.1f")%")
+                        .font(.system(.title2, design: .monospaced, weight: .bold))
+                        .foregroundStyle(color)
+                        .monospacedDigit()
+                }
+            }
+        }
+        .padding(PremiumSpacing.large)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background {
+            RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius)
+                .fill(.regularMaterial)
+                .overlay {
+                    RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius)
+                        .strokeBorder(LinearGradient(
+                            colors: [color.opacity(0.2), color.opacity(0.05)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ), lineWidth: 1)
+                }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius))
+        .shadow(color: color.opacity(0.15), radius: isHovered ? 12 : 8, x: 0, y: isHovered ? 6 : 4)
+        .scaleEffect(isHovered ? 1.02 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isHovered)
+        .onHover { hovering in
+            isHovered = hovering
+        }
+    }
+
+    private func trendIndicator(_ trend: Double) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: trend >= 0 ? "arrow.up.right" : "arrow.down.right")
+                .font(.caption2)
+            Text("\(abs(trend), specifier: "%.1f")%")
+                .font(.caption2)
+                .monospacedDigit()
+        }
+        .foregroundStyle(trend >= 0 ? Color.florijnGreen : Color.florijnRed)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(.ultraThinMaterial)
+        .clipShape(Capsule())
+    }
+}
+
+// MARK: - Professional Window Background
+extension View {
+    func professionalWindowBackground() -> some View {
+        self
+            .background {
+                // Subtle gradient background for depth
+                LinearGradient(
+                    colors: [
+                        Color.florijnOffWhite,
+                        Color.florijnLightGray.opacity(0.3)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            }
+    }
+}
+
 // MARK: - Utility Extensions
 // Note: toCurrencyString() extension already exists in TransactionQueryService.swift

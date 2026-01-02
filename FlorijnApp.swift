@@ -316,12 +316,22 @@ struct ContentView: View {
     @StateObject private var appState = AppState()
 
     var body: some View {
-        NavigationSplitView {
-            SidebarView(selection: $appState.selectedTab)
-                .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 250)
-        } detail: {
-            detailView
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        VStack(spacing: 0) {
+            // Professional trust-building header
+            ProfessionalAppHeader(
+                "Florijn",
+                subtitle: "Personal Finance Manager"
+            )
+
+            NavigationSplitView {
+                SidebarView(selection: $appState.selectedTab)
+                    .professionalSidebar()
+                    .navigationSplitViewColumnWidth(min: 220, ideal: 250, max: 280)
+            } detail: {
+                detailView
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .professionalWindowBackground()
+            }
         }
         .environmentObject(appState)
     }
@@ -447,46 +457,66 @@ struct SidebarView: View {
 
     var body: some View {
         List(selection: $selection) {
-            Section("Overview") {
+            Section {
                 Label("Dashboard", systemImage: "chart.bar.fill")
                     .tag(AppTab.dashboard)
+                    .professionalSidebarItem(isSelected: selection == .dashboard)
 
                 Label("Transactions", systemImage: "list.bullet.rectangle.fill")
                     .tag(AppTab.transactions)
+                    .professionalSidebarItem(isSelected: selection == .transactions)
 
                 Label("Transfers", systemImage: "arrow.left.arrow.right")
                     .tag(AppTab.transfers)
+                    .professionalSidebarItem(isSelected: selection == .transfers)
 
                 Label("Merchants", systemImage: "building.2.fill")
                     .tag(AppTab.merchants)
+                    .professionalSidebarItem(isSelected: selection == .merchants)
+            } header: {
+                Text("Overview")
+                    .professionalSidebarSection()
             }
 
-            Section("Planning") {
+            Section {
                 Label("Budgets", systemImage: "chart.pie.fill")
                     .tag(AppTab.budgets)
+                    .professionalSidebarItem(isSelected: selection == .budgets)
 
                 Label("Categories", systemImage: "square.grid.2x2.fill")
                     .tag(AppTab.categories)
+                    .professionalSidebarItem(isSelected: selection == .categories)
 
                 Label("Insights", systemImage: "chart.bar.xaxis")
                     .tag(AppTab.insights)
+                    .professionalSidebarItem(isSelected: selection == .insights)
+            } header: {
+                Text("Planning")
+                    .professionalSidebarSection()
             }
 
-            Section("Accounts") {
+            Section {
                 Label("All Accounts", systemImage: "creditcard.fill")
                     .tag(AppTab.accounts)
+                    .professionalSidebarItem(isSelected: selection == .accounts)
+            } header: {
+                Text("Accounts")
+                    .professionalSidebarSection()
             }
 
-            Section("Settings") {
+            Section {
                 Label("Rules", systemImage: "slider.horizontal.3")
                     .tag(AppTab.rules)
+                    .professionalSidebarItem(isSelected: selection == .rules)
 
                 Label("Import", systemImage: "square.and.arrow.down.fill")
                     .tag(AppTab.import)
+                    .professionalSidebarItem(isSelected: selection == .import)
+            } header: {
+                Text("Settings")
+                    .professionalSidebarSection()
             }
         }
-        .listStyle(.sidebar)
-        .navigationTitle("Florijn")
     }
 }
 

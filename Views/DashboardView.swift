@@ -37,14 +37,16 @@ struct DashboardView: View {
     var body: some View {
         ZStack {
             ScrollView {
-                VStack(spacing: PremiumSpacing.xlarge) {
-                    // Header with filters
+                VStack(spacing: PremiumSpacing.xxlarge) {
+                    // Enhanced professional header with better spacing
                     headerSection
+                        .padding(.bottom, PremiumSpacing.medium)
 
-                    // Main KPIs
+                    // Main KPIs with enhanced visual hierarchy
                     kpiCardsSection
+                        .padding(.bottom, PremiumSpacing.large)
 
-                    // Charts section
+                    // Charts section with premium styling
                     chartsSection
 
                     // Category breakdown
@@ -53,25 +55,49 @@ struct DashboardView: View {
                     // Accounts overview
                     accountsSection
 
-                    // Net worth
+                    // Net worth with hero treatment
                     netWorthSection
 
+                    // Professional bottom spacing
                     Spacer(minLength: PremiumSpacing.hero)
                 }
-                .padding(PremiumSpacing.xlarge)
+                .padding(.horizontal, PremiumSpacing.xxlarge)
+                .padding(.vertical, PremiumSpacing.xlarge)
             }
-            .background(Color(nsColor: .windowBackgroundColor))
 
-            // Loading overlay
+            // Professional loading overlay with trust elements
             if viewModel.isLoading {
-                Color.black.opacity(0.1)
+                Color.black.opacity(0.05)
                     .ignoresSafeArea()
+                    .background(.ultraThinMaterial)
                     .overlay {
-                        ProgressView("Loading...")
-                            .padding(24)
-                            .background(Color(nsColor: .controlBackgroundColor))
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                            .shadow(radius: 4)
+                        VStack(spacing: PremiumSpacing.medium) {
+                            // Security-conscious loading indicator
+                            HStack(spacing: PremiumSpacing.small) {
+                                Image(systemName: "lock.shield")
+                                    .font(.title3)
+                                    .foregroundStyle(Color.florijnGreen)
+
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                    .progressViewStyle(CircularProgressViewStyle(tint: Color.florijnBlue))
+                            }
+
+                            Text("Analyzing Your Financial Data...")
+                                .font(.bodyLarge)
+                                .fontWeight(.medium)
+                                .foregroundStyle(Color.florijnCharcoal)
+
+                            Text("Your data is processed locally on your device")
+                                .font(.caption)
+                                .foregroundStyle(Color.florijnMediumGray)
+                        }
+                        .padding(PremiumSpacing.xlarge)
+                        .background {
+                            RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius)
+                                .fill(.regularMaterial)
+                                .shadow(color: .black.opacity(0.1), radius: 16, x: 0, y: 8)
+                        }
                     }
             }
         }
@@ -173,10 +199,10 @@ struct DashboardView: View {
                         .redacted(reason: .placeholder)
                 }
             } else {
-                // Premium financial KPI cards with semantic styling and Sarah's context
+                // Professional trust-enhanced KPI cards
                 Group {
                     VStack(alignment: .leading, spacing: PremiumSpacing.tiny) {
-                        PremiumKPICard(
+                        TrustEnhancedKPICard(
                             title: "Income",
                             value: viewModel.kpis?.totalIncome ?? 0,
                             percentage: nil,
@@ -186,14 +212,14 @@ struct DashboardView: View {
                             cardType: .income
                         )
 
-                        // Sarah's context: What this number means
+                        // Financial context for users
                         Text(incomeContextText(viewModel.kpis?.totalIncome ?? 0))
                             .financialLabel()
                             .padding(.horizontal, PremiumSpacing.medium)
                     }
 
                     VStack(alignment: .leading, spacing: PremiumSpacing.tiny) {
-                        PremiumKPICard(
+                        TrustEnhancedKPICard(
                             title: "Expenses",
                             value: abs(viewModel.kpis?.totalExpenses ?? 0),
                             percentage: nil,
@@ -209,7 +235,7 @@ struct DashboardView: View {
                     }
 
                     VStack(alignment: .leading, spacing: PremiumSpacing.tiny) {
-                        PremiumKPICard(
+                        TrustEnhancedKPICard(
                             title: "Saved",
                             value: viewModel.kpis?.netSavings ?? 0,
                             percentage: nil,
@@ -225,7 +251,7 @@ struct DashboardView: View {
                     }
 
                     VStack(alignment: .leading, spacing: PremiumSpacing.tiny) {
-                        PremiumKPICard(
+                        TrustEnhancedKPICard(
                             title: "Savings Rate",
                             value: nil,
                             percentage: Double(truncating: ((viewModel.kpis?.savingsRate ?? 0) * 100) as NSNumber),

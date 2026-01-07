@@ -11,7 +11,7 @@
 |--------|-------|
 | Total Lines | 14,854 |
 | Swift Files | 21 |
-| Test Coverage | 70 tests, 100% passing |
+| Test Coverage | 75 tests, 100% passing |
 | Build Warnings | 0 |
 
 ### Recent Refactoring (Completed)
@@ -19,6 +19,8 @@
 1. **Unified Rule Engine** - Replaced 5 separate services (CategorizationEngine, RuleEngine, TriggerEvaluator, ActionExecutor, RuleProgressPublisher) with single `RuleService.swift`
 2. **Removed Dead Code** - Deleted unused RuleStatistics.swift, empty directories
 3. **Fixed Bugs** - Cache invalidation issue, batch UUID bug, DateFormatter performance
+4. **Fixed Import Path** - Rules without setCategory (name-only standardization) now work during CSV import
+5. **E2E Tests** - Added end-to-end tests for `categorizeParsedTransactions()` (the CSV import path)
 
 ### Project Structure
 
@@ -162,7 +164,7 @@ xcodebuild test -scheme FamilyFinance -destination 'platform=macOS' \
 
 | Test Suite | Tests | Coverage |
 |------------|-------|----------|
-| RuleServiceTests | 11 | Triggers, actions, AND/OR logic, stopProcessing |
+| RuleServiceTests | 16 | Triggers, actions, AND/OR logic, stopProcessing, E2E import |
 | FlorijnTests | 14 | Dutch parsing, CSV, KPIs, duplicate detection |
 | TransactionDetailViewTests | 25 | Categories, splits, audit logs |
 | TransactionModelTests | 20 | Model behavior, unique keys |

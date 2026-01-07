@@ -82,21 +82,44 @@ class RuleService {
 
     /// Categorize parsed transactions (for CSV import before they become Transaction objects)
     /// Returns category assignments that can be applied during import
+    ///
+    /// Note: Processes ALL matching rules until one sets a category or has stopProcessing.
+    /// This allows rules that only set counterParty (name standardization) to work.
     func categorizeParsedTransactions(_ parsed: [ParsedTransaction]) -> [CategorizationResult] {
         let rules = getActiveRules()
 
         return parsed.map { transaction in
+            var resultCategory: String? = nil
+            var resultStandardizedName: String? = nil
+            var resultMatchedRuleName: String? = nil
+
             for rule in rules {
                 if evaluateAgainstParsed(rule: rule, transaction: transaction) {
-                    // Find the setCategory action
+                    // Check for setCategory action
                     if let categoryAction = rule.actions.first(where: { $0.type == .setCategory }) {
-                        return CategorizationResult(
-                            category: categoryAction.value,
-                            standardizedName: getStandardizedName(from: rule, transaction: transaction),
-                            matchedRuleName: rule.name
-                        )
+                        resultCategory = categoryAction.value
+                        resultMatchedRuleName = rule.name
+                    }
+
+                    // Check for setCounterParty action (name standardization)
+                    if let counterPartyAction = rule.actions.first(where: { $0.type == .setCounterParty }) {
+                        resultStandardizedName = counterPartyAction.value
+                    }
+
+                    // Stop if rule has stopProcessing OR we found a category
+                    if rule.stopProcessing || resultCategory != nil {
+                        break
                     }
                 }
+            }
+
+            // Return result if we found anything, otherwise uncategorized
+            if resultCategory != nil || resultStandardizedName != nil {
+                return CategorizationResult(
+                    category: resultCategory,
+                    standardizedName: resultStandardizedName,
+                    matchedRuleName: resultMatchedRuleName
+                )
             }
             return .uncategorized
         }
@@ -449,16 +472,6 @@ class RuleService {
             let info = "Ref: \(action.value)"
             transaction.notes = [transaction.notes, info].compactMap { $0 }.joined(separator: " | ")
         }
-    }
-
-    // MARK: - Helpers
-
-    private func getStandardizedName(from rule: Rule, transaction: ParsedTransaction) -> String? {
-        // Check if rule has a setCounterParty action
-        if let action = rule.actions.first(where: { $0.type == .setCounterParty }) {
-            return action.value
-        }
-        return nil
     }
 }
 

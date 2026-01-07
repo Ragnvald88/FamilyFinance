@@ -388,4 +388,240 @@ final class RuleServiceTests: XCTestCase {
             XCTAssertEqual(t.autoCategory, "Shopping", "Transaction \(t.sequenceNumber) should be categorized")
         }
     }
+
+    // MARK: - Name Standardization Only Tests
+
+    func testRuleWithOnlySetCounterParty() throws {
+        // Rule that ONLY sets counter party (no category)
+        let rule = Rule(name: "Standardize AH Name")
+        rule.isActive = true
+
+        let trigger = RuleTrigger(field: .counterParty, triggerOperator: .contains, value: "ah ")
+        trigger.rule = rule
+        rule.triggers.append(trigger)
+
+        // Only setCounterParty action, no setCategory
+        let action = RuleAction(type: .setCounterParty, value: "Albert Heijn")
+        action.rule = rule
+        rule.actions.append(action)
+
+        modelContext.insert(rule)
+        try modelContext.save()
+
+        let transaction = Transaction(iban: "NL00TEST001", sequenceNumber: 1, date: Date(), amount: -30, balance: 970, transactionType: .expense)
+        transaction.counterName = "AH To Go Station"
+        modelContext.insert(transaction)
+
+        ruleService.processTransaction(transaction)
+
+        // Should have standardized name but no category
+        XCTAssertEqual(transaction.standardizedName, "Albert Heijn")
+        XCTAssertNil(transaction.autoCategory)
+    }
+
+    func testRuleWithBothCategoryAndCounterParty() throws {
+        let rule = Rule(name: "Albert Heijn Rule")
+        rule.isActive = true
+
+        let trigger = RuleTrigger(field: .counterParty, triggerOperator: .contains, value: "albert")
+        trigger.rule = rule
+        rule.triggers.append(trigger)
+
+        let categoryAction = RuleAction(type: .setCategory, value: "Groceries")
+        categoryAction.rule = rule
+        categoryAction.sortOrder = 1
+        rule.actions.append(categoryAction)
+
+        let counterPartyAction = RuleAction(type: .setCounterParty, value: "Albert Heijn")
+        counterPartyAction.rule = rule
+        counterPartyAction.sortOrder = 2
+        rule.actions.append(counterPartyAction)
+
+        modelContext.insert(rule)
+        try modelContext.save()
+
+        let transaction = Transaction(iban: "NL00TEST001", sequenceNumber: 1, date: Date(), amount: -50, balance: 950, transactionType: .expense)
+        transaction.counterName = "Albert Heijn Amsterdam"
+        modelContext.insert(transaction)
+
+        ruleService.processTransaction(transaction)
+
+        // Should have both
+        XCTAssertEqual(transaction.autoCategory, "Groceries")
+        XCTAssertEqual(transaction.standardizedName, "Albert Heijn")
+    }
+
+    // MARK: - End-to-End Categorization Tests (ParsedTransaction path)
+
+    func testCategorizeParsedTransactionsWithCategory() throws {
+        // Create a rule
+        let rule = Rule(name: "Groceries Rule")
+        rule.isActive = true
+
+        let trigger = RuleTrigger(field: .description, triggerOperator: .contains, value: "supermarket")
+        trigger.rule = rule
+        rule.triggers.append(trigger)
+
+        let action = RuleAction(type: .setCategory, value: "Groceries")
+        action.rule = rule
+        rule.actions.append(action)
+
+        modelContext.insert(rule)
+        try modelContext.save()
+
+        // Create parsed transactions (simulating CSV import)
+        let parsed = [
+            ParsedTransaction(
+                iban: "NL00TEST001",
+                sequenceNumber: 1,
+                date: Date(),
+                amount: Decimal(-50),
+                balance: Decimal(950),
+                counterIBAN: nil,
+                counterName: "Local Store",
+                description1: "Purchase at supermarket",
+                description2: nil,
+                description3: nil,
+                transactionCode: nil,
+                valueDate: nil,
+                returnReason: nil,
+                mandateReference: nil,
+                transactionType: .expense,
+                contributor: nil,
+                sourceFile: "test.csv"
+            ),
+            ParsedTransaction(
+                iban: "NL00TEST001",
+                sequenceNumber: 2,
+                date: Date(),
+                amount: Decimal(-100),
+                balance: Decimal(850),
+                counterIBAN: nil,
+                counterName: "Gas Station",
+                description1: "Fuel purchase",
+                description2: nil,
+                description3: nil,
+                transactionCode: nil,
+                valueDate: nil,
+                returnReason: nil,
+                mandateReference: nil,
+                transactionType: .expense,
+                contributor: nil,
+                sourceFile: "test.csv"
+            )
+        ]
+
+        // Run categorization
+        let results = ruleService.categorizeParsedTransactions(parsed)
+
+        // First should be categorized, second should not
+        XCTAssertEqual(results[0].category, "Groceries")
+        XCTAssertNil(results[1].category)
+    }
+
+    func testCategorizeParsedTransactionsNameStandardizationOnly() throws {
+        // Rule that only sets counter party (no category)
+        let rule = Rule(name: "Standardize Name")
+        rule.isActive = true
+
+        let trigger = RuleTrigger(field: .counterParty, triggerOperator: .contains, value: "ah ")
+        trigger.rule = rule
+        rule.triggers.append(trigger)
+
+        let action = RuleAction(type: .setCounterParty, value: "Albert Heijn")
+        action.rule = rule
+        rule.actions.append(action)
+
+        modelContext.insert(rule)
+        try modelContext.save()
+
+        let parsed = [
+            ParsedTransaction(
+                iban: "NL00TEST001",
+                sequenceNumber: 1,
+                date: Date(),
+                amount: Decimal(-30),
+                balance: Decimal(970),
+                counterIBAN: nil,
+                counterName: "AH To Go",
+                description1: "Purchase",
+                description2: nil,
+                description3: nil,
+                transactionCode: nil,
+                valueDate: nil,
+                returnReason: nil,
+                mandateReference: nil,
+                transactionType: .expense,
+                contributor: nil,
+                sourceFile: "test.csv"
+            )
+        ]
+
+        let results = ruleService.categorizeParsedTransactions(parsed)
+
+        // Should have standardized name but no category
+        XCTAssertNil(results[0].category)
+        XCTAssertEqual(results[0].standardizedName, "Albert Heijn")
+    }
+
+    func testCategorizeParsedTransactionsMultipleRules() throws {
+        // First rule: Only standardizes name (no category)
+        let rule1 = Rule(name: "Standardize AH")
+        rule1.isActive = true
+        rule1.groupExecutionOrder = 1
+
+        let trigger1 = RuleTrigger(field: .counterParty, triggerOperator: .contains, value: "ah ")
+        trigger1.rule = rule1
+        rule1.triggers.append(trigger1)
+
+        let action1 = RuleAction(type: .setCounterParty, value: "Albert Heijn")
+        action1.rule = rule1
+        rule1.actions.append(action1)
+
+        modelContext.insert(rule1)
+
+        // Second rule: Sets category for groceries
+        let rule2 = Rule(name: "Groceries Category")
+        rule2.isActive = true
+        rule2.groupExecutionOrder = 2
+
+        let trigger2 = RuleTrigger(field: .counterParty, triggerOperator: .contains, value: "ah ")
+        trigger2.rule = rule2
+        rule2.triggers.append(trigger2)
+
+        let action2 = RuleAction(type: .setCategory, value: "Groceries")
+        action2.rule = rule2
+        rule2.actions.append(action2)
+
+        modelContext.insert(rule2)
+        try modelContext.save()
+
+        let parsed = [
+            ParsedTransaction(
+                iban: "NL00TEST001",
+                sequenceNumber: 1,
+                date: Date(),
+                amount: Decimal(-30),
+                balance: Decimal(970),
+                counterIBAN: nil,
+                counterName: "AH To Go",
+                description1: "Purchase",
+                description2: nil,
+                description3: nil,
+                transactionCode: nil,
+                valueDate: nil,
+                returnReason: nil,
+                mandateReference: nil,
+                transactionType: .expense,
+                contributor: nil,
+                sourceFile: "test.csv"
+            )
+        ]
+
+        let results = ruleService.categorizeParsedTransactions(parsed)
+
+        // Should have BOTH standardized name (from rule1) and category (from rule2)
+        XCTAssertEqual(results[0].category, "Groceries")
+        XCTAssertEqual(results[0].standardizedName, "Albert Heijn")
+    }
 }

@@ -278,7 +278,7 @@ struct DashboardView: View {
             // Monthly trend chart
             VStack(alignment: .leading, spacing: PremiumSpacing.medium) {
                 HStack {
-                    GeometricFlowIcon(.income, size: PremiumSpacing.iconSizeSmall)
+                    FinancialIcon(.income, size: PremiumSpacing.iconSizeSmall)
 
                     Text("Financial Flow Trends")
                         .font(.headingMedium)
@@ -342,7 +342,7 @@ struct DashboardView: View {
                     // Sarah's UX fix: Actionable empty state with clear next steps
                     ContentUnavailableView {
                         VStack(spacing: PremiumSpacing.small) {
-                            GeometricFlowIcon(.income, size: 32, color: .incomeGreen)
+                            FinancialIcon(.income, size: 32, color: .incomeGreen)
                             Text("Let's Track Your Money Flow")
                                 .font(.headingMedium)
                                 .foregroundStyle(Color.florijnCharcoal)
@@ -372,7 +372,7 @@ struct DashboardView: View {
             // Enhanced category breakdown with sophisticated styling
             VStack(alignment: .leading, spacing: PremiumSpacing.medium) {
                 HStack {
-                    GeometricFlowIcon(.expenses, size: PremiumSpacing.iconSizeSmall)
+                    FinancialIcon(.expenses, size: PremiumSpacing.iconSizeSmall)
 
                     Text("Top Spending")
                         .font(.headingMedium)
@@ -411,7 +411,7 @@ struct DashboardView: View {
                     // Sarah's UX fix: Guide users to categorization success
                     ContentUnavailableView {
                         VStack(spacing: PremiumSpacing.small) {
-                            GeometricFlowIcon(.expenses, size: 32, color: .expenseRed)
+                            FinancialIcon(.expenses, size: 32, color: .expenseRed)
                             Text("Discover Your Spending Patterns")
                                 .font(.headingMedium)
                                 .foregroundStyle(Color.florijnCharcoal)
@@ -445,7 +445,7 @@ struct DashboardView: View {
     private var categorySection: some View {
         VStack(alignment: .leading, spacing: PremiumSpacing.medium) {
             HStack {
-                GeometricFlowIcon(.saved, size: PremiumSpacing.iconSizeSmall)
+                FinancialIcon(.saved, size: PremiumSpacing.iconSizeSmall)
 
                 Text("Budget vs Actual")
                     .font(.headingMedium)
@@ -500,7 +500,7 @@ struct DashboardView: View {
             if let accounts = viewModel.accountBalances, !accounts.isEmpty {
                 VStack(alignment: .leading, spacing: PremiumSpacing.medium) {
                     HStack {
-                        GeometricFlowIcon(.saved, size: PremiumSpacing.iconSizeSmall, color: .tealSecure)
+                        FinancialIcon(.saved, size: PremiumSpacing.iconSizeSmall, color: .tealSecure)
 
                         Text("Account Balances")
                             .font(.headingMedium)
@@ -530,7 +530,7 @@ struct DashboardView: View {
                 // Enhanced empty state with sophisticated styling
                 ContentUnavailableView {
                     VStack(spacing: PremiumSpacing.medium) {
-                        GeometricFlowIcon(.saved, size: 48, color: .florijnMediumGray)
+                        FinancialIcon(.saved, size: 48, color: .florijnMediumGray)
                         Text("No Bank Accounts")
                             .font(.headingLarge)
                             .foregroundStyle(Color.florijnCharcoal)
@@ -562,7 +562,7 @@ struct DashboardView: View {
     private var netWorthSection: some View {
         VStack(alignment: .leading, spacing: PremiumSpacing.large) {
             HStack {
-                GeometricFlowIcon(.savingsRate, size: PremiumSpacing.iconSizeSmall)
+                FinancialIcon(.savingsRate, size: PremiumSpacing.iconSizeSmall)
 
                 Text("Financial Position")
                     .font(.headingMedium)
@@ -624,7 +624,7 @@ struct DashboardView: View {
             } else {
                 ContentUnavailableView {
                     VStack(spacing: PremiumSpacing.small) {
-                        GeometricFlowIcon(.savingsRate, size: 32, color: .florijnMediumGray)
+                        FinancialIcon(.savingsRate, size: 32, color: .florijnMediumGray)
                         Text("Calculating Net Worth")
                             .font(.bodyLarge)
                             .foregroundStyle(Color.florijnMediumGray)

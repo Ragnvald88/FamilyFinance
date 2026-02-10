@@ -567,7 +567,7 @@ struct CategoriesListView: View {
             // Header
             HStack {
                 Text("Categories")
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.headingLarge)
 
                 Spacer()
 
@@ -842,13 +842,23 @@ struct BudgetsListView: View {
 
     @State private var selectedYear: Int = Calendar.current.component(.year, from: Date())
     @State private var selectedMonth: Int = Calendar.current.component(.month, from: Date())
+    @State private var categorySummaries: [CategorySummary] = []
+    @State private var showingAddBudget = false
 
     private var expenseCategories: [Category] {
         categories.filter { $0.type == .expense && $0.monthlyBudget > 0 }
     }
 
+    private var categoriesWithoutBudgets: [Category] {
+        categories.filter { $0.type == .expense && $0.monthlyBudget == 0 }
+    }
+
     private var totalBudget: Decimal {
         expenseCategories.reduce(Decimal.zero) { $0 + $1.monthlyBudget }
+    }
+
+    private var totalSpent: Decimal {
+        categorySummaries.reduce(Decimal.zero) { $0 + $1.totalAmount }
     }
 
     var body: some View {
@@ -857,9 +867,21 @@ struct BudgetsListView: View {
                 // Header
                 HStack {
                     Text("Budgets")
-                        .font(.system(size: 28, weight: .bold))
+                        .font(.headingLarge)
 
                     Spacer()
+
+                    // Add budget button
+                    Button(action: {
+                        showingAddBudget = true
+                    }) {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundStyle(.blue)
+                        Text("Add Budget")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(categoriesWithoutBudgets.isEmpty)
 
                     // Period picker
                     HStack(spacing: 8) {
@@ -881,13 +903,45 @@ struct BudgetsListView: View {
                 .padding(.horizontal)
 
                 // Total budget card
-                VStack(spacing: 8) {
-                    Text("Monthly Budget")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                VStack(spacing: 16) {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("Budget")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                            Text(totalBudget.toCurrencyString())
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                        }
 
-                    Text(totalBudget.toCurrencyString())
-                        .font(.system(size: 32, weight: .bold))
+                        Spacer()
+
+                        VStack(alignment: .trailing) {
+                            Text("Spent")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                            Text(totalSpent.toCurrencyString())
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(totalSpent > totalBudget ? .red : .primary)
+                        }
+                    }
+
+                    // Overall progress bar
+                    if totalBudget > 0 {
+                        GeometryReader { geometry in
+                            ZStack(alignment: .leading) {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Color.gray.opacity(0.2))
+                                    .frame(height: 8)
+
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(totalSpent > totalBudget ? Color.red : Color.blue)
+                                    .frame(width: min(geometry.size.width, geometry.size.width * CGFloat(truncating: (totalSpent / totalBudget) as NSNumber)), height: 8)
+                            }
+                        }
+                        .frame(height: 8)
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding(20)
@@ -898,7 +952,8 @@ struct BudgetsListView: View {
                 // Budget categories
                 LazyVStack(spacing: 12) {
                     ForEach(expenseCategories) { category in
-                        BudgetCategoryCard(category: category)
+                        let summary = categorySummaries.first { $0.category == category.name }
+                        BudgetCategoryCard(category: category, summary: summary)
                     }
                 }
                 .padding(.horizontal)
@@ -906,6 +961,24 @@ struct BudgetsListView: View {
             .padding(.vertical)
         }
         .background(Color(nsColor: .windowBackgroundColor))
+        .onAppear {
+            Task {
+                await loadBudgetData()
+            }
+        }
+        .onChange(of: selectedYear) { _, _ in
+            Task {
+                await loadBudgetData()
+            }
+        }
+        .onChange(of: selectedMonth) { _, _ in
+            Task {
+                await loadBudgetData()
+            }
+        }
+        .sheet(isPresented: $showingAddBudget) {
+            AddBudgetSheet(categories: categoriesWithoutBudgets)
+        }
     }
 
     private func monthName(_ month: Int) -> String {
@@ -914,10 +987,41 @@ struct BudgetsListView: View {
         formatter.locale = Locale.current
         return formatter.monthSymbols[month - 1].capitalized
     }
+
+    @MainActor
+    private func loadBudgetData() async {
+        let filter = TransactionFilter(year: selectedYear, month: selectedMonth)
+        let queryService = TransactionQueryService(modelContext: modelContext)
+
+        do {
+            categorySummaries = try await queryService.getCategorySummaries(filter: filter)
+        } catch {
+            print("Error loading budget data: \(error)")
+            categorySummaries = []
+        }
+    }
 }
 
 struct BudgetCategoryCard: View {
     let category: Category
+    let summary: CategorySummary?
+
+    @State private var isEditing = false
+    @State private var editedBudget = ""
+    @Environment(\.modelContext) private var modelContext
+
+    private var spentAmount: Decimal {
+        summary?.totalAmount ?? 0
+    }
+
+    private var progressPercentage: Double {
+        guard category.monthlyBudget > 0 else { return 0 }
+        return min(1.0, Double(truncating: (spentAmount / category.monthlyBudget) as NSNumber))
+    }
+
+    private var isOverBudget: Bool {
+        spentAmount > category.monthlyBudget
+    }
 
     var body: some View {
         VStack(spacing: 12) {
@@ -931,12 +1035,58 @@ struct BudgetCategoryCard: View {
 
                 Spacer()
 
-                Text(category.monthlyBudget.toCurrencyString())
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
+                VStack(alignment: .trailing, spacing: 2) {
+                    HStack(spacing: 4) {
+                        Text("\(spentAmount.toCurrencyString()) /")
+                            .font(.caption)
+                            .foregroundStyle(isOverBudget ? .red : .secondary)
+
+                        if isEditing {
+                            TextField("Budget", text: $editedBudget)
+                                .font(.caption)
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 60)
+                                .onSubmit {
+                                    saveBudgetEdit()
+                                }
+                        } else {
+                            Button(action: {
+                                startEditing()
+                            }) {
+                                Text(category.monthlyBudget.toCurrencyString())
+                                    .font(.caption)
+                                    .foregroundStyle(.blue)
+                                    .underline()
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+
+                    if isEditing {
+                        HStack(spacing: 4) {
+                            Button("Save") {
+                                saveBudgetEdit()
+                            }
+                            .font(.caption2)
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.mini)
+
+                            Button("Cancel") {
+                                cancelEditing()
+                            }
+                            .font(.caption2)
+                            .buttonStyle(.bordered)
+                            .controlSize(.mini)
+                        }
+                    } else if let transactionCount = summary?.transactionCount, transactionCount > 0 {
+                        Text("\(transactionCount) transactions")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                }
             }
 
-            // Progress bar placeholder (actual spending would come from query)
+            // Real progress bar
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 4)
@@ -944,8 +1094,8 @@ struct BudgetCategoryCard: View {
                         .frame(height: 6)
 
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(Color(hex: category.color ?? "3B82F6"))
-                        .frame(width: geometry.size.width * 0.5, height: 6) // Placeholder 50%
+                        .fill(isOverBudget ? Color.red : Color(hex: category.color ?? "3B82F6"))
+                        .frame(width: geometry.size.width * progressPercentage, height: 6)
                 }
             }
             .frame(height: 6)
@@ -953,6 +1103,110 @@ struct BudgetCategoryCard: View {
         .padding(16)
         .background(Color(nsColor: .controlBackgroundColor))
         .cornerRadius(12)
+        .contextMenu {
+            Button("Remove Budget") {
+                removeBudget()
+            }
+        }
+    }
+
+    private func startEditing() {
+        isEditing = true
+        editedBudget = String(describing: category.monthlyBudget)
+    }
+
+    private func saveBudgetEdit() {
+        guard let newBudget = Decimal(string: editedBudget) else {
+            cancelEditing()
+            return
+        }
+
+        category.monthlyBudget = newBudget
+        try? modelContext.save()
+        isEditing = false
+    }
+
+    private func cancelEditing() {
+        isEditing = false
+        editedBudget = ""
+    }
+
+    private func removeBudget() {
+        category.monthlyBudget = 0
+        try? modelContext.save()
+    }
+}
+
+struct AddBudgetSheet: View {
+    let categories: [Category]
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+
+    @State private var selectedCategory: Category?
+    @State private var budgetAmount: String = ""
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                Text("Add Budget")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Category")
+                        .font(.headline)
+
+                    Picker("Category", selection: $selectedCategory) {
+                        Text("Select category").tag(nil as Category?)
+                        ForEach(categories) { category in
+                            HStack {
+                                Image(systemName: category.icon ?? "square.grid.2x2")
+                                    .foregroundStyle(Color(hex: category.color ?? "3B82F6"))
+                                Text(category.name)
+                            }.tag(category as Category?)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Monthly Budget Amount")
+                        .font(.headline)
+
+                    TextField("€0.00", text: $budgetAmount)
+                        .textFieldStyle(.roundedBorder)
+                }
+
+                Spacer()
+            }
+            .padding()
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        saveBudget()
+                    }
+                    .disabled(selectedCategory == nil || budgetAmount.isEmpty)
+                }
+            }
+        }
+        .frame(width: 400, height: 300)
+    }
+
+    private func saveBudget() {
+        guard let category = selectedCategory,
+              let amount = Decimal(string: budgetAmount) else {
+            return
+        }
+
+        category.monthlyBudget = amount
+        try? modelContext.save()
+        dismiss()
     }
 }
 
@@ -998,7 +1252,7 @@ struct MerchantsListView: View {
             // Header
             HStack {
                 Text("Merchants")
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.headingLarge)
 
                 Spacer()
 
@@ -1118,7 +1372,7 @@ struct TransfersListView: View {
             // Header
             HStack {
                 Text("Internal Transfers")
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.headingLarge)
 
                 Spacer()
 
@@ -1285,7 +1539,7 @@ struct InsightsView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Financial Insights")
-                        .font(.system(size: 28, weight: .bold))
+                        .font(.headingLarge)
 
                     Text("Analyze your spending patterns and track your financial goals")
                         .font(.subheadline)
@@ -1874,7 +2128,7 @@ struct OptimizedTransactionsView: View {
         VStack(spacing: 16) {
             HStack {
                 Text("Transactions")
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.headingLarge)
 
                 Spacer()
 

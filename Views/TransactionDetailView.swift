@@ -135,7 +135,7 @@ struct TransactionDetailView: View {
                 // Amount
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(transaction.amount.toCurrencyString())
-                        .font(.system(size: 28, weight: .bold))
+                        .font(.currencyLarge)
                         .foregroundStyle(transaction.amount >= 0 ? .green : .primary)
 
                     Text("Balance: \(transaction.balance.toCurrencyString())")

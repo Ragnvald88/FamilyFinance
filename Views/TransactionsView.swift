@@ -109,7 +109,7 @@ struct TransactionsListView: View {
         VStack(spacing: 12) {
             HStack {
                 Text("Transactions")
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.headingLarge)
 
                 Spacer()
 

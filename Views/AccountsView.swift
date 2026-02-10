@@ -22,7 +22,7 @@ struct AccountsListView: View {
                 // Header
                 HStack {
                     Text("Accounts")
-                        .font(.system(size: 28, weight: .bold))
+                        .font(.headingLarge)
                     Spacer()
                     Text("\(accounts.count) accounts")
                         .font(.subheadline)
@@ -55,7 +55,7 @@ struct AccountsListView: View {
                 .foregroundStyle(.secondary)
 
             Text(totalBalance.toCurrencyString())
-                .font(.system(size: 36, weight: .bold))
+                .font(.currencyHero)
                 .foregroundStyle(.primary)
         }
         .frame(maxWidth: .infinity)

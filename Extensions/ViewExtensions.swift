@@ -40,23 +40,24 @@ extension Color {
     @available(*, deprecated, message: "Use expenseRed instead - expenses should be red, not orange")
     static let warmOrange = Color(red: 0.95, green: 0.55, blue: 0.25)
 
-    // Premium Neutrals - Sophisticated Hierarchy
-    static let florijnCharcoal = Color(red: 0.12, green: 0.12, blue: 0.14)    // Primary text
-    static let florijnDarkGray = Color(red: 0.25, green: 0.25, blue: 0.28)    // Secondary text
-    static let florijnMediumGray = Color(red: 0.45, green: 0.45, blue: 0.48)  // Supporting text
-    static let florijnLightGray = Color(red: 0.92, green: 0.92, blue: 0.94)   // Subtle backgrounds
-    static let florijnOffWhite = Color(red: 0.98, green: 0.98, blue: 0.99)    // Pure backgrounds
+    // Clean Professional Colors
+    static let florijnCharcoal = Color(nsColor: .labelColor)                  // System text - perfect contrast
+    static let florijnDarkGray = Color(nsColor: .secondaryLabelColor)         // System secondary text
+    static let florijnMediumGray = Color(nsColor: .tertiaryLabelColor)        // System tertiary text
+    static let florijnLightGray = Color(nsColor: .separatorColor)             // System separator
+    static let florijnOffWhite = Color(nsColor: .windowBackgroundColor)      // System window background
 
-    // Glass Morphism Colors
-    static let glassSurface = Color.white.opacity(0.1)
-    static let glassStroke = Color.white.opacity(0.2)
-    static let glassBackground = Color.black.opacity(0.05)
+    // Professional Clean Colors (Auto-Adaptive)
+    static let cleanBackground = Color(nsColor: .windowBackgroundColor)      // System background
+    static let cardBackground = Color(nsColor: .controlBackgroundColor)     // Adaptive card background
+    static let subtleBorder = Color(nsColor: .separatorColor)               // Subtle borders
 
-    // Adaptive System Colors (for light/dark mode compatibility)
-    static let adaptivePrimary = Color(nsColor: .labelColor)
-    static let adaptiveSecondary = Color(nsColor: .secondaryLabelColor)
-    static let adaptiveBackground = Color(nsColor: .windowBackgroundColor)
-    static let adaptiveSurface = Color(nsColor: .controlBackgroundColor)
+    // Adaptive System Colors (Perfect for light/dark mode)
+    static let adaptivePrimary = Color(nsColor: .labelColor)                 // Main text
+    static let adaptiveSecondary = Color(nsColor: .secondaryLabelColor)      // Secondary text
+    static let adaptiveTertiary = Color(nsColor: .tertiaryLabelColor)        // Supporting text
+    static let adaptiveBackground = Color(nsColor: .windowBackgroundColor)   // Window background
+    static let adaptiveSurface = Color(nsColor: .controlBackgroundColor)     // Card/surface background
 }
 
 extension Font {
@@ -118,14 +119,24 @@ extension Animation {
     static let subtleHover = Animation.easeInOut(duration: 0.2)
 }
 
-// MARK: - Geometric Flow Icons
+// MARK: - Financial Icons (SF Symbols)
 
-struct GeometricFlowIcon: View {
+struct FinancialIcon: View {
     enum IconType {
-        case income      // Upward flowing stream (clear directional)
-        case expenses    // Downward flowing stream (clear directional)
-        case saved       // Secure vault container (retention)
-        case savingsRate // Progress arc with momentum (percentage)
+        case income      // Money coming in
+        case expenses    // Money going out
+        case saved       // Money saved
+        case savingsRate // Savings percentage
+
+        /// Clean SF Symbol for each type
+        var sfSymbolName: String {
+            switch self {
+            case .income: return "arrow.up.circle.fill"
+            case .expenses: return "arrow.down.circle.fill"
+            case .saved: return "checkmark.circle.fill"  // Achievement/goal completion
+            case .savingsRate: return "percent"
+            }
+        }
 
         /// Semantic color for financial flow logic
         var semanticColor: Color {
@@ -140,7 +151,7 @@ struct GeometricFlowIcon: View {
 
     let type: IconType
     let size: CGFloat
-    let color: Color?
+    let color: Color
 
     init(_ type: IconType, size: CGFloat = 24, color: Color? = nil) {
         self.type = type
@@ -149,114 +160,9 @@ struct GeometricFlowIcon: View {
     }
 
     var body: some View {
-        switch type {
-        case .income:
-            incomeIcon
-        case .expenses:
-            expensesIcon
-        case .saved:
-            savedIcon
-        case .savingsRate:
-            savingsRateIcon
-        }
-    }
-
-    // Income: Upward flowing stream (clearly directional inflow)
-    private var incomeIcon: some View {
-        VStack(spacing: 1) {
-            // Top: Smallest (destination)
-            Circle()
-                .fill(color!)
-                .frame(width: size * 0.15, height: size * 0.15)
-
-            // Flow indicators
-            ForEach(0..<3, id: \.self) { index in
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(color!.opacity(0.8 - Double(index) * 0.2))
-                    .frame(width: size * (0.3 + Double(index) * 0.15), height: size * 0.12)
-            }
-
-            // Base: Widest (source)
-            RoundedRectangle(cornerRadius: 3)
-                .fill(color!.opacity(0.4))
-                .frame(width: size * 0.75, height: size * 0.2)
-        }
-        .frame(width: size, height: size)
-    }
-
-    // Expenses: Downward flowing stream (clearly directional outflow)
-    private var expensesIcon: some View {
-        VStack(spacing: 1) {
-            // Source: Widest (starting point)
-            RoundedRectangle(cornerRadius: 3)
-                .fill(color!.opacity(0.4))
-                .frame(width: size * 0.75, height: size * 0.2)
-
-            // Flow indicators (widening as money flows out)
-            ForEach(0..<3, id: \.self) { index in
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(color!.opacity(0.6 + Double(index) * 0.15))
-                    .frame(width: size * (0.45 + Double(index) * 0.1), height: size * 0.12)
-            }
-
-            // Bottom: Distribution points
-            HStack(spacing: 2) {
-                Circle()
-                    .fill(color!)
-                    .frame(width: size * 0.12, height: size * 0.12)
-                Circle()
-                    .fill(color!)
-                    .frame(width: size * 0.12, height: size * 0.12)
-                Circle()
-                    .fill(color!)
-                    .frame(width: size * 0.12, height: size * 0.12)
-            }
-        }
-        .frame(width: size, height: size)
-    }
-
-    // Saved: Secure vault container (security & retention) - KEEP CURRENT, IT'S EXCELLENT
-    private var savedIcon: some View {
-        ZStack {
-            // Outer security layer
-            RoundedRectangle(cornerRadius: 6)
-                .stroke(color!.opacity(0.4), lineWidth: 2)
-                .frame(width: size * 0.9, height: size * 0.7)
-
-            // Inner vault
-            RoundedRectangle(cornerRadius: 4)
-                .fill(color!)
-                .frame(width: size * 0.6, height: size * 0.45)
-
-            // Security indicator (small lock metaphor)
-            Circle()
-                .fill(color!.opacity(0.8))
-                .frame(width: size * 0.15, height: size * 0.15)
-                .offset(x: size * 0.2, y: -size * 0.15)
-        }
-        .frame(width: size, height: size)
-    }
-
-    // Savings Rate: Progress arc with momentum (percentage) - KEEP CURRENT, IT'S EXCELLENT
-    private var savingsRateIcon: some View {
-        ZStack {
-            Circle()
-                .trim(from: 0, to: 0.75)
-                .stroke(color!, style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                .rotationEffect(.degrees(-90))
-
-            // Momentum indicator (arrow tip)
-            Circle()
-                .fill(color!)
-                .frame(width: 4, height: 4)
-                .offset(x: size * 0.35, y: -size * 0.1)
-
-            // Center progress dot
-            Circle()
-                .fill(color!.opacity(0.3))
-                .frame(width: size * 0.2, height: size * 0.2)
-        }
-        .frame(width: size, height: size)
+        Image(systemName: type.sfSymbolName)
+            .font(.system(size: size, weight: .medium))
+            .foregroundStyle(color)
     }
 }
 
@@ -273,39 +179,15 @@ enum FinancialCardType {
     case neutral    // General financial data
 
     var backgroundColor: Color {
-        switch self {
-        case .hero: return Color.florijnBlue.opacity(0.04)
-        case .primary: return Color.white
-        case .supporting: return Color.florijnLightGray.opacity(0.3)
-        case .income: return Color.incomeGreen.opacity(0.06)
-        case .expenses: return Color.expenseRed.opacity(0.04)
-        case .savings: return Color.savingsWin.opacity(0.05)
-        case .neutral: return Color.florijnBlue.opacity(0.03)
-        }
+        return Color.adaptiveSurface  // All cards use adaptive surface color
     }
 
     var borderColor: Color {
-        switch self {
-        case .hero: return Color.florijnBlue.opacity(0.15)
-        case .primary: return Color.florijnLightGray
-        case .supporting: return Color.florijnMediumGray.opacity(0.2)
-        case .income: return Color.incomeGreen.opacity(0.12)
-        case .expenses: return Color.expenseRed.opacity(0.08)
-        case .savings: return Color.savingsWin.opacity(0.10)
-        case .neutral: return Color.florijnBlue.opacity(0.08)
-        }
+        return Color.subtleBorder  // All cards use adaptive border color
     }
 
     var shadowColor: Color {
-        switch self {
-        case .hero: return Color.florijnBlue.opacity(0.15)
-        case .primary: return Color.black.opacity(0.08)
-        case .supporting: return Color.black.opacity(0.04)
-        case .income: return Color.incomeGreen.opacity(0.08)
-        case .expenses: return Color.expenseRed.opacity(0.06)
-        case .savings: return Color.savingsWin.opacity(0.08)
-        case .neutral: return Color.black.opacity(0.06)
-        }
+        return Color.primary.opacity(0.1)  // Adaptive shadow that works in both modes
     }
 
     var scale: CGFloat {
@@ -326,15 +208,19 @@ extension View {
         self
             .background {
                 RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius)
-                    .fill(.ultraThinMaterial)
+                    .fill(.regularMaterial)
                     .overlay {
                         RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius)
-                            .stroke(Color.glassStroke, lineWidth: 0.5)
+                            .stroke(LinearGradient(
+                                colors: [Color.white.opacity(0.3), Color.clear, Color.black.opacity(0.1)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ), lineWidth: 1)
                     }
             }
             .clipShape(RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius))
-            .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
-            .shadow(color: .black.opacity(0.05), radius: 1, x: 0, y: 1)
+            .shadow(color: .black.opacity(0.12), radius: 12, x: 0, y: 6)
+            .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
     }
 
     /// Elevated premium card for hero content
@@ -345,11 +231,7 @@ extension View {
                     .fill(.regularMaterial)
                     .overlay {
                         RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius + 4)
-                            .stroke(LinearGradient(
-                                colors: [Color.glassStroke, Color.clear],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ), lineWidth: 1)
+                            .stroke(Color.subtleBorder, lineWidth: 1)
                     }
             }
             .clipShape(RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius + 4))
@@ -369,32 +251,55 @@ extension View {
             .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
     }
 
-    /// Semantic financial card with meaningful colors and hierarchy
+    /// Clean professional financial card
     func financialCard(type: FinancialCardType) -> some View {
         self
             .scaleEffect(type.scale)
-            .background {
-                RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius)
-                    .fill(type.backgroundColor)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius)
-                            .stroke(type.borderColor, lineWidth: type == .hero ? 1.5 : 1)
-                    }
+            .padding(16)
+            .background(type.backgroundColor)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay {
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(type.borderColor, lineWidth: 1)
             }
-            .clipShape(RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius))
-            .shadow(color: type.shadowColor, radius: type == .hero ? 12 : 6, x: 0, y: type == .hero ? 6 : 3)
-            .shadow(color: type.shadowColor.opacity(0.5), radius: type == .hero ? 4 : 2, x: 0, y: 1)
+            .shadow(color: type.shadowColor, radius: 4, x: 0, y: 2)
     }
 
-    /// Improved hover interaction for financial cards
+    /// Sophisticated hover interaction with proper state tracking
     func withFinancialHover() -> some View {
-        self
+        modifier(FinancialHoverModifier())
+    }
+}
+
+struct FinancialHoverModifier: ViewModifier {
+    @State private var isHovered = false
+
+    func body(content: Content) -> some View {
+        content
             .onHover { hovering in
-                NSCursor.pointingHand.set()
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                    isHovered = hovering
+                }
+                if hovering {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pop()
+                }
             }
-            .scaleEffect(1.01)
-            .shadow(radius: 8)
-            .animation(.subtleHover, value: false)
+            .scaleEffect(isHovered ? 1.02 : 1.0)
+            .shadow(
+                color: .black.opacity(isHovered ? 0.15 : 0.08),
+                radius: isHovered ? 20 : 8,
+                x: 0,
+                y: isHovered ? 10 : 4
+            )
+            .overlay {
+                if isHovered {
+                    RoundedRectangle(cornerRadius: PremiumSpacing.cardCornerRadius)
+                        .stroke(Color.white.opacity(0.4), lineWidth: 1)
+                        .blendMode(.overlay)
+                }
+            }
     }
 }
 
@@ -408,19 +313,35 @@ struct PremiumPrimaryButtonStyle: ButtonStyle {
             .frame(height: PremiumSpacing.buttonHeight)
             .background {
                 LinearGradient(
-                    colors: [Color.florijnBlue, Color.florijnNavy],
+                    colors: [
+                        Color.florijnBlue.opacity(configuration.isPressed ? 0.9 : 1.0),
+                        Color.florijnNavy.opacity(configuration.isPressed ? 0.9 : 1.0)
+                    ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
+                .overlay {
+                    RoundedRectangle(cornerRadius: PremiumSpacing.buttonCornerRadius)
+                        .fill(.thinMaterial.opacity(0.3))
+                        .blendMode(.overlay)
+                }
             }
             .foregroundStyle(.white)
             .font(.bodyLarge)
             .fontWeight(.semibold)
             .clipShape(RoundedRectangle(cornerRadius: PremiumSpacing.buttonCornerRadius))
-            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
-            .opacity(configuration.isPressed ? 0.9 : 1.0)
-            .shadow(color: Color.florijnBlue.opacity(0.3), radius: configuration.isPressed ? 4 : 8, x: 0, y: configuration.isPressed ? 2 : 4)
-            .animation(.quickResponse, value: configuration.isPressed)
+            .overlay {
+                RoundedRectangle(cornerRadius: PremiumSpacing.buttonCornerRadius)
+                    .stroke(LinearGradient(
+                        colors: [Color.white.opacity(0.3), Color.clear, Color.black.opacity(0.2)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ), lineWidth: 1)
+            }
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+            .shadow(color: Color.florijnBlue.opacity(0.4), radius: configuration.isPressed ? 6 : 12, x: 0, y: configuration.isPressed ? 3 : 6)
+            .shadow(color: Color.florijnBlue.opacity(0.2), radius: configuration.isPressed ? 2 : 4, x: 0, y: configuration.isPressed ? 1 : 2)
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: configuration.isPressed)
     }
 }
 
@@ -446,7 +367,7 @@ struct PremiumSecondaryButtonStyle: ButtonStyle {
 // MARK: - Premium Typography Modifiers
 
 extension View {
-    func premiumHeading(_ color: Color = .florijnCharcoal) -> some View {
+    func premiumHeading(_ color: Color = .adaptivePrimary) -> some View {
         self
             .font(.headingPrimary)
             .foregroundStyle(color)
@@ -476,12 +397,12 @@ extension View {
     }
 
     /// Subtle labels that don't compete with financial data
+    /// 2026 WCAG 2.2 AA Compliant - 4.5:1 contrast minimum
     func financialLabel() -> some View {
         self
             .font(.caption2)
-            .fontWeight(.light)
-            .foregroundStyle(Color.florijnMediumGray)
-            .opacity(0.7)
+            .fontWeight(.medium)                     // Better readability than .light
+            .foregroundStyle(Color.adaptiveSecondary) // secondaryLabelColor (auto-adapts light/dark)
     }
 
     private func fontForAmount(_ amount: Decimal) -> Font {
@@ -558,7 +479,7 @@ struct PremiumKPICard: View {
     let title: String
     let value: Decimal?
     let percentage: Double?
-    let icon: GeometricFlowIcon.IconType
+    let icon: FinancialIcon.IconType
     let color: Color
     let trend: Double?
     let cardType: FinancialCardType
@@ -569,7 +490,7 @@ struct PremiumKPICard: View {
         title: String,
         value: Decimal? = nil,
         percentage: Double? = nil,
-        icon: GeometricFlowIcon.IconType,
+        icon: FinancialIcon.IconType,
         color: Color,
         trend: Double? = nil,
         cardType: FinancialCardType = .primary
@@ -587,7 +508,7 @@ struct PremiumKPICard: View {
         VStack(alignment: .leading, spacing: PremiumSpacing.medium) {
             // Header with icon and trend
             HStack {
-                GeometricFlowIcon(icon, size: PremiumSpacing.iconSize, color: color)
+                FinancialIcon(icon, size: PremiumSpacing.iconSize, color: color)
 
                 Spacer()
 
@@ -759,16 +680,68 @@ extension View {
     }
 
     func professionalSidebarItem(isSelected: Bool = false) -> some View {
-        self
-            .font(.body)
-            .fontWeight(isSelected ? .semibold : .medium)
-            .foregroundStyle(isSelected ? Color.florijnBlue : Color.florijnCharcoal)
+        modifier(ProfessionalSidebarItemModifier(isSelected: isSelected))
+    }
+}
+
+struct ProfessionalSidebarItemModifier: ViewModifier {
+    let isSelected: Bool
+    @State private var isHovered = false
+
+    func body(content: Content) -> some View {
+        content
+            .font(.bodyLarge)
+            .fontWeight(isSelected ? .bold : .medium)
+            .foregroundStyle(isSelected ? Color.florijnBlue : (isHovered ? Color.florijnCharcoal : Color.florijnDarkGray))
             .listRowBackground(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(isSelected ? Color.florijnBlue.opacity(0.08) : Color.clear)
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(
+                        LinearGradient(
+                            colors: backgroundColors,
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(borderColor, lineWidth: isSelected ? 1.5 : 0.5)
+                            .opacity(isSelected || isHovered ? 1.0 : 0.0)
+                    )
+                    .shadow(
+                        color: shadowColor,
+                        radius: isSelected ? 4 : (isHovered ? 2 : 0),
+                        x: 0,
+                        y: isSelected ? 2 : (isHovered ? 1 : 0)
+                    )
                     .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
             )
-            .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+            .listRowInsets(EdgeInsets(top: 3, leading: 16, bottom: 3, trailing: 16))
+            .onHover { hovering in
+                withAnimation(.spring(response: 0.25, dampingFraction: 0.8)) {
+                    isHovered = hovering
+                }
+            }
+            .scaleEffect(isSelected ? 1.0 : (isHovered ? 1.01 : 1.0))
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+    }
+
+    private var backgroundColors: [Color] {
+        if isSelected {
+            return [Color.florijnBlue.opacity(0.12), Color.florijnBlue.opacity(0.08)]
+        } else if isHovered {
+            return [Color.florijnLightGray.opacity(0.6), Color.florijnLightGray.opacity(0.3)]
+        } else {
+            return [Color.clear, Color.clear]
+        }
+    }
+
+    private var borderColor: Color {
+        isSelected ? Color.florijnBlue.opacity(0.3) : Color.florijnMediumGray.opacity(0.2)
+    }
+
+    private var shadowColor: Color {
+        isSelected ? Color.florijnBlue.opacity(0.2) : Color.black.opacity(0.1)
     }
 }
 
@@ -778,7 +751,7 @@ struct TrustEnhancedKPICard: View {
     let title: String
     let value: Decimal?
     let percentage: Double?
-    let icon: GeometricFlowIcon.IconType
+    let icon: FinancialIcon.IconType
     let color: Color
     let trend: Double?
     let cardType: FinancialCardType
@@ -790,7 +763,7 @@ struct TrustEnhancedKPICard: View {
         title: String,
         value: Decimal? = nil,
         percentage: Double? = nil,
-        icon: GeometricFlowIcon.IconType,
+        icon: FinancialIcon.IconType,
         color: Color,
         trend: Double? = nil,
         cardType: FinancialCardType = .primary,
@@ -810,7 +783,7 @@ struct TrustEnhancedKPICard: View {
         VStack(alignment: .leading, spacing: PremiumSpacing.medium) {
             // Enhanced header with trust indicators
             HStack {
-                GeometricFlowIcon(icon, size: PremiumSpacing.iconSize, color: color)
+                FinancialIcon(icon, size: PremiumSpacing.iconSize, color: color)
 
                 Spacer()
 
@@ -892,17 +865,7 @@ struct TrustEnhancedKPICard: View {
 extension View {
     func professionalWindowBackground() -> some View {
         self
-            .background {
-                // Subtle gradient background for depth
-                LinearGradient(
-                    colors: [
-                        Color.florijnOffWhite,
-                        Color.florijnLightGray.opacity(0.3)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            }
+            .background(Color.adaptiveBackground)
     }
 }
 

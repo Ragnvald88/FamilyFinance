@@ -346,7 +346,7 @@ struct ContentView: View {
         case .transfers:
             TransfersListView()
         case .categories:
-            CategoriesListView()
+            CategoryManagementView()
         case .budgets:
             BudgetsListView()
         case .accounts:

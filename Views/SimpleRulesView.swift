@@ -31,6 +31,7 @@ struct SimpleRulesView: View {
     @State private var showingCreateRule = false
     @State private var editingRule: Rule?
     @State private var showingManageGroups = false
+    @State private var showingTemplates = false
 
     private var filteredRules: [Rule] {
         var rules = allRules
@@ -109,6 +110,13 @@ struct SimpleRulesView: View {
                     Spacer()
 
                     Button {
+                        showingTemplates = true
+                    } label: {
+                        Label("Templates", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button {
                         showingCreateRule = true
                     } label: {
                         Label("Create Rule", systemImage: "plus")
@@ -157,6 +165,9 @@ struct SimpleRulesView: View {
         }
         .sheet(isPresented: $showingManageGroups) {
             GroupsManagerView(groups: groups)
+        }
+        .sheet(isPresented: $showingTemplates) {
+            RuleTemplatesView()
         }
     }
 

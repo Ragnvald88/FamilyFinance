@@ -32,6 +32,12 @@
 		A1000001232312340027 /* FinancialHealthIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340127 /* FinancialHealthIndicator.swift */; };
 		A1000001232312340028 /* CategoryManagementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340128 /* CategoryManagementViewModel.swift */; };
 		A1000001232312340055 /* CategoryManagementViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340155 /* CategoryManagementViewTests.swift */; };
+		A1000001232312340029 /* BudgetManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340129 /* BudgetManagementView.swift */; };
+		A1000001232312340030 /* BudgetManagementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340130 /* BudgetManagementViewModel.swift */; };
+		A1000001232312340056 /* BudgetManagementViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340156 /* BudgetManagementViewTests.swift */; };
+		A1000001232312340031 /* RuleTemplates.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340131 /* RuleTemplates.swift */; };
+		A1000001232312340032 /* RuleTemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340132 /* RuleTemplatesView.swift */; };
+		A1000001232312340057 /* RuleTemplatesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001232312340157 /* RuleTemplatesTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +76,12 @@
 		A1000001232312340127 /* FinancialHealthIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinancialHealthIndicator.swift; sourceTree = "<group>"; };
 		A1000001232312340128 /* CategoryManagementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryManagementViewModel.swift; sourceTree = "<group>"; };
 		A1000001232312340155 /* CategoryManagementViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryManagementViewTests.swift; sourceTree = "<group>"; };
+		A1000001232312340129 /* BudgetManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetManagementView.swift; sourceTree = "<group>"; };
+		A1000001232312340130 /* BudgetManagementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetManagementViewModel.swift; sourceTree = "<group>"; };
+		A1000001232312340156 /* BudgetManagementViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetManagementViewTests.swift; sourceTree = "<group>"; };
+		A1000001232312340131 /* RuleTemplates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleTemplates.swift; sourceTree = "<group>"; };
+		A1000001232312340132 /* RuleTemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleTemplatesView.swift; sourceTree = "<group>"; };
+		A1000001232312340157 /* RuleTemplatesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleTemplatesTests.swift; sourceTree = "<group>"; };
 		A1000001232312340401 /* Florijn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Florijn.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000001232312340402 /* FlorijnTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlorijnTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -112,6 +124,7 @@
 			children = (
 				A1000001232312340102 /* SwiftDataModels.swift */,
 				A1000001232312340115 /* RulesModels.swift */,
+				A1000001232312340131 /* RuleTemplates.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -126,6 +139,8 @@
 				A1000001232312340124 /* TransactionsView.swift */,
 				A1000001232312340125 /* AccountsView.swift */,
 				A1000001232312340126 /* CategoryManagementView.swift */,
+				A1000001232312340129 /* BudgetManagementView.swift */,
+				A1000001232312340132 /* RuleTemplatesView.swift */,
 				A1000001232312340608 /* Components */,
 			);
 			path = Views;
@@ -168,6 +183,8 @@
 				A1000001232312340153 /* TransactionDetailViewTests.swift */,
 				A1000001232312340154 /* RuleServiceTests.swift */,
 				A1000001232312340155 /* CategoryManagementViewTests.swift */,
+				A1000001232312340156 /* BudgetManagementViewTests.swift */,
+				A1000001232312340157 /* RuleTemplatesTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -176,6 +193,7 @@
 			isa = PBXGroup;
 			children = (
 				A1000001232312340128 /* CategoryManagementViewModel.swift */,
+				A1000001232312340130 /* BudgetManagementViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -317,6 +335,10 @@
 				A1000001232312340026 /* CategoryManagementView.swift in Sources */,
 				A1000001232312340027 /* FinancialHealthIndicator.swift in Sources */,
 				A1000001232312340028 /* CategoryManagementViewModel.swift in Sources */,
+				A1000001232312340029 /* BudgetManagementView.swift in Sources */,
+				A1000001232312340030 /* BudgetManagementViewModel.swift in Sources */,
+				A1000001232312340031 /* RuleTemplates.swift in Sources */,
+				A1000001232312340032 /* RuleTemplatesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -329,6 +351,8 @@
 				A1000001232312340053 /* TransactionDetailViewTests.swift in Sources */,
 				A1000001232312340054 /* RuleServiceTests.swift in Sources */,
 				A1000001232312340055 /* CategoryManagementViewTests.swift in Sources */,
+				A1000001232312340056 /* BudgetManagementViewTests.swift in Sources */,
+				A1000001232312340057 /* RuleTemplatesTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
